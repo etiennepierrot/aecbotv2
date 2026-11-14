@@ -103,3 +103,12 @@ describe("sources et commandes d'équipe", () => {
     expect(parseAjouter("Titre seul")).toBeUndefined();
   });
 });
+
+describe("suites", () => {
+  it("numérote les suites après les sources, et rappelle la question choisie", () => {
+    const msg = formatAnswer({ ...answer, suites: ["Comment la financer ?", "Et les <femmes> ?"] }, "Et le SMIC ?");
+    expect(msg.startsWith("🔎 <b>Et le SMIC ?</b>\n\nRetraite à 60 ans [1].")).toBe(true);
+    expect(msg).toContain("page 23\n\n<b>Pour aller plus loin</b>\n1. Comment la financer ?\n2. Et les &lt;femmes&gt; ?\n");
+    expect(msg.endsWith("<i>Initiative non officielle, non endossée par LFI.</i>")).toBe(true);
+  });
+});

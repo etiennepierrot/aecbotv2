@@ -28,7 +28,7 @@ export const MESSAGES = {
     [
       "Bonjour ! Je réponds à tes questions sur le programme <b>L'Avenir en commun</b>, ses livrets et ses plans.",
       "Je cherche dans les documents publiés et je cite chaque source avec sa page. Si je ne trouve pas, je te le dis plutôt que d'inventer.",
-      "Exemple : <i>Qu'est-ce que le programme dit sur la retraite ?</i>",
+      "Exemple : <i>Qu'est-ce que le programme dit sur la retraite ?</i>\nSous chaque réponse, je te propose des questions numérotées pour aller plus loin : touche un numéro ou envoie-le.",
       [
         "<b>Aide-nous à améliorer le bot</b>",
         "• <b>Sur une réponse</b> : touche 👍 ou 👎 juste en dessous. Après un 👎, je te demande ce qui n'allait pas : réponds à ce message pour l'expliquer (facultatif).",
@@ -51,6 +51,7 @@ export const MESSAGES = {
   demandeCommentaire: "Merci. Qu'est-ce qui n'allait pas ? Réponds à ce message si tu veux préciser (facultatif).",
   commentaireNote: "Merci, c'est noté. Ça nous aide à corriger le bot.",
   voteExpire: "Ce vote n'est plus disponible.",
+  suiteExpiree: "Cette suggestion n'est plus disponible : pose ta question directement.",
   demandeAvis:
     "Qu'est-ce que tu penses du bot ? Une idée, un manque, un problème : réponds à ce message, l'équipe le lira et pourra te répondre ici.",
   avisNote: "Merci, ton avis est transmis à l'équipe. Elle pourra te répondre ici.",
@@ -115,8 +116,18 @@ export function parseAjouter(arg: string): { title: string; url?: string; text?:
   return line && text ? { title: line, text } : undefined;
 }
 
-function voteKeyboard(traceId: string): InlineKeyboard {
-  return new InlineKeyboard().text("👍", `fb:up:${traceId}`).text("👎", `fb:down:${traceId}`);
+/** Sous une réponse : 👍/👎 (si le feedback est branché), puis un bouton par suite proposée. */
+function answerKeyboard(traceId: string, opts: { votes: boolean; suites: string[] }): InlineKeyboard | undefined {
+  const kb = new InlineKeyboard();
+  if (opts.votes) kb.text("👍", `fb:up:${traceId}`).text("👎", `fb:down:${traceId}`).row();
+  opts.suites.forEach((_q, i) => kb.text(String(i + 1), `sx:${i + 1}:${traceId}`));
+  return kb.inline_keyboard.flat().length ? kb : undefined;
+}
+
+/** « 2 », « 2. » ou « 2) » envoyé seul : le choix d'une suite proposée. */
+export function parseChoix(text: string): number | undefined {
+  const m = /^\s*([1-9])\s*[.)]?\s*$/.exec(text);
+  return m ? Number(m[1]) : undefined;
 }
 
 /**
@@ -302,6 +313,17 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
       }
     }
 
+    // « 2 » : la deuxième question proposée sous la dernière réponse.
+    const choix = parseChoix(question);
+    if (choix !== undefined) {
+      const suite = (await deps.store.lastSuites(pseudo))[choix - 1];
+      if (suite) return traiterQuestion(ctx, pseudo, suite, true);
+    }
+    await traiterQuestion(ctx, pseudo, question);
+  });
+
+  /** Une question → réponse vérifiée, avec ses boutons. `rappel` : la question n'a pas été tapée, on la rappelle. */
+  const traiterQuestion = async (ctx: Context, pseudo: string, question: string, rappel = false) => {
     if (question.length > MAX_QUESTION) return void (await ctx.reply(MESSAGES.tropLong));
 
     const hit = await deps.store.hit(pseudo, deps.ratePerHour);
@@ -312,12 +334,15 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
     try {
       const historique = await deps.store.history(pseudo);
       const { reponse, usage, traceId, spanId } = await deps.repondre(question, { historique });
-      await ctx.reply(formatAnswer(reponse), {
+      // Sans trace, pas de boutons : les suites restent accessibles en envoyant leur numéro.
+      const suites = reponse.statut === "repondu" ? (reponse.suites ?? []) : [];
+      const keyboard = traceId ? answerKeyboard(traceId, { votes: !!deps.feedback, suites }) : undefined;
+      await ctx.reply(formatAnswer({ ...reponse, suites }, rappel ? question : undefined), {
         parse_mode: "HTML",
         link_preview_options: { is_disabled: true },
-        ...(traceId && deps.feedback ? { reply_markup: voteKeyboard(traceId) } : {}),
+        ...(keyboard ? { reply_markup: keyboard } : {}),
       });
-      await deps.store.append(pseudo, question, answerForMemory(reponse), traceId, spanId);
+      await deps.store.append(pseudo, question, answerForMemory(reponse), traceId, spanId, suites);
       // Ni question, ni réponse, ni identifiant dans les journaux.
       log?.info("question traitée", {
         pseudo,
@@ -330,6 +355,17 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
       log?.error("échec de la réponse", { pseudo, erreur: e instanceof Error ? e.message : String(e) });
       await ctx.reply(MESSAGES.erreur).catch(() => {});
     }
+  };
+
+  // Bouton « 1 », « 2 », « 3 » sous une réponse : on pose la question proposée.
+  bot.callbackQuery(/^sx:([1-9]):([0-9a-f]{16,64})$/, async (ctx) => {
+    const pseudo = pseudoOf(ctx, deps);
+    const [, n, traceId] = ctx.match as RegExpMatchArray;
+    // Le bouton vient du client : la suite est relue en base, pour cette personne et cette réponse.
+    const suite = pseudo ? (await deps.store.suitesOf(pseudo, traceId!))[Number(n) - 1] : undefined;
+    if (!pseudo || !suite) return void (await ctx.answerCallbackQuery({ text: MESSAGES.suiteExpiree }));
+    await ctx.answerCallbackQuery();
+    await traiterQuestion(ctx, pseudo, suite, true);
   });
 
   bot.callbackQuery(/^fb:(up|down):([0-9a-f]{16,64})$/, async (ctx) => {
@@ -349,8 +385,10 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
     }
     log?.info("vote reçu", { pseudo, traceId, value });
     await ctx.answerCallbackQuery({ text: MESSAGES.merci });
-    // Un seul vote par réponse : les boutons disparaissent.
-    await ctx.editMessageReplyMarkup({ reply_markup: new InlineKeyboard() }).catch(() => {});
+    // Un seul vote par réponse : les boutons 👍/👎 disparaissent, ceux des suites restent.
+    const suites = await deps.store.suitesOf(pseudo, traceId!);
+    const keep = answerKeyboard(traceId!, { votes: false, suites }) ?? new InlineKeyboard();
+    await ctx.editMessageReplyMarkup({ reply_markup: keep }).catch(() => {});
     if (value === -1) {
       const prompt = await ctx.reply(MESSAGES.demandeCommentaire, {
         reply_markup: { force_reply: true, input_field_placeholder: "Ce qui n'allait pas…" },

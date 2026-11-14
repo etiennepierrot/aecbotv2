@@ -40,6 +40,8 @@ export class BotStore {
         -- Trace Mastra de la réponse : relie un vote à sa trace, et permet de l'effacer avec /oublier.
         ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS trace_id text;
         ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS span_id text;
+        -- Questions d'approfondissement proposées sous la réponse (boutons 1, 2, 3).
+        ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS suites jsonb;
         CREATE INDEX IF NOT EXISTS aec_conversations_trace ON aec_conversations (trace_id) WHERE trace_id IS NOT NULL;
         -- Après un 👎, la question « qu'est-ce qui n'allait pas ? » en attente de réponse.
         CREATE TABLE IF NOT EXISTS aec_feedback_prompts (
@@ -106,13 +108,37 @@ export class BotStore {
     return rows as HistoryMessage[];
   }
 
-  async append(pseudo: string, question: string, answer: string, traceId?: string, spanId?: string): Promise<void> {
+  async append(
+    pseudo: string, question: string, answer: string, traceId?: string, spanId?: string, suites: string[] = [],
+  ): Promise<void> {
     await this.init();
     await this.pool.query(
-      `INSERT INTO aec_conversations (pseudo, role, content, trace_id, span_id)
-       VALUES ($1, 'user', $2, NULL, NULL), ($1, 'assistant', $3, $4, $5)`,
-      [pseudo, question, answer, traceId ?? null, spanId ?? null],
+      `INSERT INTO aec_conversations (pseudo, role, content, trace_id, span_id, suites)
+       VALUES ($1, 'user', $2, NULL, NULL, NULL), ($1, 'assistant', $3, $4, $5, $6)`,
+      [pseudo, question, answer, traceId ?? null, spanId ?? null, suites.length ? JSON.stringify(suites) : null],
     );
+  }
+
+  /** Les suites proposées sous la réponse de cette trace, si elle a été donnée à cette personne. */
+  async suitesOf(pseudo: string, traceId: string): Promise<string[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT suites FROM aec_conversations WHERE pseudo = $1 AND trace_id = $2 AND suites IS NOT NULL LIMIT 1`,
+      [pseudo, traceId],
+    );
+    return (rows[0]?.suites as string[] | undefined) ?? [];
+  }
+
+  /** Les suites proposées sous la dernière réponse (moins de 24 h) : « 2 » envoyé au clavier. */
+  async lastSuites(pseudo: string): Promise<string[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT suites FROM aec_conversations
+        WHERE pseudo = $1 AND role = 'assistant' AND created_at > now() - interval '1 day'
+        ORDER BY id DESC LIMIT 1`,
+      [pseudo],
+    );
+    return (rows[0]?.suites as string[] | null | undefined) ?? [];
   }
 
   /**

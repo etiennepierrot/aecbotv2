@@ -37,6 +37,8 @@ export interface Answer {
   texte: string;
   sources: Source[];
   avertissements: string[];
+  /** Questions d'approfondissement proposées (3 au plus), sans références. */
+  suites?: string[];
   /** Ce que la vérification a corrigé : sert aux évals et aux traces. */
   controle: {
     passagesRecuperes: number;

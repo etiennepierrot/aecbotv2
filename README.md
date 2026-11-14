@@ -208,6 +208,19 @@ la réponse à ce message est enregistrée comme commentaire (elle ne compte pas
 Les boutons utilisent les `callback_query` de Telegram : après le déploiement, relancer
 `pnpm webhook:prod <URL>` une fois pour que le webhook les reçoive.
 
+### Suites numérotées (« Pour aller plus loin »)
+
+Après une réponse trouvée, l'agent ajoute un bloc `SUITES :` de 2 ou 3 questions de suite, tirées des
+passages reçus. `extractSuites()` (src/aec/verify.ts) les sépare du texte vérifié : seules de vraies
+questions courtes (« ? », 120 caractères au plus) sont gardées, sans références.
+
+- Affichées sous les sources, numérotées, avec un bouton par suite (`sx:<n>:<traceId>`) sous 👍/👎.
+- Toucher un bouton, ou envoyer « 2 » au clavier, pose la question proposée ; elle est rappelée en
+  tête de la réponse (🔎) et compte comme une question (limite horaire).
+- Les suites sont stockées avec la réponse (`aec_conversations.suites`) et relues en base : un bouton
+  forgé ne peut pas faire poser une autre question. Après un vote, les boutons des suites restent.
+- Coût : quelques dizaines de jetons de sortie par réponse.
+
 ### Avis généraux sur le bot (`/avis`) et réponses de l'équipe
 
 `/avis` (ou `/avis texte`) envoie un avis sur le bot en général, sans lien avec une réponse.

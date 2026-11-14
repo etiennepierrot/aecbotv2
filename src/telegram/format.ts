@@ -4,14 +4,29 @@ import type { Category, Corpus } from "../corpus/types.js";
 export const DISCLAIMER = "Initiative non officielle, non endossée par LFI.";
 const MAX_LENGTH = 4000; // Telegram coupe à 4096 caractères
 
-/** Réponse vérifiée → message Telegram (parse_mode HTML). */
-export function formatAnswer(answer: Answer): string {
-  const parts = [markdownToTelegramHtml(answer.texte)];
+/**
+ * Réponse vérifiée → message Telegram (parse_mode HTML).
+ * `question` : rappelée en tête quand elle n'apparaît pas dans la discussion (choix d'une suite).
+ */
+export function formatAnswer(answer: Answer, question?: string): string {
+  const head = question ? `🔎 <b>${escapeHtml(question)}</b>\n\n` : "";
+  const parts = [head + markdownToTelegramHtml(answer.texte)];
   if (answer.sources.length) parts.push(answer.sources.map(formatSource).join("\n"));
+  const suites = formatSuites(answer.suites);
+  if (suites) parts.push(suites);
   const notes = [...answer.avertissements, DISCLAIMER].map((n) => `<i>${escapeHtml(n)}</i>`).join("\n");
   parts.push(notes);
   const msg = parts.join("\n\n");
-  return msg.length <= MAX_LENGTH ? msg : truncate(answer, notes);
+  return msg.length <= MAX_LENGTH ? msg : truncate(answer, notes, head, suites);
+}
+
+function formatSuites(suites: string[] | undefined): string {
+  if (!suites?.length) return "";
+  return [
+    "<b>Pour aller plus loin</b>",
+    ...suites.map((q, i) => `${i + 1}. ${escapeHtml(q)}`),
+    "<i>Touche un numéro ci-dessous, ou envoie-le.</i>",
+  ].join("\n");
 }
 
 function formatSource(s: Source): string {
@@ -27,10 +42,11 @@ function formatSource(s: Source): string {
   return `[${s.n}] <a href="${escapeAttr(href)}">${escapeHtml(prettyTitle(s.title, s.category, s.corpus))}</a>${where}${old}`;
 }
 
-function truncate(answer: Answer, notes: string): string {
+function truncate(answer: Answer, notes: string, head = "", suites = ""): string {
   const sources = answer.sources.map(formatSource).join("\n");
-  const room = MAX_LENGTH - sources.length - notes.length - 10;
-  return [markdownToTelegramHtml(answer.texte.slice(0, Math.max(room, 200))) + "…", sources, notes].join("\n\n");
+  const room = MAX_LENGTH - head.length - sources.length - suites.length - notes.length - 12;
+  const body = head + markdownToTelegramHtml(answer.texte.slice(0, Math.max(room, 200))) + "…";
+  return [body, sources, suites, notes].filter(Boolean).join("\n\n");
 }
 
 /** Résumé gardé en mémoire pour les questions de suite : la réponse et ses sources. */

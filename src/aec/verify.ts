@@ -18,7 +18,7 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
     phrasesRetirees: 0,
     phrasesSansSource: 0,
   };
-  const text = raw.trim();
+  const { texte: text, suites } = extractSuites(raw);
   if (!text || /^\W*INTROUVABLE\b/i.test(text)) return introuvable(controle);
 
   const sources: Source[] = [];
@@ -96,7 +96,36 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
         "le programme 2027 n'est pas encore publié en entier.",
     );
   }
-  return { statut: "repondu", texte, sources, avertissements, controle };
+  return { statut: "repondu", texte, sources, avertissements, suites, controle };
+}
+
+const SUITES_HEADING = /^\s*(?:\*\*)?\s*(?:SUITES|Pour aller plus loin)\s*(?:\*\*)?\s*:?\s*(?:\*\*)?\s*$/im;
+export const MAX_SUITES = 3;
+const MAX_SUITE_LENGTH = 120;
+
+/**
+ * Sépare le bloc « SUITES : » (questions d'approfondissement) du corps de la réponse.
+ * Les questions ne sont pas vérifiées comme des affirmations : on retire leurs références
+ * et on ne garde que de vraies questions, courtes.
+ */
+export function extractSuites(raw: string): { texte: string; suites: string[] } {
+  const text = raw.trim();
+  const m = SUITES_HEADING.exec(text);
+  if (!m) return { texte: text, suites: [] };
+  const suites: string[] = [];
+  for (const line of text.slice(m.index + m[0].length).split("\n")) {
+    const item = /^\s*(?:\d+\s*[.)]|[-*•])\s*(.+)$/.exec(line)?.[1];
+    if (!item) continue;
+    const q = item
+      .replace(MARKER, "")
+      .replace(/\*\*|__|[*_`]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (q.length < 8 || q.length > MAX_SUITE_LENGTH || !q.endsWith("?")) continue;
+    if (!suites.some((s) => s.toLowerCase() === q.toLowerCase())) suites.push(q);
+    if (suites.length === MAX_SUITES) break;
+  }
+  return { texte: text.slice(0, m.index).trim(), suites };
 }
 
 function introuvable(controle: Answer["controle"]): Answer {

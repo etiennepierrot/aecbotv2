@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PassageCollector } from "../src/aec/collector.js";
 import { INTROUVABLE_TEXTE, type RetrievedPassage } from "../src/aec/types.js";
-import { splitSentences, verifyAnswer } from "../src/aec/verify.js";
+import { extractSuites, splitSentences, verifyAnswer } from "../src/aec/verify.js";
 
 const passage = (id: string, over: Partial<RetrievedPassage> = {}): RetrievedPassage => ({
   id, score: 0.9, docId: id.split("#")[0]!, title: "PROGRAMME SITE 2025",
@@ -110,5 +110,34 @@ describe("joinChunks", () => {
     const b = "porté à 1 600 euros net par mois pour tous. Revaloriser les APL de 10 %.";
     expect(joinChunks([a, b])).toBe("Augmenter les salaires. Le SMIC sera porté à 1 600 euros net par mois pour tous. Revaloriser les APL de 10 %.");
     expect(joinChunks(["Sans lien.", "Autre texte."])).toBe("Sans lien.\nAutre texte.");
+  });
+});
+
+describe("suites d'approfondissement", () => {
+  const c = () => collectorWith(passage("wp:media:15699#p33#0"));
+
+  it("sépare le bloc SUITES de la réponse, sans le compter comme phrases sans source", () => {
+    const a = verifyAnswer(
+      "Retraite à 60 ans [P1].\n\nSUITES :\n1. Comment serait-elle financée ? [P1]\n2. **Et les carrières longues ?**\n3. Et la pénibilité ?",
+      c(),
+    );
+    expect(a.texte).toBe("Retraite à 60 ans [1].");
+    expect(a.suites).toEqual(["Comment serait-elle financée ?", "Et les carrières longues ?", "Et la pénibilité ?"]);
+    expect(a.controle.phrasesSansSource).toBe(0);
+  });
+
+  it("accepte « Pour aller plus loin », ne garde que de vraies questions courtes, 3 au plus, sans doublon", () => {
+    const { suites } = extractSuites(
+      [
+        "Réponse.", "**Pour aller plus loin :**",
+        "- Quel calendrier ?", "- Quel calendrier ?", "- Une affirmation.", `- ${"x".repeat(130)} ?`,
+        "- Quel financement ?", "- Quelles exceptions ?", "- Une de trop ?",
+      ].join("\n"),
+    );
+    expect(suites).toEqual(["Quel calendrier ?", "Quel financement ?", "Quelles exceptions ?"]);
+  });
+
+  it("pas de suites sur une réponse introuvable", () => {
+    expect(verifyAnswer("INTROUVABLE\nSUITES :\n1. Et la retraite ?", c()).suites).toBeUndefined();
   });
 });

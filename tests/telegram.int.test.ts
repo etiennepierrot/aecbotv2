@@ -275,6 +275,74 @@ describe.skipIf(!DB)("bot Telegram", () => {
       expect(sent.at(-1)).toMatchObject({ method: "answerCallbackQuery", payload: { text: MESSAGES.voteExpire } });
     });
 
+    describe("suites numérotées", () => {
+      const SUITES = ["Comment serait-elle financée ?", "Et les carrières longues ?"];
+      const withSuites = async () => {
+        const bot = makeFbBot();
+        await bot.handleUpdate(message("/oublier") as never);
+        nextAnswer = async () => {
+          const r = answered("Retraite à 60 ans [1].");
+          return { ...r, reponse: { ...r.reponse, suites: SUITES } };
+        };
+        await bot.handleUpdate(message("Et la retraite ?") as never);
+        nextAnswer = async () => answered("Financement par les cotisations [1].");
+        return bot;
+      };
+
+      it("affiche les suites numérotées, avec un bouton par suite sous 👍/👎", async () => {
+        await withSuites();
+        const reply = sent.filter((x) => x.method === "sendMessage").at(-1)!.payload;
+        expect(reply.text).toContain("<b>Pour aller plus loin</b>\n1. Comment serait-elle financée ?\n2. Et les carrières longues ?");
+        expect(reply.reply_markup.inline_keyboard[1]).toEqual([
+          { text: "1", callback_data: `sx:1:${TRACE}` },
+          { text: "2", callback_data: `sx:2:${TRACE}` },
+        ]);
+      });
+
+      it("un bouton pose la question proposée et la rappelle en tête de réponse", async () => {
+        const bot = await withSuites();
+        sent.length = 0;
+        asked.length = 0;
+        await bot.handleUpdate(click(`sx:2:${TRACE}`) as never);
+        expect(sent[0]!.method).toBe("answerCallbackQuery");
+        expect(asked.map((a) => a.question)).toEqual(["Et les carrières longues ?"]);
+        const reply = sent.filter((x) => x.method === "sendMessage").at(-1)!.payload.text as string;
+        expect(reply.startsWith("🔎 <b>Et les carrières longues ?</b>\n\nFinancement")).toBe(true);
+      });
+
+      it("« 1 » envoyé au clavier choisit la première suite ; sans suites, « 1 » reste une question", async () => {
+        const bot = await withSuites();
+        asked.length = 0;
+        await bot.handleUpdate(message("1") as never);
+        expect(asked.map((a) => a.question)).toEqual(["Comment serait-elle financée ?"]);
+        await bot.handleUpdate(message("1") as never); // la dernière réponse n'a pas proposé de suites
+        expect(asked.at(-1)!.question).toBe("1");
+      });
+
+      it("après un vote, seuls les boutons des suites restent", async () => {
+        const bot = await withSuites();
+        sent.length = 0;
+        await bot.handleUpdate(click(`fb:up:${TRACE}`) as never);
+        const edit = sent.find((x) => x.method === "editMessageReplyMarkup")!.payload;
+        expect(edit.reply_markup.inline_keyboard).toEqual([[
+          { text: "1", callback_data: `sx:1:${TRACE}` },
+          { text: "2", callback_data: `sx:2:${TRACE}` },
+        ]]);
+      });
+
+      it("refuse une suite qui n'a pas été proposée à cette personne", async () => {
+        const bot = await withSuites();
+        sent.length = 0;
+        asked.length = 0;
+        await bot.handleUpdate(click("sx:3:" + TRACE) as never);
+        await bot.handleUpdate(click("sx:1:ffffffffffffffffffffffffffffffff") as never);
+        expect(asked).toEqual([]);
+        expect(sent.filter((x) => x.method === "answerCallbackQuery").map((x) => x.payload.text)).toEqual([
+          MESSAGES.suiteExpiree, MESSAGES.suiteExpiree,
+        ]);
+      });
+    });
+
     it("/oublier efface aussi les traces (et donc les votes)", async () => {
       const bot = makeFbBot();
       await bot.handleUpdate(message("Et la retraite ?") as never);
