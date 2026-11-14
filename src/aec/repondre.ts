@@ -2,6 +2,7 @@ import { RequestContext } from "@mastra/core/request-context";
 import { aecAgent } from "../mastra/agents/aec.js";
 import { COLLECTOR_KEY, PassageCollector } from "./collector.js";
 import type { Answer, ReferencedPassage } from "./types.js";
+import { filtrerSuites } from "./suites.js";
 import { verifyAnswer } from "./verify.js";
 
 export interface RepondreOptions {
@@ -51,8 +52,16 @@ export async function repondre(question: string, opts: RepondreOptions = {}): Pr
     throw new Error(`Recherche impossible : ${collector.errors[0]}`);
   }
 
+  const reponse = verifyAnswer(result.text, collector);
+  // On ne propose que des suites que le corpus sait servir.
+  if (reponse.suites?.length) {
+    const { gardees, retirees } = await filtrerSuites(reponse.suites);
+    reponse.suites = gardees;
+    reponse.controle.suitesRetirees = retirees;
+  }
+
   return {
-    reponse: verifyAnswer(result.text, collector),
+    reponse,
     brut: result.text,
     passages: collector.all(),
     usage: {

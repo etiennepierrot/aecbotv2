@@ -30,6 +30,11 @@ const Env = z.object({
     .string()
     .default("")
     .transform((s) => new Set(s.split(",").map((x) => x.trim()).filter(Boolean).map(Number).filter(Number.isFinite))),
+  /**
+   * Similarité minimale (cosinus) entre une suite proposée et son meilleur passage pour l'afficher.
+   * À calibrer avec `pnpm suites:calibrer` sur le corpus réel.
+   */
+  SUITES_MIN_SCORE: z.coerce.number().min(0).max(1).default(0.8),
   /** Protège les routes /api/* (Studio, agents, workflows) une fois déployé. */
   ADMIN_API_TOKEN: z.string().optional(),
 });

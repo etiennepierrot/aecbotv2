@@ -31,7 +31,7 @@ beforeAll(async () => {
     vector: {
       query: (async (args: { queryVector: unknown; filter: unknown }) => {
         queries.push({ query: args.queryVector, filter: args.filter });
-        const corpus = (args.filter as { corpus: { $eq: string } }).corpus.$eq;
+        const corpus = (args.filter as { corpus: { $eq?: string } }).corpus.$eq;
         return corpus === "aec2027" ? PASSAGES.retraite!.map((p) => ({ id: p.id, score: p.score, metadata: { ...p } })) : [];
       }) as never,
     },
@@ -63,6 +63,19 @@ describe("repondre", () => {
     expect(model.calls[1]!.toolChoice).not.toEqual({ type: "required" });
     // Par défaut : une requête par édition de EDITIONS (2027 puis 2022), chacune avec son quota.
     expect(queries.slice(-2).map((q) => q.filter)).toEqual([{ corpus: { $eq: "aec2027" } }, { corpus: { $eq: "aec2022" } }]);
+  });
+
+  it("ne garde que les suites que le corpus sait servir", async () => {
+    const model = fakeModel((_prompt, call) =>
+      call === 1
+        ? { tool: "recherche", input: { requete: "retraite" } }
+        : { text: "Retraite à 60 ans [P1].\nSUITES :\n1. Comment serait-elle financée ?\n2. Et le football ?" },
+    );
+    // La recherche simulée ne trouve rien pour un filtre multi-éditions : score 0, suites écartées.
+    const res = await repondre("Et la retraite ?", { model });
+    expect(res.reponse.texte).toBe("Retraite à 60 ans [1].");
+    expect(res.reponse.suites).toEqual([]);
+    expect(res.reponse.controle.suitesRetirees).toBe(2);
   });
 
   it("une panne de la recherche remonte comme une erreur, pas comme « introuvable »", async () => {

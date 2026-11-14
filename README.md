@@ -219,7 +219,14 @@ questions courtes (« ? », 120 caractères au plus) sont gardées, sans référ
   tête de la réponse (🔎) et compte comme une question (limite horaire).
 - Les suites sont stockées avec la réponse (`aec_conversations.suites`) et relues en base : un bouton
   forgé ne peut pas faire poser une autre question. Après un vote, les boutons des suites restent.
-- Coût : quelques dizaines de jetons de sortie par réponse.
+- **Seulement des suites qu'on sait servir** : chaque suite est cherchée dans l'index avant d'être
+  affichée (un seul appel d'embeddings pour toutes, `src/aec/suites.ts`). Elle n'est gardée que si
+  son meilleur passage atteint `SUITES_MIN_SCORE` (0,8 par défaut). En cas de panne : aucune suite.
+- **Calibrer le seuil** : `pnpm suites:calibrer:prod` score les questions d'évals (répondues /
+  introuvables) et propose un seuil qui sépare les deux groupes ; `pnpm suites:calibrer:prod "question"`
+  teste une question. En production, le journal « question traitée » donne `origine: "suite"`,
+  `suitesProposees` et `suitesRetirees` : une suite choisie qui finit introuvable = seuil trop bas.
+- Coût : quelques dizaines de jetons de sortie et un appel d'embeddings par réponse.
 
 ### Avis généraux sur le bot (`/avis`) et réponses de l'équipe
 

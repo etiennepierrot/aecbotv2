@@ -46,6 +46,8 @@ export interface Answer {
     citationsRejetees: number;
     phrasesRetirees: number;
     phrasesSansSource: number;
+    /** Suites proposées par le modèle mais écartées : le corpus ne permettrait pas d'y répondre. */
+    suitesRetirees?: number;
   };
 }
 

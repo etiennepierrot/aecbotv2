@@ -29,7 +29,9 @@
     "docs": "tsx --env-file-if-exists=.env scripts/docs.ts",
     "docs:prod": "tsx --env-file=.env.production scripts/docs.ts",
     "avis": "tsx --env-file-if-exists=.env scripts/avis.ts",
-    "avis:prod": "tsx --env-file=.env.production scripts/avis.ts"
+    "avis:prod": "tsx --env-file=.env.production scripts/avis.ts",
+    "suites:calibrer": "tsx --env-file-if-exists=.env scripts/suites-calibrer.ts",
+    "suites:calibrer:prod": "tsx --env-file=.env.production scripts/suites-calibrer.ts"
   },
   "dependencies": {
     "@mastra/core": "1.80.0",

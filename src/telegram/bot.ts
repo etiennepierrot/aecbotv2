@@ -347,6 +347,9 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
       log?.info("question traitée", {
         pseudo,
         statut: reponse.statut,
+        // Une suite choisie qui finit « introuvable » : le seuil SUITES_MIN_SCORE est trop bas.
+        origine: rappel ? "suite" : "question",
+        suitesProposees: suites.length,
         ...reponse.controle,
         ...usage,
         ms: Date.now() - started,
