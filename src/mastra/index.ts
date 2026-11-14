@@ -3,6 +3,7 @@ import { PinoLogger } from "@mastra/loggers";
 import { MastraStorageExporter, Observability, SamplingStrategyType } from "@mastra/observability";
 import { PostgresStoreVNext } from "@mastra/pg";
 import { COLLECTOR_KEY } from "../aec/collector.js";
+import { cloudExporter } from "./cloud-exporter.js";
 import { registerApiRoute, SimpleAuth } from "@mastra/core/server";
 import { config, PASSAGES_INDEX } from "../config.js";
 import { pgVector } from "../corpus/deps.js";
@@ -81,7 +82,8 @@ export const mastra = new Mastra({
     configs: {
       default: {
         serviceName: "aecbot",
-        exporters: [new MastraStorageExporter()],
+        // Neon (Studio, /oublier, purge) et, si un token est fourni, Mastra Cloud.
+        exporters: [new MastraStorageExporter(), cloudExporter],
         sampling: { type: SamplingStrategyType.CUSTOM, sampler: (o) => o?.requestContext?.get(COLLECTOR_KEY as never) !== undefined },
         logging: { enabled: false },
       },

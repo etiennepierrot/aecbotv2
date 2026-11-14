@@ -6,6 +6,7 @@ import { pgVector } from "../corpus/deps.js";
 import type { Mastra } from "@mastra/core";
 import { createBot } from "./bot.js";
 import { mastraFeedbackSink } from "./feedback.js";
+import { cloudExporter } from "../mastra/cloud-exporter.js";
 import { ajouterDocument, listerDocuments, MAX_PDF_BYTES, supprimerDocument } from "../corpus/manual.js";
 import { BotStore } from "./store.js";
 
@@ -30,7 +31,7 @@ export function botFromEnv(logger?: Parameters<typeof createBot>[1]["logger"], m
     pseudonymSecret: cfg.PSEUDONYM_SECRET,
     ratePerHour: cfg.RATE_LIMIT_PER_HOUR,
     memoryDays: cfg.MEMORY_DAYS,
-    feedback: mastra ? mastraFeedbackSink(mastra) : undefined,
+    feedback: mastra ? mastraFeedbackSink(mastra, cloudExporter) : undefined,
     team: cfg.TEAM_TELEGRAM_IDS,
     admin: mastra
       ? {

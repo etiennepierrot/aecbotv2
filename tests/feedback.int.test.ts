@@ -12,6 +12,7 @@ describe.skipIf(!DB)("feedback Mastra (Postgres réel)", () => {
   let repondre: typeof import("../src/aec/repondre.js").repondre;
   let sink: import("../src/telegram/feedback.js").FeedbackSink;
   let obs: any;
+  const copied: import("@mastra/core/observability").FeedbackEvent[] = [];
 
   const flush = async () => {
     await (mastra.observability as unknown as { flush?: () => Promise<void> }).flush?.();
@@ -39,7 +40,7 @@ describe.skipIf(!DB)("feedback Mastra (Postgres réel)", () => {
     ({ mastra } = await import("../src/mastra/index.js"));
     ({ repondre } = await import("../src/aec/repondre.js"));
     const { mastraFeedbackSink } = await import("../src/telegram/feedback.js");
-    sink = mastraFeedbackSink(mastra);
+    sink = mastraFeedbackSink(mastra, { onFeedbackEvent: async (e) => void copied.push(e) });
     obs = await mastra.getStorage()!.getStore("observability");
   });
 
@@ -65,6 +66,11 @@ describe.skipIf(!DB)("feedback Mastra (Postgres réel)", () => {
     expect(feedback.map((f: any) => [f.feedbackType, f.value, f.feedbackUserId, f.spanId]).sort()).toEqual([
       ["comment", "Il manque la version 2022", "u_test", res.spanId],
       ["thumbs", -1, "u_test", res.spanId],
+    ]);
+    // La même chose part vers Mastra Cloud, rattachée à la trace et à l'agent.
+    expect(copied.map((e) => [e.feedback.feedbackType, e.feedback.value, e.feedback.traceId, e.feedback.correlationContext?.entityId])).toEqual([
+      ["thumbs", -1, res.traceId, "aec"],
+      ["comment", "Il manque la version 2022", res.traceId, "aec"],
     ]);
 
     await flush();

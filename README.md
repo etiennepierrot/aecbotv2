@@ -201,7 +201,11 @@ la réponse à ce message est enregistrée comme commentaire (elle ne compte pas
   l'observabilité gère le feedback. Elles suivent la même règle que la mémoire : `MEMORY_DAYS` jours
   (purge nocturne via `storage.prune()`), effacées par `/oublier`.
 - Un vote n'est accepté que si la réponse a bien été donnée à cette personne.
-- **Lire les avis** : Studio → Observability → Traces, onglet Feedback de chaque trace, ou l'API
+- **Copie vers Mastra Cloud** : avec `MASTRA_PLATFORM_ACCESS_TOKEN` et `MASTRA_PROJECT_ID` dans les
+  variables de production, traces, votes et commentaires partent aussi vers le tableau de bord
+  Mastra Cloud (Observability), en plus de Neon. Cette copie suit la conservation de Mastra Cloud :
+  ni la purge nocturne ni `/oublier` ne l'effacent. Sans token, rien ne part.
+- **Lire les avis** : Mastra Cloud → Observability, ou Studio → Observability → Traces, onglet Feedback de chaque trace, ou l'API
   `GET /api/observability/feedback?feedbackType=thumbs` (avec `ADMIN_API_TOKEN`). Les bons cas
   de 👎 vont dans `evals/questions.json`.
 
@@ -301,7 +305,9 @@ et sans attendre les tests.
    Puis, dans le tableau de bord Mastra → Environments → production → Variables, renseigner :
    `DATABASE_URL`, `OPENROUTER_API_KEY` (ou `MISTRAL_API_KEY`), `TELEGRAM_BOT_TOKEN`,
    `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` (une nouvelle clé, propre à la production),
-   `ADMIN_API_TOKEN`, `INGEST_CRON=0 3 * * *`, `PURGE_CRON=30 3 * * *`, `EDITIONS`.
+   `ADMIN_API_TOKEN`, `INGEST_CRON=0 3 * * *`, `PURGE_CRON=30 3 * * *`, `EDITIONS`,
+   `TEAM_TELEGRAM_IDS`. Pour voir traces et votes dans Mastra Cloud : `MASTRA_PLATFORM_ACCESS_TOKEN`
+   (`pnpm exec mastra auth tokens create observability`) et `MASTRA_PROJECT_ID` (dans `.mastra-project.json`).
    Activer l'option **Persistent Server** : sans elle le serveur peut s'endormir, et les scans
    et purges planifiés ne sont pas garantis.
 4. **Secrets GitHub** : Settings → Environments → créer `production`, puis y ajouter
