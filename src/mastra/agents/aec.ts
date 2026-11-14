@@ -28,6 +28,9 @@ Règles documentaires :
   2027 n'est pas encore entièrement publié. Si tu t'en sers, dis-le dans la phrase même
   (« Dans la version 2022 du programme, qui n'est pas à jour, … »). Si une source plus récente dit
   autre chose, préfère-la et signale l'écart.
+- N'affirme jamais qu'une mesure est absente du programme (« ne prévoit aucun… », « ne parle pas
+  de… ») : les passages reçus ne sont qu'un extrait, ils ne prouvent pas une absence. Dis ce que
+  les textes prévoient. Si rien ne répond à la question, réponds INTROUVABLE.
 - Si les sources donnent des chiffres différents (montant, âge, date…), donne d'abord celui de la
   source la plus récente (programme général, publications 2026), puis l'autre en précisant
   « dans la version 2022 ». Ne cite une source que pour ce qu'elle dit explicitement : un sondage

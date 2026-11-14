@@ -36,7 +36,7 @@ export const rechercheTool = createTool({
       .default("toutes")
       .describe("« toutes » par défaut ; une édition précise seulement si la question en nomme une"),
   }),
-  outputSchema: z.object({ passages: z.array(passageOut) }),
+  outputSchema: z.object({ passages: z.array(passageOut), erreur: z.string().optional() }),
   execute: async ({ requete, edition }, context) => {
     // Le collecteur est fourni par repondre() ; dans Studio on en crée un jetable.
     const collector =
@@ -45,9 +45,11 @@ export const rechercheTool = createTool({
     try {
       found = await searchPassages({ requete, edition });
     } catch (e) {
-      // Noté pour repondre() : sans ça, le modèle répondrait « introuvable » et la panne passerait inaperçue.
-      collector.errors.push(e instanceof Error ? e.message : String(e));
-      throw e;
+      // Noté pour repondre(), qui en fera une erreur : sans ça, la panne passerait pour « introuvable ».
+      // On ne relance pas l'exception : le modèle réessaierait jusqu'à maxSteps pour rien.
+      const message = e instanceof Error ? e.message : String(e);
+      collector.errors.push(message);
+      return { passages: [], erreur: message };
     }
     const referenced = collector.add(found);
     return {
@@ -64,7 +66,12 @@ export const rechercheTool = createTool({
     };
   },
   // Ce que voit le modèle : passages compacts, sans URL ni score.
-  toModelOutput: ({ passages }) => ({ type: "text", value: formatForModel(passages) }),
+  toModelOutput: ({ passages, erreur }) => ({
+    type: "text",
+    value: erreur
+      ? "ERREUR : la recherche est indisponible. Ne réessaie pas ; réponds uniquement INTROUVABLE."
+      : formatForModel(passages),
+  }),
 });
 
 export function formatForModel(

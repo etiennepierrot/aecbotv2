@@ -2,7 +2,7 @@ import { Mastra } from "@mastra/core";
 import { PinoLogger } from "@mastra/loggers";
 import { PostgresStore } from "@mastra/pg";
 import { registerApiRoute, SimpleAuth } from "@mastra/core/server";
-import { config } from "../config.js";
+import { config, PASSAGES_INDEX } from "../config.js";
 import { pgVector } from "../corpus/deps.js";
 import { botFromEnv, telegramWebhookHandler } from "../telegram/runtime.js";
 import { aecAgent } from "./agents/aec.js";
@@ -17,11 +17,19 @@ const logger = new PinoLogger({ name: "aecbot", level: "info" });
 const statusRoute = registerApiRoute("/status", {
   method: "GET",
   handler: async (c) => {
+    const version = process.env.AEC_VERSION ?? "dev";
     try {
-      await pgVector().pool.query("SELECT 1");
-      return c.json({ status: "ok", version: process.env.AEC_VERSION ?? "dev" });
+      const { rows } = await pgVector().pool.query(
+        `SELECT to_regclass('${PASSAGES_INDEX}') IS NOT NULL AS index_present`,
+      );
+      if (!rows[0].index_present) {
+        // Base joignable mais sans index : mauvaise base, ou aucun scan encore fait sur celle-ci.
+        return c.json({ status: "index absent", version }, 503);
+      }
+      const n = await pgVector().pool.query(`SELECT count(*)::int AS n FROM ${PASSAGES_INDEX}`);
+      return c.json({ status: "ok", version, passages: n.rows[0].n });
     } catch {
-      return c.json({ status: "base injoignable" }, 503);
+      return c.json({ status: "base injoignable", version }, 503);
     }
   },
 });
