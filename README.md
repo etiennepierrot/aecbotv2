@@ -8,7 +8,7 @@ Sont faites les **étapes 1 à 3 de la feuille de route** : scan + index, agent 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Workflow `ingest` branché sur le WordPress, pgvector rempli | ✅ |
-| 2 | Agent `aec`, outil de recherche filtré, réponse vérifiée, scorers, 20 questions types | ✅ |
+| 2 | Agent `aec`, outil de recherche filtré, réponse vérifiée, scorers, 21 questions types | ✅ |
 | 3 | Bot Telegram (webhook, limite, mise en forme, mémoire 30 jours, /oublier) | ✅ |
 | 4 | `/ajouter`, `/docs`, `/supprimer` pour l'équipe | entrée `manuel` du workflow prête |
 
@@ -23,7 +23,7 @@ pnpm db:up                    # Postgres 17 + pgvector
 pnpm ingest --limit 3         # essai sur 3 documents
 pnpm ingest                   # scan complet
 pnpm ask "Que dit le programme sur la retraite ?"
-pnpm evals                    # les 20 questions types, grille de décision
+pnpm evals                    # les 21 questions types, grille de décision
 pnpm bot                      # le bot en local (long polling), avec TELEGRAM_BOT_TOKEN
 pnpm dev                      # Mastra Studio sur http://localhost:4111
 ```
@@ -120,9 +120,9 @@ question ─▶ agent aec ──▶ outil recherche (pgvector, édition 2027 par
 
 ## Évals : la grille de décision
 
-`evals/questions.json` : 15 questions dont la réponse est dans le corpus (sources et pages
-attendues relevées dans le corpus actuel), 1 sur l'édition 2022 (non indexée), 3 hors corpus
-et 1 tentative de détournement.
+`evals/questions.json` : 17 questions dont la réponse est dans le corpus (sources et pages
+attendues relevées dans le corpus actuel), dont 1 sur l'édition 2022 et 1 à laquelle les textes
+ne répondent qu'en partie (démission et Constituante), 3 hors corpus et 1 tentative de détournement.
 
 ```bash
 pnpm evals --model mistral/mistral-small-latest --model openai/gpt-5-mini
@@ -160,6 +160,25 @@ Telegram ─▶ POST /telegram (secret vérifié) ─▶ grammY ─▶ limite/he
   avertissement « programme provisoire » si besoin, mention « initiative non officielle » sur
   chaque réponse, aperçus de liens désactivés.
 
+### Avis des militants (👍/👎)
+
+Sous chaque réponse, deux boutons. Après un 👎, le bot demande « Qu'est-ce qui n'allait pas ? » ;
+la réponse à ce message est enregistrée comme commentaire (elle ne compte pas comme une question).
+
+- Chaque réponse est **tracée** par l'observabilité Mastra (question, recherches, passages reçus,
+  réponse), et le vote s'attache à cette trace : `feedbackType` `thumbs` (1 / -1) ou `comment`,
+  `feedbackUserId` = pseudonyme. Seules les réponses passant par `repondre()` sont tracées.
+- Les traces sont stockées dans la base Neon (UE) : `PostgresStoreVNext`, la variante dont
+  l'observabilité gère le feedback. Elles suivent la même règle que la mémoire : `MEMORY_DAYS` jours
+  (purge nocturne via `storage.prune()`), effacées par `/oublier`.
+- Un vote n'est accepté que si la réponse a bien été donnée à cette personne.
+- **Lire les avis** : Studio → Observability → Traces, onglet Feedback de chaque trace, ou l'API
+  `GET /api/observability/feedback?feedbackType=thumbs` (avec `ADMIN_API_TOKEN`). Les bons cas
+  de 👎 vont dans `evals/questions.json`.
+
+Les boutons utilisent les `callback_query` de Telegram : après le déploiement, relancer
+`pnpm webhook:prod <URL>` une fois pour que le webhook les reçoive.
+
 ### Brancher le bot en production
 
 1. Renseigner `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` et
@@ -193,7 +212,7 @@ la base de `.env`.
    `mastra deploy --env production --region eu --workers in-process --yes`, puis attend que
    `GET /status` renvoie le commit déployé (si la variable `PROD_URL` est définie).
 
-`.github/workflows/evals.yml` se lance à la main (onglet Actions) : les 20 questions types
+`.github/workflows/evals.yml` se lance à la main (onglet Actions) : les 21 questions types
 contre l'index de production, résultat dans le résumé du job et en artefact.
 
 Les secrets de l'application restent côté Mastra ; GitHub ne connaît que de quoi déployer.

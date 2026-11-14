@@ -3,7 +3,9 @@ import { repondre } from "../aec/repondre.js";
 import { assertModelKey, config } from "../config.js";
 import { DEFAULT_MODEL } from "../mastra/agents/aec.js";
 import { pgVector } from "../corpus/deps.js";
+import type { Mastra } from "@mastra/core";
 import { createBot } from "./bot.js";
+import { mastraFeedbackSink } from "./feedback.js";
 import { BotStore } from "./store.js";
 
 let store: BotStore | undefined;
@@ -13,7 +15,7 @@ export function botStore(): BotStore {
 }
 
 /** Le bot construit depuis l'environnement (webhook en production, polling en local). */
-export function botFromEnv(logger?: Parameters<typeof createBot>[1]["logger"]): Bot {
+export function botFromEnv(logger?: Parameters<typeof createBot>[1]["logger"], mastra?: Mastra): Bot {
   const cfg = config();
   if (!cfg.TELEGRAM_BOT_TOKEN) throw new Error("TELEGRAM_BOT_TOKEN manquant");
   assertModelKey(DEFAULT_MODEL);
@@ -26,6 +28,7 @@ export function botFromEnv(logger?: Parameters<typeof createBot>[1]["logger"]): 
     pseudonymSecret: cfg.PSEUDONYM_SECRET,
     ratePerHour: cfg.RATE_LIMIT_PER_HOUR,
     memoryDays: cfg.MEMORY_DAYS,
+    feedback: mastra ? mastraFeedbackSink(mastra) : undefined,
     logger,
   });
 }

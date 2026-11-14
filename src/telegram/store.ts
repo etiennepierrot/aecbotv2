@@ -37,6 +37,17 @@ export class BotStore {
           created_at timestamptz NOT NULL DEFAULT now()
         );
         CREATE INDEX IF NOT EXISTS aec_conversations_pseudo ON aec_conversations (pseudo, created_at DESC);
+        -- Trace Mastra de la réponse : relie un vote à sa trace, et permet de l'effacer avec /oublier.
+        ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS trace_id text;
+        CREATE INDEX IF NOT EXISTS aec_conversations_trace ON aec_conversations (trace_id) WHERE trace_id IS NOT NULL;
+        -- Après un 👎, la question « qu'est-ce qui n'allait pas ? » en attente de réponse.
+        CREATE TABLE IF NOT EXISTS aec_feedback_prompts (
+          pseudo            text NOT NULL,
+          prompt_message_id bigint NOT NULL,
+          trace_id          text NOT NULL,
+          created_at        timestamptz NOT NULL DEFAULT now(),
+          PRIMARY KEY (pseudo, prompt_message_id)
+        );
       `)
       .then(() => undefined);
     return this.ready;
@@ -70,12 +81,53 @@ export class BotStore {
     return rows as HistoryMessage[];
   }
 
-  async append(pseudo: string, question: string, answer: string): Promise<void> {
+  async append(pseudo: string, question: string, answer: string, traceId?: string): Promise<void> {
     await this.init();
     await this.pool.query(
-      `INSERT INTO aec_conversations (pseudo, role, content) VALUES ($1, 'user', $2), ($1, 'assistant', $3)`,
-      [pseudo, question, answer],
+      `INSERT INTO aec_conversations (pseudo, role, content, trace_id)
+       VALUES ($1, 'user', $2, NULL), ($1, 'assistant', $3, $4)`,
+      [pseudo, question, answer, traceId ?? null],
     );
+  }
+
+  /** La réponse de cette trace a-t-elle bien été donnée à cette personne ? (le bouton vient du client) */
+  async ownsTrace(pseudo: string, traceId: string): Promise<boolean> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT 1 FROM aec_conversations WHERE pseudo = $1 AND trace_id = $2 LIMIT 1`,
+      [pseudo, traceId],
+    );
+    return rows.length > 0;
+  }
+
+  async traceIds(pseudo: string): Promise<string[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT DISTINCT trace_id FROM aec_conversations WHERE pseudo = $1 AND trace_id IS NOT NULL`,
+      [pseudo],
+    );
+    return rows.map((r) => r.trace_id as string);
+  }
+
+  async addFeedbackPrompt(pseudo: string, promptMessageId: number, traceId: string): Promise<void> {
+    await this.init();
+    await this.pool.query(
+      `INSERT INTO aec_feedback_prompts (pseudo, prompt_message_id, trace_id) VALUES ($1, $2, $3)
+       ON CONFLICT DO NOTHING`,
+      [pseudo, promptMessageId, traceId],
+    );
+  }
+
+  /** Consomme la demande de commentaire à laquelle ce message répond, s'il y en a une. */
+  async takeFeedbackPrompt(pseudo: string, promptMessageId: number): Promise<string | undefined> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `DELETE FROM aec_feedback_prompts WHERE pseudo = $1 AND prompt_message_id = $2
+         AND created_at > now() - interval '1 day'
+       RETURNING trace_id`,
+      [pseudo, promptMessageId],
+    );
+    return rows[0]?.trace_id;
   }
 
   /** Droit à l'effacement : /oublier. */
@@ -83,6 +135,7 @@ export class BotStore {
     await this.init();
     const a = await this.pool.query(`DELETE FROM aec_conversations WHERE pseudo = $1`, [pseudo]);
     await this.pool.query(`DELETE FROM aec_rate_limit WHERE pseudo = $1`, [pseudo]);
+    await this.pool.query(`DELETE FROM aec_feedback_prompts WHERE pseudo = $1`, [pseudo]);
     return a.rowCount ?? 0;
   }
 
@@ -94,6 +147,7 @@ export class BotStore {
       [days],
     );
     const c = await this.pool.query(`DELETE FROM aec_rate_limit WHERE window_start < now() - interval '2 hours'`);
+    await this.pool.query(`DELETE FROM aec_feedback_prompts WHERE created_at < now() - interval '1 day'`);
     return { messages: m.rowCount ?? 0, compteurs: c.rowCount ?? 0 };
   }
 }

@@ -75,6 +75,25 @@
     ]
   },
   {
+    "id": "constituante-demission",
+    "question": "Mélenchon va-t-il démissionner s'il convoque la Constituante pour la 6e République ?",
+    "attendu": "repondu",
+    "note": "Le programme ne parle pas de démission : l'agent doit le dire sans l'affirmer comme une absence, puis décrire le processus constituant (référendum art. 11, Constituante, référendum après deux ans).",
+    "sources": [
+      {
+        "document": "PROGRAMME SITE 2025",
+        "pages": [
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "document": "6e-REP"
+      }
+    ]
+  },
+  {
     "id": "nucleaire",
     "question": "Quelle est la position sur le nucléaire ?",
     "attendu": "repondu",

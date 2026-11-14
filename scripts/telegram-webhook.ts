@@ -19,7 +19,7 @@ if (!values.info) {
   const url = `${base.replace(/\/$/, "")}/telegram`;
   await api.setWebhook(url, {
     secret_token: cfg.TELEGRAM_WEBHOOK_SECRET,
-    allowed_updates: ["message"],
+    allowed_updates: ["message", "callback_query"], // callback_query : boutons 👍/👎
     drop_pending_updates: true,
   });
   await api.setMyCommands([

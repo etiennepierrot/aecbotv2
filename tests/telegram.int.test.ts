@@ -159,7 +159,8 @@ describe.skipIf(!DB)("bot Telegram", () => {
 
   it("/start présente le bot, la conservation des données et la limite", async () => {
     await makeBot(20).handleUpdate(message("/start") as never);
-    expect(replies()[0]).toContain("gardées 30 jours, sous un pseudonyme");
+    expect(replies()[0]).toContain("sont gardés 30 jours, sous un pseudonyme");
+    expect(replies()[0]).toContain("👍 ou 👎");
     expect(replies()[0]).toContain("Limite : 20 questions par heure");
   });
 
@@ -178,6 +179,106 @@ describe.skipIf(!DB)("bot Telegram", () => {
     });
     expect(ok.status).toBe(200);
     expect(asked).toHaveLength(1);
+  });
+
+  describe("feedback 👍/👎", () => {
+    const votes: { kind: string; traceId: string; pseudo: string; value?: number; comment?: string }[] = [];
+    const forgotten: string[][] = [];
+    const feedback = {
+      vote: async (a: { traceId: string; pseudo: string; value: 1 | -1 }) => void votes.push({ kind: "vote", ...a }),
+      comment: async (a: { traceId: string; pseudo: string; comment: string }) => void votes.push({ kind: "comment", ...a }),
+      forgetTraces: async (ids: string[]) => void forgotten.push(ids),
+    };
+    const TRACE = "0123456789abcdef0123456789abcdef";
+    const makeFbBot = () => {
+      const bot = createBot("123:TEST", {
+        repondre: async (question, opts) => {
+          asked.push({ question, historique: opts?.historique });
+          return { ...(await nextAnswer()), traceId: TRACE };
+        },
+        store, pseudonymSecret: SECRET, ratePerHour: 100, memoryDays: 30, feedback,
+      }, botInfo);
+      bot.api.config.use(async (_prev, method, payload) => {
+        sent.push({ method, payload });
+        return { ok: true, result: method === "answerCallbackQuery" || method === "editMessageReplyMarkup"
+          ? true : { message_id: 500 + sent.length, date: 0, chat: { id: USER_ID, type: "private" } } } as never;
+      });
+      return bot;
+    };
+    const click = (data: string) => ({
+      update_id: updateId++,
+      callback_query: {
+        id: `cb${updateId}`, chat_instance: "x", data,
+        from: { id: USER_ID, is_bot: false, first_name: "Militante" },
+        message: { message_id: 42, date: 0, chat: { id: USER_ID, type: "private" }, text: "réponse" },
+      },
+    });
+    const pseudo = () => pseudonymize(USER_ID, SECRET);
+
+    beforeEach(() => {
+      votes.length = 0;
+      forgotten.length = 0;
+    });
+
+    it("chaque réponse porte les boutons 👍/👎 liés à sa trace", async () => {
+      await makeFbBot().handleUpdate(message("Et la retraite ?") as never);
+      const reply = sent.find((x) => x.method === "sendMessage")!.payload;
+      expect(reply.reply_markup.inline_keyboard[0]).toEqual([
+        { text: "👍", callback_data: `fb:up:${TRACE}` },
+        { text: "👎", callback_data: `fb:down:${TRACE}` },
+      ]);
+      expect(await store.ownsTrace(pseudo(), TRACE)).toBe(true);
+    });
+
+    it("👍 : vote enregistré sous pseudonyme, boutons retirés", async () => {
+      const bot = makeFbBot();
+      await bot.handleUpdate(message("Et la retraite ?") as never);
+      sent.length = 0;
+      await bot.handleUpdate(click(`fb:up:${TRACE}`) as never);
+      expect(votes).toEqual([{ kind: "vote", traceId: TRACE, pseudo: pseudo(), value: 1 }]);
+      expect(sent.map((x) => x.method)).toEqual(["answerCallbackQuery", "editMessageReplyMarkup"]);
+      expect(sent[0]!.payload.text).toBe(MESSAGES.merci);
+    });
+
+    it("👎 puis commentaire en réponse : enregistré comme commentaire, sans compter comme question", async () => {
+      const bot = makeFbBot();
+      await bot.handleUpdate(message("Et le SMIC ?") as never);
+      sent.length = 0;
+      asked.length = 0;
+      await bot.handleUpdate(click(`fb:down:${TRACE}`) as never);
+      const prompt = sent.find((x) => x.method === "sendMessage")!;
+      expect(prompt.payload).toMatchObject({ text: MESSAGES.demandeCommentaire, reply_markup: { force_reply: true } });
+      const promptId = 500 + sent.indexOf(prompt) + 1;
+
+      const reply = message("Le chiffre de 1 400 € est celui de 2022");
+      (reply.message as Record<string, unknown>).reply_to_message = {
+        message_id: promptId, date: 0, chat: { id: USER_ID, type: "private" }, text: MESSAGES.demandeCommentaire,
+      };
+      await bot.handleUpdate(reply as never);
+      expect(votes).toEqual([
+        { kind: "vote", traceId: TRACE, pseudo: pseudo(), value: -1 },
+        { kind: "comment", traceId: TRACE, pseudo: pseudo(), comment: "Le chiffre de 1 400 € est celui de 2022" },
+      ]);
+      expect(asked).toHaveLength(0);
+      expect(sent.at(-1)!.payload.text).toBe(MESSAGES.commentaireNote);
+      // La demande est consommée : une seconde réponse au même message redevient une question.
+      await bot.handleUpdate({ ...reply, update_id: updateId++ } as never);
+      expect(asked).toHaveLength(1);
+    });
+
+    it("refuse un vote sur une trace qui n'a pas été donnée à cette personne", async () => {
+      await makeFbBot().handleUpdate(click("fb:up:ffffffffffffffffffffffffffffffff") as never);
+      expect(votes).toEqual([]);
+      expect(sent.at(-1)).toMatchObject({ method: "answerCallbackQuery", payload: { text: MESSAGES.voteExpire } });
+    });
+
+    it("/oublier efface aussi les traces (et donc les votes)", async () => {
+      const bot = makeFbBot();
+      await bot.handleUpdate(message("Et la retraite ?") as never);
+      await bot.handleUpdate(message("/oublier") as never);
+      expect(forgotten).toEqual([[TRACE]]);
+      expect(await store.ownsTrace(pseudo(), TRACE)).toBe(false);
+    });
   });
 
   it("purge : efface les conversations trop anciennes", async () => {
