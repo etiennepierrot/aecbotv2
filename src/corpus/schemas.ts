@@ -11,6 +11,7 @@ export const sourceItemSchema = z.object({
   inlineContent: z.string().optional(),
   telegramFileId: z.string().optional(),
   addedBy: z.string().optional(),
+  inlinePages: z.array(z.object({ page: z.number(), text: z.string() })).optional(),
   forced: z.object({ category: z.enum(CATEGORIES), corpus: z.enum(["aec2027", "aec2022"]) }).optional(),
 });
 

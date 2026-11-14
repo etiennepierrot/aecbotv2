@@ -61,7 +61,35 @@ export class CorpusStore {
         indexed_at       timestamptz NOT NULL DEFAULT now()
       );
       CREATE INDEX IF NOT EXISTS aec_documents_hash ON aec_documents (content_hash) WHERE included;
+      -- Journal des ajouts et suppressions faits par l'équipe (qui, quoi, quand).
+      CREATE TABLE IF NOT EXISTS aec_admin_log (
+        id       bigserial PRIMARY KEY,
+        at       timestamptz NOT NULL DEFAULT now(),
+        who      text NOT NULL,
+        action   text NOT NULL,
+        doc_id   text,
+        title    text,
+        detail   text
+      );
     `);
+  }
+
+  /** Documents ajoutés à la main, du plus récent au plus ancien. */
+  async listManualDocuments(): Promise<
+    { id: string; title: string; url: string; included: boolean; reason: string; passages: number; addedBy: string | null; indexedAt: string }[]
+  > {
+    const { rows } = await this.pool.query(
+      `SELECT id, title, url, included, reason, passages, added_by AS "addedBy", indexed_at AS "indexedAt"
+         FROM aec_documents WHERE origin = 'manuel' ORDER BY indexed_at DESC`,
+    );
+    return rows.map((r) => ({ ...r, indexedAt: new Date(r.indexedAt).toISOString() }));
+  }
+
+  async logAdmin(entry: { who: string; action: string; docId?: string; title?: string; detail?: string }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO aec_admin_log (who, action, doc_id, title, detail) VALUES ($1, $2, $3, $4, $5)`,
+      [entry.who, entry.action, entry.docId ?? null, entry.title ?? null, entry.detail ?? null],
+    );
   }
 
   async listDocuments(origin?: string): Promise<DocumentRow[]> {

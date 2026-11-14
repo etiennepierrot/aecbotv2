@@ -7,7 +7,7 @@ import { Pool } from "pg";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { RepondreResult } from "../src/aec/repondre.js";
 import { INTROUVABLE_TEXTE } from "../src/aec/types.js";
-import { createBot, MESSAGES } from "../src/telegram/bot.js";
+import { ADMIN_MESSAGES, createBot, MESSAGES } from "../src/telegram/bot.js";
 import { pseudonymize } from "../src/telegram/privacy.js";
 import { telegramWebhookHandler } from "../src/telegram/runtime.js";
 import { BotStore } from "../src/telegram/store.js";
@@ -280,6 +280,102 @@ describe.skipIf(!DB)("bot Telegram", () => {
       await bot.handleUpdate(message("/oublier") as never);
       expect(forgotten).toEqual([[TRACE]]);
       expect(await store.ownsTrace(pseudo(), TRACE)).toBe(false);
+    });
+  });
+
+  describe("gestion du corpus par l'équipe", () => {
+    const TEAM_ID = 777;
+    const calls: { op: string; args: any }[] = [];
+    const admin = {
+      ajouter: async (a: any) => {
+        calls.push({ op: "ajouter", args: { ...a, pdf: a.pdf ? Array.from(a.pdf) : undefined } });
+        return { id: "manual:3f2a9c1b-0000", title: a.title, status: "indexé" as const, category: "ajout_manuel" as const, passages: 12, detail: "" };
+      },
+      lister: async () => [
+        { id: "manual:3f2a9c1b-0000", title: "Note <interne>", included: true, reason: "", passages: 12, addedBy: "Camille (u_x)", indexedAt: "2026-11-14T10:00:00Z" },
+        { id: "manual:aa11bb22-0000", title: "Scan", included: false, reason: "Extraction non exploitable", passages: 0, addedBy: "Camille (u_x)", indexedAt: "2026-11-14T11:00:00Z" },
+      ],
+      supprimer: async (id: string, who: string) => {
+        calls.push({ op: "supprimer", args: { id, who } });
+        return { id: "manual:3f2a9c1b-0000", title: "Note <interne>" };
+      },
+      telecharger: async (fileId: string) => {
+        calls.push({ op: "telecharger", args: fileId });
+        return new Uint8Array([1, 2, 3]);
+      },
+    };
+    const makeAdminBot = () => {
+      const bot = createBot("123:TEST", {
+        repondre: async () => nextAnswer(), store, pseudonymSecret: SECRET, ratePerHour: 100, memoryDays: 30,
+        team: new Set([TEAM_ID]), admin,
+      }, botInfo);
+      bot.api.config.use(async (_prev, method, payload) => {
+        sent.push({ method, payload });
+        return { ok: true, result: { message_id: 900 + sent.length, date: 0, chat: { id: TEAM_ID, type: "private" } } } as never;
+      });
+      return bot;
+    };
+    const from = (id: number, text: string, extra: Record<string, unknown> = {}) => {
+      const m = message(text) as any;
+      m.message.from = { id, is_bot: false, first_name: "Camille" };
+      m.message.chat = { id, type: "private", first_name: "Camille" };
+      Object.assign(m.message, extra);
+      return m;
+    };
+    beforeEach(() => void (calls.length = 0));
+
+    it("refuse les commandes d'équipe à un militant", async () => {
+      const bot = makeAdminBot();
+      for (const cmd of ["/ajouter https://x.fr/a.pdf Titre", "/docs", "/supprimer 3f2a9c1b"]) {
+        await bot.handleUpdate(from(USER_ID, cmd) as never);
+        expect(replies().at(-1)).toBe(ADMIN_MESSAGES.reserve);
+      }
+      expect(calls).toEqual([]);
+    });
+
+    it("/ajouter : un lien, un texte, et l'aide si la commande est incomplète", async () => {
+      const bot = makeAdminBot();
+      await bot.handleUpdate(from(TEAM_ID, "/ajouter https://exemple.fr/tribune.pdf Tribune sur les retraites") as never);
+      await bot.handleUpdate(from(TEAM_ID, "/ajouter Mémo transports\nLa gratuité des transports est proposée.\nDeuxième ligne.") as never);
+      expect(calls.map((c) => c.args)).toEqual([
+        { title: "Tribune sur les retraites", url: "https://exemple.fr/tribune.pdf", addedBy: expect.stringMatching(/^Camille \(u_/), pdf: undefined },
+        { title: "Mémo transports", text: "La gratuité des transports est proposée.\nDeuxième ligne.", addedBy: expect.any(String), pdf: undefined },
+      ]);
+      expect(replies().at(-1)).toBe("Ajouté : « Mémo transports », 12 passages (identifiant <code>3f2a9c1b</code>).");
+      await bot.handleUpdate(from(TEAM_ID, "/ajouter Titre sans contenu") as never);
+      expect(replies().at(-1)).toBe(ADMIN_MESSAGES.aide);
+    });
+
+    it("/ajouter : un PDF envoyé avec la légende", async () => {
+      const bot = makeAdminBot();
+      const doc = from(TEAM_ID, "", {
+        document: { file_id: "FILE1", file_unique_id: "U1", file_name: "note.pdf", mime_type: "application/pdf" },
+        caption: "/ajouter Note interne",
+        caption_entities: [{ type: "bot_command", offset: 0, length: 8 }],
+      });
+      delete doc.message.text;
+      delete doc.message.entities;
+      await bot.handleUpdate(doc as never);
+      expect(calls).toEqual([
+        { op: "telecharger", args: "FILE1" },
+        { op: "ajouter", args: { title: "Note interne", pdf: [1, 2, 3], addedBy: expect.any(String), telegramFileId: "FILE1" } },
+      ]);
+      const notPdf = from(TEAM_ID, "", { document: { file_id: "F2", file_unique_id: "U2", mime_type: "image/png" }, caption: "/ajouter Image" });
+      delete notPdf.message.text;
+      delete notPdf.message.entities;
+      await bot.handleUpdate(notPdf as never);
+      expect(replies().at(-1)).toBe(ADMIN_MESSAGES.pasPdf);
+    });
+
+    it("/docs liste les documents, /supprimer en retire un", async () => {
+      const bot = makeAdminBot();
+      await bot.handleUpdate(from(TEAM_ID, "/docs") as never);
+      const list = replies().at(-1)!;
+      expect(list).toContain("<code>3f2a9c1b</code> Note &lt;interne&gt; — 12 passages, 14/11/2026, Camille");
+      expect(list).toContain("<code>aa11bb22</code> Scan — écarté : Extraction non exploitable");
+      await bot.handleUpdate(from(TEAM_ID, "/supprimer 3f2a9c1b") as never);
+      expect(calls.at(-1)).toEqual({ op: "supprimer", args: { id: "3f2a9c1b", who: expect.stringMatching(/^Camille/) } });
+      expect(replies().at(-1)).toBe("Retiré du corpus : « Note &lt;interne&gt; ».");
     });
   });
 

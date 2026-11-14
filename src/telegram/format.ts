@@ -16,6 +16,11 @@ export function formatAnswer(answer: Answer): string {
 
 function formatSource(s: Source): string {
   const first = s.pages[0];
+  if (!s.url) {
+    // Document ajouté par l'équipe sans lien public (PDF envoyé au bot, texte).
+    const where = s.pages.length ? `, page${s.pages.length > 1 ? "s" : ""} ${s.pages.join(", ")}` : "";
+    return `[${s.n}] ${escapeHtml(prettyTitle(s.title, s.category, s.corpus))}${where} (document de l'équipe)`;
+  }
   const href = first ? `${s.url}#page=${first}` : s.url;
   const where = s.pages.length === 0 ? "" : s.pages.length === 1 ? `, page ${first}` : `, pages ${s.pages.join(", ")}`;
   const old = s.corpus === "aec2022" ? " (version 2022, pas à jour)" : "";

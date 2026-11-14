@@ -37,6 +37,8 @@ export interface SourceItem {
   /** Ajouts manuels Telegram : file_id pour renvoyer le PDF. */
   telegramFileId?: string;
   addedBy?: string;
+  /** PDF déjà extrait par l'appelant (ajout manuel), page par page. */
+  inlinePages?: { page: number; text: string }[];
   /** Classement imposé (sources ajoutées hors WordPress, comme l'édition 2022). */
   forced?: { category: Category; corpus: Corpus };
 }

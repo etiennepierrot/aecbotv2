@@ -215,6 +215,39 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     deps.setRetrievalDeps({ embedder, vector: deps.pgVector() });
   });
 
+  it("ajout manuel d'un PDF (sans WordPress), liste, puis suppression", async () => {
+    const { ajouterDocument, listerDocuments, shortId, supprimerDocument } = await import("../src/corpus/manual.js");
+    const pdf = makePdf([filler("la note interne"), ["Page deux : le SMIC a 1600 euros net.", ...filler("les salaires")]]);
+    const r = await ajouterDocument(mastra, { title: "Note interne salaires", pdf, addedBy: "Camille (u_abc)" });
+    expect(r).toMatchObject({ status: "indexé", category: "ajout_manuel" });
+    const { rows } = await pool.query(
+      `SELECT metadata FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' = $1 AND metadata->>'text' LIKE '%1600 euros%'`,
+      [r.id],
+    );
+    expect(rows[0]?.metadata).toMatchObject({ page: 2, url: "", category: "ajout_manuel", corpus: "aec2027" });
+
+    const docs = await listerDocuments();
+    expect(docs[0]).toMatchObject({ id: r.id, title: "Note interne salaires", included: true, addedBy: "Camille (u_abc)" });
+
+    // Un document du WordPress ne peut pas être supprimé ainsi (le scan le remettrait).
+    await expect(supprimerDocument("15699", "Camille")).rejects.toThrow(/Aucun document ajouté à la main/);
+    await expect(supprimerDocument(shortId(r.id), "Camille (u_abc)")).resolves.toMatchObject({ title: "Note interne salaires" });
+    const left = await pool.query(`SELECT count(*)::int n FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' = $1`, [r.id]);
+    expect(left.rows[0].n).toBe(0);
+    const log = await pool.query(`SELECT who, action, title FROM aec_admin_log WHERE doc_id = $1 ORDER BY id`, [r.id]);
+    expect(log.rows).toEqual([
+      { who: "Camille (u_abc)", action: "ajouter", title: "Note interne salaires" },
+      { who: "Camille (u_abc)", action: "supprimer", title: "Note interne salaires" },
+    ]);
+  });
+
+  it("ajout manuel : un PDF scanné (sans texte) est refusé avec la raison", async () => {
+    const { ajouterDocument } = await import("../src/corpus/manual.js");
+    const r = await ajouterDocument(mastra, { title: "Scan illisible", pdf: makePdf([["."], ["."]]), addedBy: "Camille" });
+    expect(r).toMatchObject({ status: "écarté", detail: "Extraction non exploitable" });
+    await expect(ajouterDocument(mastra, { title: "x", text: "y", addedBy: "Camille" })).rejects.toThrow(/titre/);
+  });
+
   it("ajout manuel d'un texte par l'équipe", async () => {
     const run = await mastra.getWorkflow("ingest").createRun();
     const res = await run.start({
@@ -228,7 +261,7 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     expect(res.status).toBe("success");
     if (res.status !== "success") return;
     expect(res.result.documents[0]).toMatchObject({ status: "indexé", category: "ajout_manuel" });
-    const manual = (await store.listDocuments("manuel"))[0];
+    const manual = (await store.listDocuments("manuel")).find((d) => d.title.startsWith("Note de campagne"));
     expect(manual).toMatchObject({ title: "Note de campagne sur les transports", included: true });
   });
 });

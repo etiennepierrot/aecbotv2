@@ -67,3 +67,39 @@ describe("pseudonymize", () => {
     expect(a).toMatch(/^u_[0-9a-f]{24}$/);
   });
 });
+
+describe("markdownToTelegramHtml", () => {
+  it("traduit le gras, l'italique, les listes et les titres, après échappement", async () => {
+    const { markdownToTelegramHtml } = await import("../src/telegram/format.js");
+    expect(markdownToTelegramHtml("Le programme prévoit **aucun soutien militaire** direct [1].")).toBe(
+      "Le programme prévoit <b>aucun soutien militaire</b> direct [1].",
+    );
+    expect(markdownToTelegramHtml("- sortie de l'OTAN\n* renforcer l'ONU")).toBe("• sortie de l'OTAN\n• renforcer l'ONU");
+    expect(markdownToTelegramHtml("### Paix\nune *paix durable* <b>")).toBe("<b>Paix</b>\nune <i>paix durable</i> &lt;b&gt;");
+    expect(markdownToTelegramHtml("gras **non refermé")).toBe("gras non refermé");
+    expect(markdownToTelegramHtml("5 * 3 = 15 et 2*x")).toBe("5 * 3 = 15 et 2*x");
+  });
+});
+
+describe("sources et commandes d'équipe", () => {
+  it("affiche toutes les pages citées d'un document", () => {
+    const multi = { ...answer, sources: [{ ...answer.sources[1]!, n: 1, pages: [3, 21, 23] }] };
+    expect(formatAnswer(multi)).toContain('#page=3">Livret « emploi »</a>, pages 3, 21, 23');
+  });
+
+  it("affiche un document de l'équipe sans lien public", () => {
+    const team = {
+      ...answer,
+      sources: [{ n: 1, title: "Note interne", url: "", pages: [2], category: "ajout_manuel" as const, corpus: "aec2027" as const, provisional: false }],
+    };
+    expect(formatAnswer(team)).toContain("[1] Note interne, page 2 (document de l'équipe)");
+  });
+
+  it("lit les commandes /ajouter", async () => {
+    const { parseAjouter } = await import("../src/telegram/bot.js");
+    expect(parseAjouter("https://x.fr/a.pdf Mon titre")).toEqual({ title: "Mon titre", url: "https://x.fr/a.pdf" });
+    expect(parseAjouter("Titre\nTexte\nsuite")).toEqual({ title: "Titre", text: "Texte\nsuite" });
+    expect(parseAjouter("https://x.fr/a.pdf")).toBeUndefined();
+    expect(parseAjouter("Titre seul")).toBeUndefined();
+  });
+});

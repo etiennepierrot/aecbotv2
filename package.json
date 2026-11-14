@@ -24,7 +24,10 @@
     "corpus": "tsx --env-file-if-exists=.env scripts/corpus.ts",
     "ingest:prod": "tsx --env-file=.env.production scripts/ingest.ts",
     "corpus:prod": "tsx --env-file=.env.production scripts/corpus.ts",
-    "ask:prod": "tsx --env-file=.env.production scripts/ask.ts"
+    "ask:prod": "tsx --env-file=.env.production scripts/ask.ts",
+    "feedback:prod": "tsx --env-file=.env.production scripts/feedback.ts",
+    "docs": "tsx --env-file-if-exists=.env scripts/docs.ts",
+    "docs:prod": "tsx --env-file=.env.production scripts/docs.ts"
   },
   "dependencies": {
     "@mastra/core": "1.80.0",

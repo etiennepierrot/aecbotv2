@@ -3,6 +3,7 @@ import type { UserFromGetMe } from "grammy/types";
 import type { repondre as repondreFn } from "../aec/repondre.js";
 import { answerForMemory, DISCLAIMER, escapeHtml, formatAnswer } from "./format.js";
 import { pseudonymize } from "./privacy.js";
+import type { DocumentResult } from "../corpus/schemas.js";
 import type { FeedbackSink } from "./feedback.js";
 import type { BotStore } from "./store.js";
 
@@ -14,6 +15,9 @@ export interface BotDeps {
   memoryDays: number;
   /** Absent : pas de boutons 👍/👎. */
   feedback?: FeedbackSink;
+  /** Identifiants Telegram de l'équipe : seuls eux peuvent /ajouter, /docs, /supprimer. */
+  team?: Set<number>;
+  admin?: AdminOps;
   logger?: { info: (msg: string, meta?: object) => void; error: (msg: string, meta?: object) => void };
 }
 
@@ -47,6 +51,55 @@ export const MESSAGES = {
 
 const MAX_COMMENT = 1000;
 
+/** Opérations de gestion du corpus (src/corpus/manual.ts en production). */
+export interface AdminOps {
+  ajouter(a: { title: string; url?: string; text?: string; pdf?: Uint8Array; addedBy: string; telegramFileId?: string }): Promise<DocumentResult>;
+  lister(): Promise<{ id: string; title: string; included: boolean; reason: string; passages: number; addedBy: string | null; indexedAt: string }[]>;
+  supprimer(id: string, who: string): Promise<{ id: string; title: string }>;
+  /** Télécharge un fichier envoyé au bot. */
+  telecharger(fileId: string): Promise<Uint8Array>;
+}
+
+export const ADMIN_MESSAGES = {
+  reserve: "Cette commande est réservée à l'équipe.",
+  aide: [
+    "<b>Ajouter un document au corpus</b>",
+    "• un PDF : envoie le fichier avec la légende <code>/ajouter Titre du document</code>",
+    "• un lien (PDF ou page web) : <code>/ajouter https://… Titre du document</code>",
+    "• un texte : <code>/ajouter Titre du document</code>, puis le texte sur les lignes suivantes, dans le même message",
+    "",
+    "/docs liste les documents ajoutés ; <code>/supprimer identifiant</code> en retire un.",
+    "Le document est utilisable tout de suite, sans relecture : vérifie-le avant de l'ajouter.",
+  ].join("\n"),
+  enCours: "Ajout en cours…",
+  pasPdf: "Je n'accepte que les fichiers PDF.",
+};
+
+function shortDocId(id: string): string {
+  return id.replace(/^manual:/, "").slice(0, 8);
+}
+
+function describeResult(title: string, r: DocumentResult): string {
+  if (r.status === "indexé") {
+    return `Ajouté : « ${escapeHtml(title)} », ${r.passages} passages (identifiant <code>${shortDocId(r.id)}</code>).`;
+  }
+  if (r.status === "écarté") return `Non ajouté : ${escapeHtml(r.detail || "document écarté")}.`;
+  return `Échec de l'ajout : ${escapeHtml(r.detail || "erreur inconnue")}.`;
+}
+
+/** « /ajouter https://… Titre » ou « /ajouter Titre » + texte sur les lignes suivantes. */
+export function parseAjouter(arg: string): { title: string; url?: string; text?: string } | undefined {
+  const [first = "", ...rest] = arg.split("\n");
+  const line = first.trim();
+  const url = /^https?:\/\/\S+/.exec(line)?.[0];
+  if (url) {
+    const title = line.slice(url.length).trim();
+    return title ? { title, url } : undefined;
+  }
+  const text = rest.join("\n").trim();
+  return line && text ? { title: line, text } : undefined;
+}
+
 function voteKeyboard(traceId: string): InlineKeyboard {
   return new InlineKeyboard().text("👍", `fb:up:${traceId}`).text("👎", `fb:down:${traceId}`);
 }
@@ -65,6 +118,73 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
   bot.command(["start", "aide"], (ctx) =>
     ctx.reply(MESSAGES.bienvenue(deps.memoryDays, deps.ratePerHour), { parse_mode: "HTML" }),
   );
+
+  // --- Gestion du corpus par l'équipe ------------------------------------------------
+  const teamMember = (ctx: Context) => !!ctx.from && !!deps.team?.has(ctx.from.id) && !!deps.admin;
+  const who = (ctx: Context) => `${ctx.from?.first_name ?? "?"} (${pseudoOf(ctx, deps) ?? "?"})`;
+  const adminError = async (ctx: Context, e: unknown) => {
+    log?.error("échec d'une commande d'équipe", { erreur: e instanceof Error ? e.message : String(e) });
+    await ctx.reply(`Échec : ${escapeHtml(e instanceof Error ? e.message : String(e))}`, { parse_mode: "HTML" });
+  };
+
+  bot.command("ajouter", async (ctx) => {
+    if (!teamMember(ctx)) return void (await ctx.reply(ADMIN_MESSAGES.reserve));
+    const parsed = parseAjouter(String(ctx.match ?? ""));
+    if (!parsed) return void (await ctx.reply(ADMIN_MESSAGES.aide, { parse_mode: "HTML" }));
+    await ctx.reply(ADMIN_MESSAGES.enCours);
+    try {
+      const r = await deps.admin!.ajouter({ ...parsed, addedBy: who(ctx) });
+      await ctx.reply(describeResult(parsed.title, r), { parse_mode: "HTML" });
+    } catch (e) {
+      await adminError(ctx, e);
+    }
+  });
+
+  // Un PDF envoyé avec la légende « /ajouter Titre ».
+  bot.on("message:document", async (ctx, next) => {
+    const caption = ctx.message.caption?.trim() ?? "";
+    if (!/^\/ajouter(@\w+)?\b/i.test(caption)) return next();
+    if (!teamMember(ctx)) return void (await ctx.reply(ADMIN_MESSAGES.reserve));
+    const doc = ctx.message.document;
+    if (doc.mime_type !== "application/pdf") return void (await ctx.reply(ADMIN_MESSAGES.pasPdf));
+    const title = caption.replace(/^\/ajouter(@\w+)?/i, "").trim() || (doc.file_name ?? "").replace(/\.pdf$/i, "");
+    await ctx.reply(ADMIN_MESSAGES.enCours);
+    try {
+      const pdf = await deps.admin!.telecharger(doc.file_id);
+      const r = await deps.admin!.ajouter({ title, pdf, addedBy: who(ctx), telegramFileId: doc.file_id });
+      await ctx.reply(describeResult(title, r), { parse_mode: "HTML" });
+    } catch (e) {
+      await adminError(ctx, e);
+    }
+  });
+
+  bot.command("docs", async (ctx) => {
+    if (!teamMember(ctx)) return void (await ctx.reply(ADMIN_MESSAGES.reserve));
+    try {
+      const docs = await deps.admin!.lister();
+      if (docs.length === 0) return void (await ctx.reply("Aucun document ajouté à la main pour l'instant."));
+      const lines = docs.slice(0, 40).map((d) => {
+        const date = new Date(d.indexedAt).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" });
+        const etat = d.included ? `${d.passages} passages` : `écarté : ${d.reason}`;
+        return `<code>${shortDocId(d.id)}</code> ${escapeHtml(d.title)} — ${escapeHtml(etat)}, ${date}${d.addedBy ? `, ${escapeHtml(d.addedBy.split(" (")[0]!)}` : ""}`;
+      });
+      await ctx.reply([`<b>${docs.length} document(s) ajouté(s)</b>`, ...lines].join("\n"), { parse_mode: "HTML" });
+    } catch (e) {
+      await adminError(ctx, e);
+    }
+  });
+
+  bot.command("supprimer", async (ctx) => {
+    if (!teamMember(ctx)) return void (await ctx.reply(ADMIN_MESSAGES.reserve));
+    const id = String(ctx.match ?? "").trim();
+    if (!id) return void (await ctx.reply("Usage : <code>/supprimer identifiant</code> (voir /docs).", { parse_mode: "HTML" }));
+    try {
+      const d = await deps.admin!.supprimer(id, who(ctx));
+      await ctx.reply(`Retiré du corpus : « ${escapeHtml(d.title)} ».`, { parse_mode: "HTML" });
+    } catch (e) {
+      await adminError(ctx, e);
+    }
+  });
 
   bot.command("oublier", async (ctx) => {
     const pseudo = pseudoOf(ctx, deps);

@@ -25,6 +25,11 @@ const Env = z.object({
   RATE_LIMIT_PER_HOUR: z.coerce.number().int().positive().default(20),
   /** Durée de conservation de la mémoire de conversation. */
   MEMORY_DAYS: z.coerce.number().int().positive().default(30),
+  /** Identifiants Telegram de l'équipe (séparés par des virgules) : /ajouter, /docs, /supprimer. */
+  TEAM_TELEGRAM_IDS: z
+    .string()
+    .default("")
+    .transform((s) => new Set(s.split(",").map((x) => x.trim()).filter(Boolean).map(Number).filter(Number.isFinite))),
   /** Protège les routes /api/* (Studio, agents, workflows) une fois déployé. */
   ADMIN_API_TOKEN: z.string().optional(),
 });

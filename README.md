@@ -10,7 +10,7 @@ Sont faites les **étapes 1 à 3 de la feuille de route** : scan + index, agent 
 | 1 | Workflow `ingest` branché sur le WordPress, pgvector rempli | ✅ |
 | 2 | Agent `aec`, outil de recherche filtré, réponse vérifiée, scorers, 21 questions types | ✅ |
 | 3 | Bot Telegram (webhook, limite, mise en forme, mémoire 30 jours, /oublier) | ✅ |
-| 4 | `/ajouter`, `/docs`, `/supprimer` pour l'équipe | entrée `manuel` du workflow prête |
+| 4 | `/ajouter`, `/docs`, `/supprimer` pour l'équipe, et `pnpm docs` en ligne de commande | ✅ |
 
 ## Démarrer en local
 
@@ -160,6 +160,35 @@ Telegram ─▶ POST /telegram (secret vérifié) ─▶ grammY ─▶ limite/he
   avertissement « programme provisoire » si besoin, mention « initiative non officielle » sur
   chaque réponse, aperçus de liens désactivés.
 
+### Ajouter des documents sans passer par WordPress
+
+Pour l'équipe (identifiants Telegram dans `TEAM_TELEGRAM_IDS`, séparés par des virgules ; un
+membre trouve le sien avec @userinfobot), en message privé au bot :
+
+| Commande | Effet |
+|---|---|
+| PDF envoyé avec la légende `/ajouter Titre` | télécharge le PDF (20 Mo max), l'indexe page par page |
+| `/ajouter https://… Titre` | télécharge le PDF ou la page web du lien |
+| `/ajouter Titre` puis le texte sur les lignes suivantes | indexe le texte |
+| `/docs` | liste les documents ajoutés, avec leur identifiant court |
+| `/supprimer identifiant` | retire le document et tous ses passages |
+
+Les autres utilisateurs reçoivent « commande réservée à l'équipe ». Même chose depuis le terminal :
+
+```bash
+pnpm docs:prod liste
+pnpm docs:prod ajouter --titre "Note sur les retraites" --fichier note.pdf
+pnpm docs:prod ajouter --titre "Tribune" --url https://exemple.fr/tribune
+pnpm docs:prod supprimer 3f2a9c1b
+```
+
+Tout passe par le workflow `ingest` (mode `manuel`) : mêmes contrôles que le scan (PDF sans
+texte exploitable refusé, doublon exact écarté), catégorie `ajout_manuel`, utilisable tout de
+suite et **sans relecture**. Un document ajouté sans lien public est cité « (document de
+l'équipe) », sans lien. Seuls les documents ajoutés à la main peuvent être supprimés ainsi (un
+document WordPress reviendrait au scan suivant). Chaque ajout et suppression est journalisé dans
+`aec_admin_log` (qui, quoi, quand).
+
 ### Avis des militants (👍/👎)
 
 Sous chaque réponse, deux boutons. Après un 👎, le bot demande « Qu'est-ce qui n'allait pas ? » ;
@@ -264,6 +293,7 @@ src/
 │  └─ evals.ts               passe des questions types, grille
 ├─ corpus/                   logique d'ingestion, testable sans Mastra
 │  ├─ wordpress.ts           client API WordPress
+│  ├─ manual.ts              ajouts et suppressions par l'équipe
 │  ├─ extract.ts             PDF et HTML → texte
 │  ├─ classify.ts            catégories, doublons, extraction vide
 │  ├─ chunk.ts               découpage par page
@@ -282,7 +312,7 @@ src/
    ├─ tools/recherche.ts     outil de recherche
    ├─ scorers/index.ts       citations, statut, source attendue, fidélité
    └─ workflows/             ingest, purge
-scripts/                     ingest, ask, evals, bot, webhook, corpus
+scripts/                     ingest, ask, evals, bot, webhook, corpus, docs, feedback
 .github/workflows/           ci.yml (tests + déploiement), evals.yml (à la demande)
 evals/                       questions types, prix
 tests/

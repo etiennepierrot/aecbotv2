@@ -35,6 +35,8 @@ const manualInput = z.object({
   url: z.string().url().optional(),
   /** Ou bien le texte lui-même. */
   text: z.string().optional(),
+  /** Ou bien un PDF déjà extrait page par page (fichier envoyé au bot, fichier local). */
+  pages: z.array(z.object({ page: z.number(), text: z.string() })).optional(),
   telegramFileId: z.string().optional(),
   addedBy: z.string(),
 });
@@ -62,8 +64,16 @@ const detecter = createStep({
   }),
   execute: async ({ inputData, setState, state }) => {
     if (inputData.mode === "manuel") {
-      if (!inputData.url && !inputData.text) throw new Error("Ajout manuel : il faut un lien ou un texte");
-      const kind = inputData.text ? "text" : /\.pdf($|\?)/i.test(inputData.url!) ? "pdf" : "html";
+      if (!inputData.url && !inputData.text && !inputData.pages?.length) {
+        throw new Error("Ajout manuel : il faut un lien, un texte ou un PDF");
+      }
+      const kind = inputData.pages?.length
+        ? "pdf"
+        : inputData.text
+          ? "text"
+          : /\.pdf($|\?)/i.test(inputData.url!)
+            ? "pdf"
+            : "html";
       const item: SourceItem = {
         id: `manual:${randomUUID()}`,
         origin: "manuel",
@@ -72,6 +82,7 @@ const detecter = createStep({
         url: inputData.url ?? "",
         modified: new Date().toISOString(),
         inlineContent: inputData.text,
+        inlinePages: inputData.pages,
         telegramFileId: inputData.telegramFileId,
         addedBy: inputData.addedBy,
       };
@@ -134,7 +145,8 @@ const recuperer = createStep({
     try {
       const { source } = await ingestDeps();
       let extracted;
-      if (item.kind === "text") extracted = extractPlainText(item.inlineContent ?? "");
+      if (item.inlinePages?.length) extracted = { pages: item.inlinePages };
+      else if (item.kind === "text") extracted = extractPlainText(item.inlineContent ?? "");
       else if (item.kind === "html")
         extracted = extractHtml(item.inlineContent ?? new TextDecoder().decode(await source.download(item.url)));
       else extracted = await extractPdf(await source.download(item.url));
