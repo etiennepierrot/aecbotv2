@@ -3,7 +3,7 @@ import { z } from "zod";
 import { config } from "../../config.js";
 import { botStore } from "../../telegram/runtime.js";
 
-const out = z.object({ messages: z.number(), compteurs: z.number(), traces: z.number() });
+const out = z.object({ messages: z.number(), compteurs: z.number(), avis: z.number(), traces: z.number() });
 
 const purger = createStep({
   id: "purger",

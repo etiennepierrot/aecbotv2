@@ -24,6 +24,7 @@ if (!values.info) {
   });
   await api.setMyCommands([
     { command: "aide", description: "Comment ça marche" },
+    { command: "avis", description: "Donner mon avis sur le bot" },
     { command: "oublier", description: "Effacer mes échanges" },
   ]);
   console.log(`Webhook branché sur ${url}`);

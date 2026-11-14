@@ -208,6 +208,22 @@ la réponse à ce message est enregistrée comme commentaire (elle ne compte pas
 Les boutons utilisent les `callback_query` de Telegram : après le déploiement, relancer
 `pnpm webhook:prod <URL>` une fois pour que le webhook les reçoive.
 
+### Avis généraux sur le bot (`/avis`) et réponses de l'équipe
+
+`/avis` (ou `/avis texte`) envoie un avis sur le bot en général, sans lien avec une réponse.
+
+- Stocké dans `aec_avis` (pseudonyme, texte, date), purgé après `MEMORY_DAYS` jours, effacé par
+  `/oublier`. Ne compte pas comme une question. 5 avis au plus par personne et par 24 h.
+- Chaque membre de `TEAM_TELEGRAM_IDS` reçoit l'avis sur Telegram (« Avis n° 12 », pseudonyme tronqué,
+  jamais le nom). Il faut avoir écrit au bot une fois pour recevoir ses messages.
+- **Répondre** : répondre (glisser / « Répondre ») à la notification, ou `/repondre 12 texte`. La
+  personne reçoit « Réponse de l'équipe » et peut y répondre à son tour : sa réponse redevient un avis.
+- Pour pouvoir répondre, l'identifiant de discussion est gardé **chiffré** (AES-256-GCM, clé dérivée
+  de `PSEUDONYM_SECRET`) avec l'avis seulement, et disparaît avec lui.
+- `pnpm avis:prod [--jours 7]` liste les avis.
+
+Après le déploiement, `pnpm webhook:prod <URL>` met à jour le menu des commandes (ajoute `/avis`).
+
 ### Brancher le bot en production
 
 1. Renseigner `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` et

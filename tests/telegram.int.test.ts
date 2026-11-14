@@ -7,8 +7,8 @@ import { Pool } from "pg";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { RepondreResult } from "../src/aec/repondre.js";
 import { INTROUVABLE_TEXTE } from "../src/aec/types.js";
-import { ADMIN_MESSAGES, createBot, MESSAGES } from "../src/telegram/bot.js";
-import { pseudonymize } from "../src/telegram/privacy.js";
+import { ADMIN_MESSAGES, createBot, MAX_AVIS_PAR_JOUR, MESSAGES } from "../src/telegram/bot.js";
+import { openChatId, pseudonymize, sealChatId } from "../src/telegram/privacy.js";
 import { telegramWebhookHandler } from "../src/telegram/runtime.js";
 import { BotStore } from "../src/telegram/store.js";
 
@@ -387,5 +387,127 @@ describe.skipIf(!DB)("bot Telegram", () => {
     expect(res.messages).toBe(2);
     const { rows } = await pool.query("SELECT count(*)::int n FROM aec_conversations WHERE content LIKE 'vieille%'");
     expect(rows[0].n).toBe(0);
+  });
+  describe("avis généraux et réponses de l'équipe", () => {
+    const TEAM_ID = 777;
+    let ids = 2000;
+    const out: { method: string; payload: any; id: number }[] = [];
+    const makeAvisBot = () => {
+      const bot = createBot("123:TEST", {
+        repondre: async (question, opts) => {
+          asked.push({ question, historique: opts?.historique });
+          return nextAnswer();
+        },
+        store, pseudonymSecret: SECRET, ratePerHour: 100, memoryDays: 30, team: new Set([TEAM_ID]),
+      }, botInfo);
+      bot.api.config.use(async (_prev, method, payload: any) => {
+        const id = ++ids;
+        out.push({ method, payload, id });
+        return { ok: true, result: { message_id: id, date: 0, chat: { id: payload.chat_id, type: "private" } } } as never;
+      });
+      return bot;
+    };
+    const msg = (fromId: number, text: string, replyTo?: { id: number; text?: string }) => {
+      const m = message(text) as any;
+      m.message.from = { id: fromId, is_bot: false, first_name: "X" };
+      m.message.chat = { id: fromId, type: "private", first_name: "X" };
+      if (replyTo) m.message.reply_to_message = { message_id: replyTo.id, date: 0, chat: m.message.chat, text: replyTo.text };
+      return m;
+    };
+    const to = (chatId: number) => out.filter((o) => o.method === "sendMessage" && o.payload.chat_id === chatId);
+
+    beforeAll(async () => {
+      await pool.query("DROP TABLE IF EXISTS aec_avis_notifs; DROP TABLE IF EXISTS aec_avis; DROP TABLE IF EXISTS aec_avis_prompts;");
+      // Le store a déjà créé ses tables : on le force à les recréer.
+      store = new BotStore(pool);
+    });
+    beforeEach(() => void (out.length = 0));
+
+    it("chiffre l'identifiant de discussion de façon réversible avec le seul secret", () => {
+      const sealed = sealChatId(USER_ID, SECRET);
+      expect(sealed).not.toContain(String(USER_ID));
+      expect(sealChatId(USER_ID, SECRET)).not.toBe(sealed); // IV aléatoire
+      expect(openChatId(sealed, SECRET)).toBe(USER_ID);
+      expect(() => openChatId(sealed, "q".repeat(32))).toThrow();
+    });
+
+    it("/avis puis réponse : enregistré, transmis à l'équipe, sans compter comme question", async () => {
+      const bot = makeAvisBot();
+      await bot.handleUpdate(msg(USER_ID, "/avis") as never);
+      const prompt = to(USER_ID).at(-1)!;
+      expect(prompt.payload).toMatchObject({ text: MESSAGES.demandeAvis, reply_markup: { force_reply: true } });
+
+      await bot.handleUpdate(msg(USER_ID, "Il manque le <b>logement</b>", { id: prompt.id }) as never);
+      expect(asked).toEqual([]);
+      expect(to(USER_ID).at(-1)!.payload.text).toBe(MESSAGES.avisNote);
+      const notif = to(TEAM_ID).at(-1)!.payload.text as string;
+      expect(notif).toMatch(/^💬 <b>Avis n° \d+<\/b>/);
+      expect(notif).toContain("Il manque le &lt;b&gt;logement&lt;/b&gt;");
+      expect(notif).not.toContain(String(USER_ID));
+
+      const { rows } = await pool.query("SELECT pseudo, texte, chat_sealed FROM aec_avis");
+      expect(rows).toHaveLength(1);
+      expect(rows[0].pseudo).toBe(pseudonymize(USER_ID, SECRET));
+      expect(JSON.stringify(rows)).not.toContain(String(USER_ID));
+    });
+
+    it("l'équipe répond à la notification, la personne répond à son tour", async () => {
+      const bot = makeAvisBot();
+      await bot.handleUpdate(msg(USER_ID, "/avis Super bot") as never);
+      const notif = to(TEAM_ID).at(-1)!;
+
+      await bot.handleUpdate(msg(TEAM_ID, "Merci, on ajoute le logement bientôt", { id: notif.id, text: "💬 Avis n° 2" }) as never);
+      const reponse = to(USER_ID).at(-1)!;
+      expect(reponse.payload.text).toContain("Réponse de l'équipe");
+      expect(reponse.payload.text).toContain("Merci, on ajoute le logement bientôt");
+      expect(reponse.payload.reply_markup).toMatchObject({ force_reply: true });
+      expect(to(TEAM_ID).at(-1)!.payload.text).toMatch(/^Réponse envoyée/);
+      expect(asked).toEqual([]);
+
+      // Sa réponse redevient un avis, transmis à l'équipe.
+      await bot.handleUpdate(msg(USER_ID, "Top, merci !", { id: reponse.id }) as never);
+      expect(to(TEAM_ID).at(-1)!.payload.text).toContain("Top, merci !");
+      expect(asked).toEqual([]);
+    });
+
+    it("/repondre : réservé à l'équipe, par numéro d'avis", async () => {
+      const bot = makeAvisBot();
+      await bot.handleUpdate(msg(USER_ID, "/avis Une idée") as never);
+      const n = /Avis n° (\d+)/.exec(to(TEAM_ID).at(-1)!.payload.text)![1];
+      await bot.handleUpdate(msg(USER_ID, `/repondre ${n} coucou`) as never);
+      expect(to(USER_ID).at(-1)!.payload.text).toBe(ADMIN_MESSAGES.reserve);
+      await bot.handleUpdate(msg(TEAM_ID, `/repondre ${n} Bonne idée`) as never);
+      expect(to(USER_ID).at(-1)!.payload.text).toContain("Bonne idée");
+      await bot.handleUpdate(msg(TEAM_ID, "/repondre 999999 rien") as never);
+      expect(to(TEAM_ID).at(-1)!.payload.text).toMatch(/^Avis introuvable/);
+    });
+
+    it("limite le nombre d'avis par jour", async () => {
+      await pool.query("DELETE FROM aec_avis");
+      const bot = makeAvisBot();
+      for (let i = 0; i < MAX_AVIS_PAR_JOUR + 1; i++) await bot.handleUpdate(msg(USER_ID, `/avis n${i}`) as never);
+      expect(to(USER_ID).at(-1)!.payload.text).toBe(MESSAGES.avisLimite);
+      expect(to(TEAM_ID)).toHaveLength(MAX_AVIS_PAR_JOUR);
+    });
+
+    it("/oublier efface les avis : l'équipe ne peut plus répondre", async () => {
+      const bot = makeAvisBot();
+      await pool.query("DELETE FROM aec_avis");
+      await bot.handleUpdate(msg(USER_ID, "/avis À effacer") as never);
+      const notif = to(TEAM_ID).at(-1)!;
+      await bot.handleUpdate(msg(USER_ID, "/oublier") as never);
+      const { rows } = await pool.query("SELECT count(*)::int n FROM aec_avis");
+      expect(rows[0].n).toBe(0);
+      // Telegram renvoie le texte rendu, sans balises.
+      await bot.handleUpdate(msg(TEAM_ID, "Réponse", { id: notif.id, text: notif.payload.text.replace(/<[^>]+>/g, "") }) as never);
+      expect(to(TEAM_ID).at(-1)!.payload.text).toMatch(/^Avis introuvable/);
+      expect(asked).toEqual([]);
+    });
+
+    it("purge : efface les avis trop anciens", async () => {
+      await store.addAvis("u_vieux", "vieil avis");
+      await pool.query("UPDATE aec_avis SET created_at = now() - interval '31 days' WHERE texte = 'vieil avis'");
+      expect((await store.purge(30)).avis).toBe(1);
+    });
   });
 });

@@ -49,6 +49,30 @@ export class BotStore {
           created_at        timestamptz NOT NULL DEFAULT now(),
           PRIMARY KEY (pseudo, prompt_message_id)
         );
+        -- Avis généraux sur le bot (/avis), sans lien avec une réponse.
+        CREATE TABLE IF NOT EXISTS aec_avis (
+          id         bigserial PRIMARY KEY,
+          pseudo     text NOT NULL,
+          texte      text NOT NULL,
+          created_at timestamptz NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS aec_avis_created ON aec_avis (created_at DESC);
+        -- Identifiant de discussion chiffré, pour que l'équipe puisse répondre.
+        ALTER TABLE aec_avis ADD COLUMN IF NOT EXISTS chat_sealed text;
+        -- Message de notification reçu par chaque membre de l'équipe → avis (pour y répondre).
+        CREATE TABLE IF NOT EXISTS aec_avis_notifs (
+          member_id  bigint NOT NULL,
+          message_id bigint NOT NULL,
+          avis_id    bigint NOT NULL REFERENCES aec_avis (id) ON DELETE CASCADE,
+          PRIMARY KEY (member_id, message_id)
+        );
+        -- Après /avis sans texte, le message « dis-nous ce que tu en penses » en attente de réponse.
+        CREATE TABLE IF NOT EXISTS aec_avis_prompts (
+          pseudo            text NOT NULL,
+          prompt_message_id bigint NOT NULL,
+          created_at        timestamptz NOT NULL DEFAULT now(),
+          PRIMARY KEY (pseudo, prompt_message_id)
+        );
       `)
       .then(() => undefined);
     return this.ready;
@@ -143,17 +167,92 @@ export class BotStore {
     return { traceId, spanId: (await this.answerOf(pseudo, traceId))?.spanId ?? null };
   }
 
+  /** Avis des dernières 24 heures de cette personne (pour limiter les envois à l'équipe). */
+  async avisRecents(pseudo: string): Promise<number> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT count(*)::int AS n FROM aec_avis WHERE pseudo = $1 AND created_at > now() - interval '1 day'`,
+      [pseudo],
+    );
+    return rows[0].n as number;
+  }
+
+  async addAvis(pseudo: string, texte: string, chatSealed?: string): Promise<number> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `INSERT INTO aec_avis (pseudo, texte, chat_sealed) VALUES ($1, $2, $3) RETURNING id`,
+      [pseudo, texte, chatSealed ?? null],
+    );
+    return Number(rows[0].id);
+  }
+
+  async addAvisNotif(memberId: number, messageId: number, avisId: number): Promise<void> {
+    await this.init();
+    await this.pool.query(
+      `INSERT INTO aec_avis_notifs (member_id, message_id, avis_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+      [memberId, messageId, avisId],
+    );
+  }
+
+  /** L'avis dont ce membre de l'équipe a reçu la notification `messageId`. */
+  async avisOfNotif(memberId: number, messageId: number): Promise<{ id: number; chatSealed: string | null } | undefined> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT a.id, a.chat_sealed FROM aec_avis_notifs n JOIN aec_avis a ON a.id = n.avis_id
+        WHERE n.member_id = $1 AND n.message_id = $2`,
+      [memberId, messageId],
+    );
+    return rows[0] ? { id: Number(rows[0].id), chatSealed: rows[0].chat_sealed } : undefined;
+  }
+
+  async avisById(id: number): Promise<{ id: number; chatSealed: string | null } | undefined> {
+    await this.init();
+    const { rows } = await this.pool.query(`SELECT id, chat_sealed FROM aec_avis WHERE id = $1`, [id]);
+    return rows[0] ? { id: Number(rows[0].id), chatSealed: rows[0].chat_sealed } : undefined;
+  }
+
+  async listAvis({ jours = 30, limit = 50 } = {}): Promise<{ id: number; pseudo: string; texte: string; createdAt: Date }[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT id, pseudo, texte, created_at FROM aec_avis
+        WHERE created_at > now() - make_interval(days => $1) ORDER BY created_at DESC LIMIT $2`,
+      [jours, limit],
+    );
+    return rows.map((r) => ({ id: Number(r.id), pseudo: r.pseudo, texte: r.texte, createdAt: r.created_at }));
+  }
+
+  async addAvisPrompt(pseudo: string, promptMessageId: number): Promise<void> {
+    await this.init();
+    await this.pool.query(
+      `INSERT INTO aec_avis_prompts (pseudo, prompt_message_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+      [pseudo, promptMessageId],
+    );
+  }
+
+  /** Consomme l'invitation /avis à laquelle ce message répond, s'il y en a une. */
+  async takeAvisPrompt(pseudo: string, promptMessageId: number): Promise<boolean> {
+    await this.init();
+    const r = await this.pool.query(
+      `DELETE FROM aec_avis_prompts WHERE pseudo = $1 AND prompt_message_id = $2
+         AND created_at > now() - interval '1 day'`,
+      [pseudo, promptMessageId],
+    );
+    return (r.rowCount ?? 0) > 0;
+  }
+
   /** Droit à l'effacement : /oublier. */
   async forget(pseudo: string): Promise<number> {
     await this.init();
     const a = await this.pool.query(`DELETE FROM aec_conversations WHERE pseudo = $1`, [pseudo]);
     await this.pool.query(`DELETE FROM aec_rate_limit WHERE pseudo = $1`, [pseudo]);
     await this.pool.query(`DELETE FROM aec_feedback_prompts WHERE pseudo = $1`, [pseudo]);
+    await this.pool.query(`DELETE FROM aec_avis WHERE pseudo = $1`, [pseudo]);
+    await this.pool.query(`DELETE FROM aec_avis_prompts WHERE pseudo = $1`, [pseudo]);
     return a.rowCount ?? 0;
   }
 
   /** Purge nocturne : conversations plus vieilles que `days`, compteurs expirés. */
-  async purge(days: number): Promise<{ messages: number; compteurs: number }> {
+  async purge(days: number): Promise<{ messages: number; compteurs: number; avis: number }> {
     await this.init();
     const m = await this.pool.query(
       `DELETE FROM aec_conversations WHERE created_at < now() - make_interval(days => $1)`,
@@ -161,6 +260,8 @@ export class BotStore {
     );
     const c = await this.pool.query(`DELETE FROM aec_rate_limit WHERE window_start < now() - interval '2 hours'`);
     await this.pool.query(`DELETE FROM aec_feedback_prompts WHERE created_at < now() - interval '1 day'`);
-    return { messages: m.rowCount ?? 0, compteurs: c.rowCount ?? 0 };
+    const a = await this.pool.query(`DELETE FROM aec_avis WHERE created_at < now() - make_interval(days => $1)`, [days]);
+    await this.pool.query(`DELETE FROM aec_avis_prompts WHERE created_at < now() - interval '1 day'`);
+    return { messages: m.rowCount ?? 0, compteurs: c.rowCount ?? 0, avis: a.rowCount ?? 0 };
   }
 }

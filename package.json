@@ -27,7 +27,9 @@
     "ask:prod": "tsx --env-file=.env.production scripts/ask.ts",
     "feedback:prod": "tsx --env-file=.env.production scripts/feedback.ts",
     "docs": "tsx --env-file-if-exists=.env scripts/docs.ts",
-    "docs:prod": "tsx --env-file=.env.production scripts/docs.ts"
+    "docs:prod": "tsx --env-file=.env.production scripts/docs.ts",
+    "avis": "tsx --env-file-if-exists=.env scripts/avis.ts",
+    "avis:prod": "tsx --env-file=.env.production scripts/avis.ts"
   },
   "dependencies": {
     "@mastra/core": "1.80.0",
