@@ -205,6 +205,9 @@ la réponse à ce message est enregistrée comme commentaire (elle ne compte pas
   variables de production, traces, votes et commentaires partent aussi vers le tableau de bord
   Mastra Cloud (Observability), en plus de Neon. Cette copie suit la conservation de Mastra Cloud :
   ni la purge nocturne ni `/oublier` ne l'effacent. Sans token, rien ne part.
+- **Relire les votes depuis ton poste** : `pnpm feedback:prod` (toute la période, regroupés par
+  réponse, avec la question et la réponse encore en mémoire) ; `--negatifs` pour ne garder que
+  les 👎 et commentaires, `--jours 7` pour réduire la période, `--complet` pour les réponses entières.
 - **Lire les avis** : Mastra Cloud → Observability, ou Studio → Observability → Traces, onglet Feedback de chaque trace, ou l'API
   `GET /api/observability/feedback?feedbackType=thumbs` (avec `ADMIN_API_TOKEN`). Les bons cas
   de 👎 vont dans `evals/questions.json`.

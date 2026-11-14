@@ -154,6 +154,23 @@ export class BotStore {
     return rows[0] ? { spanId: rows[0].span_id } : undefined;
   }
 
+  /**
+   * Question et réponse de ces traces, pour relire les votes (scripts/feedback.ts). La question est
+   * la ligne insérée juste avant la réponse, par le même `append`. Effacées par /oublier et la purge.
+   */
+  async exchanges(traceIds: string[]): Promise<Map<string, { question: string; answer: string }>> {
+    await this.init();
+    if (traceIds.length === 0) return new Map();
+    const { rows } = await this.pool.query(
+      `SELECT a.trace_id, q.content AS question, a.content AS answer
+         FROM aec_conversations a
+         JOIN aec_conversations q ON q.id = a.id - 1 AND q.pseudo = a.pseudo AND q.role = 'user'
+        WHERE a.role = 'assistant' AND a.trace_id = ANY($1)`,
+      [traceIds],
+    );
+    return new Map(rows.map((r) => [r.trace_id as string, { question: r.question as string, answer: r.answer as string }]));
+  }
+
   async ownsTrace(pseudo: string, traceId: string): Promise<boolean> {
     return (await this.answerOf(pseudo, traceId)) !== undefined;
   }

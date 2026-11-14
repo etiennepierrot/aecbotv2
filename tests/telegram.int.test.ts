@@ -113,6 +113,17 @@ describe.skipIf(!DB)("bot Telegram", () => {
     });
   });
 
+  it("retrouve la question et la réponse d'une trace (relecture des votes)", async () => {
+    const a = "a".repeat(32), b = "b".repeat(32);
+    await store.append("u_x", "Et la retraite ?", "Retraite à 60 ans.", a, "s1");
+    await store.append("u_y", "Et le SMIC ?", "1 600 € net.", b, "s2");
+    const ex = await store.exchanges([a, b, "c".repeat(32)]);
+    expect(ex.get(a)).toEqual({ question: "Et la retraite ?", answer: "Retraite à 60 ans." });
+    expect(ex.get(b)).toEqual({ question: "Et le SMIC ?", answer: "1 600 € net." });
+    expect(ex.size).toBe(2);
+    expect(await store.exchanges([])).toEqual(new Map());
+  });
+
   it("/oublier efface la mémoire de la personne", async () => {
     const bot = makeBot(100);
     await bot.handleUpdate(message("Et la retraite ?") as never);
