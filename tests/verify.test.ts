@@ -90,3 +90,13 @@ describe("PassageCollector", () => {
     expect(col.size).toBe(2);
   });
 });
+
+describe("joinChunks", () => {
+  it("recolle les passages en retirant le chevauchement", async () => {
+    const { joinChunks } = await import("../src/aec/search.js");
+    const a = "Augmenter les salaires. Le SMIC sera porté à 1 600 euros net par mois pour tous.";
+    const b = "porté à 1 600 euros net par mois pour tous. Revaloriser les APL de 10 %.";
+    expect(joinChunks([a, b])).toBe("Augmenter les salaires. Le SMIC sera porté à 1 600 euros net par mois pour tous. Revaloriser les APL de 10 %.");
+    expect(joinChunks(["Sans lien.", "Autre texte."])).toBe("Sans lien.\nAutre texte.");
+  });
+});

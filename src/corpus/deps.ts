@@ -1,5 +1,5 @@
 import { PgVector } from "@mastra/pg";
-import { config, EMBEDDING_DIMENSION } from "../config.js";
+import { config, EMBEDDING_DIMENSION, PASSAGES_INDEX } from "../config.js";
 import { embedderFromKeys, type Embedder } from "./embed.js";
 import { CompositeSource, EDITION_2022, StaticSource } from "./sources.js";
 import { CorpusStore } from "./store.js";
@@ -48,6 +48,8 @@ export function setIngestDeps(d: IngestDeps): void {
 export interface RetrievalDeps {
   embedder: Embedder;
   vector: Pick<PgVector, "query">;
+  /** Tous les passages d'une page, dans l'ordre (absent : pas d'élargissement à la page). */
+  pageChunks?: (docId: string, page: number) => Promise<string[]>;
 }
 
 let retrieval: RetrievalDeps | undefined;
@@ -55,9 +57,23 @@ let retrieval: RetrievalDeps | undefined;
 /** Dépendances de la recherche : même modèle d'embeddings que l'ingestion. */
 export async function retrievalDeps(): Promise<RetrievalDeps> {
   if (!retrieval) {
-    retrieval = { embedder: embedderFromEnv(), vector: pgVector() };
+    const vector = pgVector();
+    retrieval = { embedder: embedderFromEnv(), vector, pageChunks: pageChunksFrom(vector) };
   }
   return retrieval;
+}
+
+/** Les passages d'une page PDF, dans l'ordre du découpage. */
+export function pageChunksFrom(vector: PgVector): NonNullable<RetrievalDeps["pageChunks"]> {
+  return async (docId, page) => {
+    const { rows } = await vector.pool.query(
+      `SELECT metadata->>'text' AS text FROM ${PASSAGES_INDEX}
+        WHERE metadata->>'docId' = $1 AND metadata->>'page' = $2
+        ORDER BY (split_part(vector_id, '#', 3))::int`,
+      [docId, String(page)],
+    );
+    return rows.map((r) => r.text as string);
+  };
 }
 
 export function setRetrievalDeps(d: RetrievalDeps): void {

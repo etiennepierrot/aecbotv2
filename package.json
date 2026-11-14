@@ -23,7 +23,8 @@
     "webhook:prod": "tsx --env-file=.env.production scripts/telegram-webhook.ts",
     "corpus": "tsx --env-file-if-exists=.env scripts/corpus.ts",
     "ingest:prod": "tsx --env-file=.env.production scripts/ingest.ts",
-    "corpus:prod": "tsx --env-file=.env.production scripts/corpus.ts"
+    "corpus:prod": "tsx --env-file=.env.production scripts/corpus.ts",
+    "ask:prod": "tsx --env-file=.env.production scripts/ask.ts"
   },
   "dependencies": {
     "@mastra/core": "1.80.0",

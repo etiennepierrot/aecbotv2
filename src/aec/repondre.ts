@@ -41,6 +41,10 @@ export async function repondre(question: string, opts: RepondreOptions = {}): Pr
     ...(opts.model ? { model: opts.model as never } : {}),
   });
   if (result.error) throw result.error;
+  if (collector.errors.length > 0 && collector.size === 0) {
+    // La recherche a échoué : ce n'est pas « rien trouvé », c'est une panne.
+    throw new Error(`Recherche impossible : ${collector.errors[0]}`);
+  }
 
   return {
     reponse: verifyAnswer(result.text, collector),

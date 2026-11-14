@@ -11,6 +11,8 @@ export const COLLECTOR_KEY = "aec:passages";
 export class PassageCollector {
   private readonly byId = new Map<string, ReferencedPassage>();
   private readonly byRef = new Map<string, ReferencedPassage>();
+  /** Échecs de l'outil de recherche (base injoignable, clé d'embeddings refusée…). */
+  readonly errors: string[] = [];
 
   add(passages: RetrievedPassage[]): ReferencedPassage[] {
     return passages.map((p) => {

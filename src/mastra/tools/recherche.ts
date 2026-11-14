@@ -38,10 +38,17 @@ export const rechercheTool = createTool({
   }),
   outputSchema: z.object({ passages: z.array(passageOut) }),
   execute: async ({ requete, edition }, context) => {
-    const found = await searchPassages({ requete, edition });
     // Le collecteur est fourni par repondre() ; dans Studio on en crée un jetable.
     const collector =
       (context?.requestContext?.get(COLLECTOR_KEY as never) as PassageCollector | undefined) ?? new PassageCollector();
+    let found;
+    try {
+      found = await searchPassages({ requete, edition });
+    } catch (e) {
+      // Noté pour repondre() : sans ça, le modèle répondrait « introuvable » et la panne passerait inaperçue.
+      collector.errors.push(e instanceof Error ? e.message : String(e));
+      throw e;
+    }
     const referenced = collector.add(found);
     return {
       passages: referenced.map((p) => ({

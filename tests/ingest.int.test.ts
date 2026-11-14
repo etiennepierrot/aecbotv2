@@ -191,6 +191,30 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     expect((await searchPassages({ requete: rows[0].text, categories: ["livret"] })).every((h) => h.category === "livret")).toBe(true);
   });
 
+  it("recherche : élargit chaque passage à sa page entière", async () => {
+    const deps = await import("../src/corpus/deps.js");
+    deps.setRetrievalDeps({ embedder, vector: deps.pgVector(), pageChunks: deps.pageChunksFrom(deps.pgVector()) });
+    const { searchPassages } = await import("../src/aec/search.js");
+    // Une publication 2026 avec une page longue, découpée en plusieurs passages.
+    site.addPdf(26000, "Plan salaires", "2026/11/plan-salaires.pdf", "2026-11-10T10:00:00.000Z", [
+      [...filler("les salaires"), ...filler("les conventions collectives"), ...filler("le SMIC a 1600 euros"), ...filler("les primes")],
+    ]);
+    await scan();
+    const { rows } = await pool.query(
+      `SELECT metadata->>'text' AS text FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' = 'wp:media:26000' AND metadata->>'page' = '1'`,
+    );
+    expect(rows.length).toBeGreaterThan(1);
+    const hits = await searchPassages({ requete: rows[0].text, edition: "aec2027" });
+    const page = hits.filter((h) => h.docId === "wp:media:26000");
+    expect(page).toHaveLength(1);
+    expect(page[0]!.id).toBe("wp:media:26000#p1");
+    // Le texte rendu contient tous les passages de la page, pas seulement celui trouvé.
+    for (const r of rows) expect(page[0]!.text).toContain(r.text.slice(-40));
+    expect(page[0]!.text).toContain("SMIC a 1600 euros");
+    site.items.delete("wp:media:26000");
+    deps.setRetrievalDeps({ embedder, vector: deps.pgVector() });
+  });
+
   it("ajout manuel d'un texte par l'équipe", async () => {
     const run = await mastra.getWorkflow("ingest").createRun();
     const res = await run.start({

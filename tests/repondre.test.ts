@@ -31,9 +31,8 @@ beforeAll(async () => {
     vector: {
       query: (async (args: { queryVector: unknown; filter: unknown }) => {
         queries.push({ query: args.queryVector, filter: args.filter });
-        const f = (args.filter as { corpus: { $eq?: string; $in?: string[] } }).corpus;
-        const editions = f.$in ?? [f.$eq];
-        return editions.includes("aec2027") ? PASSAGES.retraite!.map((p) => ({ id: p.id, score: p.score, metadata: { ...p } })) : [];
+        const corpus = (args.filter as { corpus: { $eq: string } }).corpus.$eq;
+        return corpus === "aec2027" ? PASSAGES.retraite!.map((p) => ({ id: p.id, score: p.score, metadata: { ...p } })) : [];
       }) as never,
     },
   });
@@ -59,8 +58,22 @@ describe("repondre", () => {
       controle: { passagesRecuperes: 1, citationsValides: 1, citationsRejetees: 1, phrasesRetirees: 1 },
     });
     expect(res.usage).toEqual({ inputTokens: 200, outputTokens: 40 });
-    // Par défaut : toutes les éditions de EDITIONS (2027 puis 2022 tant que 2027 n'est pas publié).
-    expect(queries.at(-1)?.filter).toEqual({ corpus: { $in: ["aec2027", "aec2022"] } });
+    // Par défaut : une requête par édition de EDITIONS (2027 puis 2022), chacune avec son quota.
+    expect(queries.slice(-2).map((q) => q.filter)).toEqual([{ corpus: { $eq: "aec2027" } }, { corpus: { $eq: "aec2022" } }]);
+  });
+
+  it("une panne de la recherche remonte comme une erreur, pas comme « introuvable »", async () => {
+    const deps = await import("../src/corpus/deps.js");
+    const previous = await deps.retrievalDeps();
+    deps.setRetrievalDeps({
+      embedder: { dimension: 3, embed: async () => { throw new Error("password authentication failed for user 'neondb_owner'"); } },
+      vector: previous.vector,
+    });
+    const model = fakeModel((_p, call) =>
+      call === 1 ? { tool: "recherche", input: { requete: "SMIC" } } : { text: "INTROUVABLE" },
+    );
+    await expect(repondre("Et le SMIC ?", { model })).rejects.toThrow(/Recherche impossible : password authentication failed/);
+    deps.setRetrievalDeps(previous);
   });
 
   it("une réponse « de mémoire », sans recherche, est refusée", async () => {
