@@ -1,0 +1,65 @@
+import { z } from "zod";
+
+const Env = z.object({
+  DATABASE_URL: z.string().min(1, "DATABASE_URL manquant"),
+  MISTRAL_API_KEY: z.string().optional(),
+  /** Alternative à MISTRAL_API_KEY : mêmes modèles Mistral, servis via OpenRouter. */
+  OPENROUTER_API_KEY: z.string().optional(),
+  WP_BASE_URL: z.string().url().default("https://melenchon2027.fr"),
+  INGEST_CRON: z.string().optional(),
+  /**
+   * Éditions interrogées par défaut, dans l'ordre de préférence. Tant que le programme 2027
+   * n'est pas publié : « aec2027,aec2022 ». Ensuite : « aec2027 » seul.
+   */
+  EDITIONS: z
+    .string()
+    .default("aec2027,aec2022")
+    .transform((s) => s.split(",").map((x) => x.trim()).filter(Boolean))
+    .pipe(z.array(z.enum(["aec2027", "aec2022"])).min(1)),
+
+  TELEGRAM_BOT_TOKEN: z.string().optional(),
+  /** Vérifié sur chaque appel du webhook (en-tête X-Telegram-Bot-Api-Secret-Token). */
+  TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
+  /** Clé HMAC pour pseudonymiser les identifiants Telegram. Ne jamais la changer en production. */
+  PSEUDONYM_SECRET: z.string().optional(),
+  RATE_LIMIT_PER_HOUR: z.coerce.number().int().positive().default(20),
+  /** Durée de conservation de la mémoire de conversation. */
+  MEMORY_DAYS: z.coerce.number().int().positive().default(30),
+  /** Protège les routes /api/* (Studio, agents, workflows) une fois déployé. */
+  ADMIN_API_TOKEN: z.string().optional(),
+});
+
+export type AppConfig = z.infer<typeof Env>;
+
+let cached: AppConfig | undefined;
+
+/** Les modèles Mistral par défaut, en direct ou via OpenRouter selon la clé disponible. */
+export function defaultModels(env: NodeJS.ProcessEnv = process.env) {
+  const viaOpenRouter = !env.MISTRAL_API_KEY && !!env.OPENROUTER_API_KEY;
+  return viaOpenRouter
+    ? { answer: "openrouter/mistralai/mistral-small-2603", judge: "openrouter/mistralai/mistral-medium-3-5" }
+    : { answer: "mistral/mistral-small-latest", judge: "mistral/mistral-medium-latest" };
+}
+
+/** Échoue tout de suite, avec un message clair, si la clé du fournisseur d'un modèle manque. */
+export function assertModelKey(model: string, env: NodeJS.ProcessEnv = process.env): void {
+  const needs: Record<string, string> = { mistral: "MISTRAL_API_KEY", openrouter: "OPENROUTER_API_KEY", openai: "OPENAI_API_KEY" };
+  const provider = model.split("/")[0] ?? "";
+  const key = needs[provider];
+  if (key && !env[key]?.trim()) {
+    throw new Error(
+      `Le modèle « ${model} » demande ${key}, absente du .env. ` +
+        `Videz AEC_MODEL / AEC_JUDGE_MODEL pour utiliser le modèle par défaut de la clé fournie, ou renseignez ${key}.`,
+    );
+  }
+}
+
+export function config(): AppConfig {
+  cached ??= Env.parse(process.env);
+  return cached;
+}
+
+/** Nom de l'index pgvector qui contient les passages. */
+export const PASSAGES_INDEX = "aec_passages";
+/** mistral-embed produit des vecteurs de 1024 dimensions. */
+export const EMBEDDING_DIMENSION = 1024;

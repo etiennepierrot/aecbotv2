@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.1-pg17
+    environment:
+      POSTGRES_USER: aecbot
+      POSTGRES_PASSWORD: aecbot
+      POSTGRES_DB: aecbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aecbot -d aecbot"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

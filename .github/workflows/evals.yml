@@ -1,0 +1,57 @@
+# Évals à la demande (coûtent des appels de modèle) contre l'index de production, en lecture seule.
+name: Évals
+
+on:
+  workflow_dispatch:
+    inputs:
+      modeles:
+        description: "Modèles à comparer, séparés par des espaces (vide = modèle par défaut)"
+        required: false
+        default: ""
+      sans_juge:
+        description: "Sans le juge de fidélité"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    env:
+      MASTRA_TELEMETRY_DISABLED: "1"
+      # Base de production (Neon) : les évals ne font que lire l'index des passages.
+      DATABASE_URL: ${{ secrets.EVALS_DATABASE_URL }}
+      MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Passer les questions types
+        run: |
+          args=""
+          for m in ${{ inputs.modeles }}; do args="$args --model $m"; done
+          if [ "${{ inputs.sans_juge }}" = "true" ]; then args="$args --sans-juge"; fi
+          pnpm evals $args | tee evals-sortie.txt
+          {
+            echo '## Évals'
+            echo '```'
+            sed -n '/Grille de décision/,$p' evals-sortie.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evals-resultats
+          path: |
+            evals/resultats/
+            evals-sortie.txt

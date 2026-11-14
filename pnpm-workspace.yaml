@@ -1,0 +1,3 @@
+# pnpm 10+ bloque les scripts d'installation par défaut : esbuild (utilisé par mastra build) en a besoin.
+allowBuilds:
+  esbuild: true

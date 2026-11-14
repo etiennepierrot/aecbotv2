@@ -1,0 +1,45 @@
+{
+  "name": "aecbot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "node .mastra/output/index.mjs",
+    "db:up": "docker compose up -d postgres",
+    "ingest": "tsx --env-file-if-exists=.env scripts/ingest.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "evals": "tsx --env-file-if-exists=.env scripts/evals.ts",
+    "ask": "tsx --env-file-if-exists=.env scripts/ask.ts",
+    "bot": "tsx --env-file-if-exists=.env scripts/bot.ts",
+    "webhook": "tsx --env-file-if-exists=.env scripts/telegram-webhook.ts",
+    "db:test": "docker compose exec postgres createdb -U aecbot aecbot_test"
+  },
+  "dependencies": {
+    "@mastra/core": "1.80.0",
+    "@mastra/loggers": "1.3.10",
+    "@mastra/pg": "1.33.0",
+    "@mastra/rag": "2.7.1",
+    "grammy": "1.46.0",
+    "pg": "8.23.1",
+    "turndown": "7.2.4",
+    "unpdf": "2.0.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/pg": "8.23.1",
+    "@types/turndown": "5.0.6",
+    "hono": "4.13.18",
+    "mastra": "1.36.0",
+    "tsx": "4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "4.1.12"
+  }
+}

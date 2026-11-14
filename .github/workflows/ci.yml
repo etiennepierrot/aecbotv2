@@ -1,0 +1,101 @@
+# Vérifie chaque PR et chaque push ; déploie main en production seulement si tout passe.
+name: CI / déploiement
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # Un déploiement à la fois ; un nouveau push sur main annule la vérification en cours.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    name: Typecheck, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.1-pg17
+        env:
+          POSTGRES_USER: aecbot
+          POSTGRES_PASSWORD: aecbot
+          POSTGRES_DB: aecbot_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U aecbot -d aecbot_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      MASTRA_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # version lue dans packageManager
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - name: Tests (unitaires + intégration sur pgvector)
+        run: pnpm test
+        env:
+          TEST_DATABASE_URL: postgresql://aecbot:aecbot@localhost:5432/aecbot_test
+      - name: Build Mastra
+        run: pnpm build
+
+  deployer:
+    name: Déployer en production
+    needs: verifier
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Environnement GitHub « production » : y mettre les secrets ci-dessous, et une
+    # approbation manuelle si on veut valider chaque mise en production.
+    environment:
+      name: production
+      url: ${{ vars.PROD_URL }}
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      MASTRA_TELEMETRY_DISABLED: "1"
+      MASTRA_API_TOKEN: ${{ secrets.MASTRA_API_TOKEN }}
+      MASTRA_ORG_ID: ${{ secrets.MASTRA_ORG_ID }}
+      MASTRA_PROJECT_ID: ${{ secrets.MASTRA_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Vérifier les secrets de déploiement
+        run: |
+          for v in MASTRA_API_TOKEN MASTRA_ORG_ID MASTRA_PROJECT_ID; do
+            if [ -z "${!v}" ]; then echo "::error::Secret $v manquant dans l'environnement GitHub « production »"; exit 1; fi
+          done
+      - name: mastra deploy
+        # Les secrets de l'application (clés, token Telegram…) sont stockés côté Mastra, pas ici.
+        # Le fichier ne fait qu'ajouter la version déployée, lue par /status.
+        run: |
+          echo "AEC_VERSION=${GITHUB_SHA::7}" > .env.deploy
+          pnpm exec mastra deploy --env production --region eu --workers in-process --env-file .env.deploy --yes
+      - name: Test après déploiement (/status)
+        if: vars.PROD_URL != ''
+        run: |
+          expected="${GITHUB_SHA::7}"
+          for i in $(seq 1 30); do
+            body=$(curl -fsS "${{ vars.PROD_URL }}/status" || true)
+            echo "essai $i : $body"
+            if echo "$body" | grep -q "\"version\":\"$expected\""; then echo "Version $expected en ligne"; exit 0; fi
+            sleep 10
+          done
+          echo "::error::/status ne renvoie pas la version $expected après 5 minutes"
+          exit 1
