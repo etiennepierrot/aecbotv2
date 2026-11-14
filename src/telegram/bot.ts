@@ -29,7 +29,11 @@ export const MESSAGES = {
       "Bonjour ! Je réponds à tes questions sur le programme <b>L'Avenir en commun</b>, ses livrets et ses plans.",
       "Je cherche dans les documents publiés et je cite chaque source avec sa page. Si je ne trouve pas, je te le dis plutôt que d'inventer.",
       "Exemple : <i>Qu'est-ce que le programme dit sur la retraite ?</i>",
-      "Sous chaque réponse, 👍 ou 👎 nous aide à améliorer le bot. Après un 👎, tu peux dire ce qui n'allait pas. Pour un avis sur le bot en général, une idée ou un problème : /avis.",
+      [
+        "<b>Aide-nous à améliorer le bot</b>",
+        "• <b>Sur une réponse</b> : touche 👍 ou 👎 juste en dessous. Après un 👎, je te demande ce qui n'allait pas : réponds à ce message pour l'expliquer (facultatif).",
+        "• <b>Sur le bot en général</b> (une idée, un sujet qui manque, un problème) : envoie /avis puis ton message, ou directement <code>/avis ton message</code>. L'équipe le lit et peut te répondre ici.",
+      ].join("\n"),
       `Tes questions, les réponses et tes avis sont gardés ${memoryDays} jours, sous un pseudonyme, pour comprendre les questions de suite et corriger les erreurs (avec un avis, on garde aussi, chiffré, de quoi te répondre). /oublier efface tout. Limite : ${rate} questions par heure.`,
       `<i>${escapeHtml(DISCLAIMER)}</i>`,
     ].join("\n\n"),

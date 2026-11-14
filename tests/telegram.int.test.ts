@@ -161,6 +161,7 @@ describe.skipIf(!DB)("bot Telegram", () => {
     await makeBot(20).handleUpdate(message("/start") as never);
     expect(replies()[0]).toContain("sont gardés 30 jours, sous un pseudonyme");
     expect(replies()[0]).toContain("👍 ou 👎");
+    expect(replies()[0]).toContain("/avis ton message");
     expect(replies()[0]).toContain("Limite : 20 questions par heure");
   });
 
