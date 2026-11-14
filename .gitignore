@@ -5,3 +5,5 @@ dist/
 *.log
 evals/resultats/
 .env.deploy
+.env.*
+!.env.example

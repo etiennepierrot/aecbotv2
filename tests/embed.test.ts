@@ -45,6 +45,10 @@ describe("embeddings", () => {
 
   it("signale clairement un modèle dont la clé manque", () => {
     expect(() => assertModelKey("mistral/mistral-small-latest", { OPENROUTER_API_KEY: "k" })).toThrow(/MISTRAL_API_KEY, absente/);
+    expect(() => assertModelKey("mistral/mistral-small-latest", {})).toThrow(/choisi par défaut.*Clés présentes : aucune/);
+    expect(() => assertModelKey("mistral/x", { AEC_MODEL: "mistral/x", OPENROUTER_API_KEY: "k" })).toThrow(
+      /imposé par AEC_MODEL.*Clés présentes : OPENROUTER_API_KEY/,
+    );
     expect(() => assertModelKey("openrouter/mistralai/mistral-small-2603", { OPENROUTER_API_KEY: "k" })).not.toThrow();
   });
 });

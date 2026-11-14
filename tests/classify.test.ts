@@ -62,3 +62,22 @@ describe("isExtractionUsable", () => {
     expect(isExtractionUsable({ pages: [{ page: 1, text: "x".repeat(800) }] })).toBe(true);
   });
 });
+
+describe("pages et articles du site", () => {
+  const html = (id: string, title: string): SourceItem => ({
+    id, origin: "wordpress", kind: "html", title, url: "https://melenchon2027.fr/programme/x/", modified: "2026-01-01T00:00:00Z",
+  });
+  it("garde les chapitres, chantiers et pages du programme", () => {
+    expect(classifyByMetadata(html("wp:post:23208", "Chapitre 7 : La force de l’entraide")).included).toBe(true);
+    expect(classifyByMetadata(html("wp:post:17914", "Chantier cadre : Retrouver les moyens d’agir")).included).toBe(true);
+    expect(classifyByMetadata(html("wp:page:26139", "Comment nous allons reconstruire notre système de santé")).included).toBe(true);
+  });
+  it("écarte les comparateurs avec d'autres partis et les articles d'actualité", () => {
+    expect(classifyByMetadata(html("wp:post:17901", "Comparateur Place Publique 2025 – Régénérer la démocratie"))).toMatchObject({
+      included: false, reason: "Comparateur avec le programme d'un autre parti",
+    });
+    expect(classifyByMetadata(html("wp:post:13653", "Non, Gérard Depardieu ne rend pas fière la France"))).toMatchObject({
+      included: false, reason: "Article d'actualité exclu par défaut",
+    });
+  });
+});

@@ -47,9 +47,15 @@ export function assertModelKey(model: string, env: NodeJS.ProcessEnv = process.e
   const provider = model.split("/")[0] ?? "";
   const key = needs[provider];
   if (key && !env[key]?.trim()) {
+    const origine =
+      env.AEC_MODEL?.trim() === model || env.AEC_JUDGE_MODEL?.trim() === model
+        ? "imposé par AEC_MODEL ou AEC_JUDGE_MODEL"
+        : "choisi par défaut car ni MISTRAL_API_KEY ni OPENROUTER_API_KEY ne sont renseignées";
+    const presentes = ["MISTRAL_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY"].filter((k) => env[k]?.trim());
     throw new Error(
-      `Le modèle « ${model} » demande ${key}, absente du .env. ` +
-        `Videz AEC_MODEL / AEC_JUDGE_MODEL pour utiliser le modèle par défaut de la clé fournie, ou renseignez ${key}.`,
+      `Le modèle « ${model} » (${origine}) demande ${key}, absente de l'environnement. ` +
+        `Clés présentes : ${presentes.join(", ") || "aucune"}. ` +
+        `Renseignez ${key}, ou mettez dans AEC_MODEL / AEC_JUDGE_MODEL un modèle du fournisseur dont vous avez la clé.`,
     );
   }
 }

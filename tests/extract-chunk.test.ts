@@ -43,3 +43,10 @@ describe("extraction et découpage", () => {
     expect(out.pages[0]?.page).toBeNull();
   });
 });
+
+describe("extractPdf : lien mort", () => {
+  it("dit clairement qu'une page HTML a été reçue à la place du PDF", async () => {
+    const html = new TextEncoder().encode("<!DOCTYPE html><html><body>Page introuvable</body></html>");
+    await expect(extractPdf(html)).rejects.toThrow(/page HTML.*lien mort/);
+  });
+});

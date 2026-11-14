@@ -16,6 +16,16 @@ export function classifyByMetadata(item: SourceItem): Classification {
     return { ...base, category: "ajout_manuel", included: true, reason: "" };
   }
   if (item.kind === "html") {
+    // Les « Comparateurs » résument le programme d'AUTRES partis : jamais dans le corpus,
+    // sinon l'agent pourrait attribuer leurs mesures à L'Avenir en commun.
+    if (/^\s*COMPARATEUR\b/.test(item.title.toUpperCase())) {
+      return { ...base, category: "autre", included: false, reason: "Comparateur avec le programme d'un autre parti" };
+    }
+    // Articles : seuls les chapitres et chantiers du programme ; les tribunes et réactions
+    // à l'actualité publiées sous /programme/ ne sont pas le programme.
+    if (item.id.startsWith("wp:post:") && !/^\s*(CHAPITRE|CHANTIER)\b/.test(item.title.toUpperCase())) {
+      return { ...base, category: "autre", included: false, reason: "Article d'actualité exclu par défaut" };
+    }
     return { ...base, category: "page", included: true, reason: "" };
   }
   if (/FRONT[-_ ]POPULAIRE|\bNFP\b/.test(hay)) {

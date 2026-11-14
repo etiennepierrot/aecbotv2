@@ -19,7 +19,11 @@
     "ask": "tsx --env-file-if-exists=.env scripts/ask.ts",
     "bot": "tsx --env-file-if-exists=.env scripts/bot.ts",
     "webhook": "tsx --env-file-if-exists=.env scripts/telegram-webhook.ts",
-    "db:test": "docker compose exec postgres createdb -U aecbot aecbot_test"
+    "db:test": "docker compose exec postgres createdb -U aecbot aecbot_test",
+    "webhook:prod": "tsx --env-file=.env.production scripts/telegram-webhook.ts",
+    "corpus": "tsx --env-file-if-exists=.env scripts/corpus.ts",
+    "ingest:prod": "tsx --env-file=.env.production scripts/ingest.ts",
+    "corpus:prod": "tsx --env-file=.env.production scripts/corpus.ts"
   },
   "dependencies": {
     "@mastra/core": "1.80.0",

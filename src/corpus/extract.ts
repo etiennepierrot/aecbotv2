@@ -4,7 +4,14 @@ import type { ExtractedDocument } from "./types.js";
 
 /** PDF → texte page par page, pour garder le numéro de page de chaque passage. */
 export async function extractPdf(data: Uint8Array): Promise<ExtractedDocument> {
-  const pdf = await getDocumentProxy(data);
+  // Un lien mort renvoie souvent une page HTML (redirection, 404 habillée) au lieu du PDF.
+  const head = new TextDecoder().decode(data.slice(0, 1024));
+  if (!head.includes("%PDF-")) {
+    const kind = /<html|<!doctype/i.test(head) ? "une page HTML" : "autre chose qu'un PDF";
+    throw new Error(`Le lien renvoie ${kind} (${data.length} octets) : lien mort ou redirigé ?`);
+  }
+  // verbosity 0 : pdf.js ne signale que les erreurs (pas les « TT: undefined function » des polices).
+  const pdf = await getDocumentProxy(data, { verbosity: 0 });
   const { text } = await extractText(pdf, { mergePages: false });
   return {
     pages: text.map((t, i) => ({ page: i + 1, text: cleanText(t) })),
