@@ -54,22 +54,26 @@ describe.skipIf(!DB)("feedback Mastra (Postgres réel)", () => {
     const res = await repondre("De combien augmenter le SMIC ?", { model });
     expect(res.reponse.statut).toBe("repondu");
     expect(res.traceId).toMatch(/^[0-9a-f]{32}$/);
-    await flush();
+    expect(res.spanId).toBeTruthy();
 
+    // Vote immédiat, comme un clic juste après la réponse : les spans ne sont peut-être pas encore
+    // écrits en base, le vote doit être enregistré quand même.
+    const target = { traceId: res.traceId!, spanId: res.spanId!, pseudo: "u_test" };
+    await sink.vote({ ...target, value: -1 });
+    await sink.comment({ ...target, comment: "Il manque la version 2022" });
+    const { feedback } = await obs.listFeedback({ filters: { traceId: res.traceId } });
+    expect(feedback.map((f: any) => [f.feedbackType, f.value, f.feedbackUserId, f.spanId]).sort()).toEqual([
+      ["comment", "Il manque la version 2022", "u_test", res.spanId],
+      ["thumbs", -1, "u_test", res.spanId],
+    ]);
+
+    await flush();
     const trace = await obs.getTrace({ traceId: res.traceId });
     expect(trace?.spans?.length).toBeGreaterThan(0);
 
-    await sink.vote({ traceId: res.traceId!, pseudo: "u_test", value: -1 });
-    await sink.comment({ traceId: res.traceId!, pseudo: "u_test", comment: "Il manque la version 2022" });
-    await flush();
-    const { feedback } = await obs.listFeedback({ filters: { traceId: res.traceId } });
-    expect(feedback.map((f: any) => [f.feedbackType, f.value, f.feedbackUserId]).sort()).toEqual([
-      ["comment", "Il manque la version 2022", "u_test"],
-      ["thumbs", -1, "u_test"],
-    ]);
-
     await sink.forgetTraces([res.traceId!]);
     expect(await obs.getTrace({ traceId: res.traceId })).toBeNull();
+    expect((await obs.listFeedback({ filters: { traceId: res.traceId } })).feedback).toEqual([]);
   });
 
   it("ne trace pas ce qui ne passe pas par repondre() (ingestion, appels directs)", async () => {

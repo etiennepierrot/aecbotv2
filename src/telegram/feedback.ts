@@ -1,34 +1,62 @@
+import { randomUUID } from "node:crypto";
 import type { Mastra } from "@mastra/core";
+
+export interface FeedbackTarget {
+  traceId: string;
+  /** Span racine de la réponse : c'est sur lui que le Studio affiche le feedback. */
+  spanId: string | null;
+  pseudo: string;
+}
 
 /** Où vont les votes et commentaires des militants (Mastra en production, faux en test). */
 export interface FeedbackSink {
-  vote(args: { traceId: string; pseudo: string; value: 1 | -1 }): Promise<void>;
-  comment(args: { traceId: string; pseudo: string; comment: string }): Promise<void>;
+  vote(args: FeedbackTarget & { value: 1 | -1 }): Promise<void>;
+  comment(args: FeedbackTarget & { comment: string }): Promise<void>;
   /** /oublier : efface les traces (et le feedback qui y est attaché). */
   forgetTraces(traceIds: string[]): Promise<void>;
 }
 
+interface ObservabilityStore {
+  createFeedback(args: { feedback: Record<string, unknown> }): Promise<void>;
+  batchDeleteTraces?(args: { traceIds: string[] }): Promise<void>;
+}
+
 /**
- * Feedback Mastra : chaque vote s'attache à la trace de la réponse, visible dans le Studio
- * (onglet Feedback de la trace) avec la question, les recherches et les passages reçus.
+ * Feedback Mastra, écrit directement dans le stockage d'observabilité (base Neon).
+ *
+ * On n'utilise pas `mastra.observability.addFeedback()` : il relit la trace dans le stockage, et
+ * les spans y arrivent par lots avec quelques secondes de retard. Un clic rapide sur 👍/👎
+ * tombait avant, et le vote était abandonné sans erreur. L'écriture directe ne dépend pas de ce délai.
  */
 export function mastraFeedbackSink(mastra: Mastra): FeedbackSink {
-  const add = async (traceId: string, feedback: Record<string, unknown>) => {
-    const addFeedback = mastra.observability.addFeedback;
-    if (!addFeedback) throw new Error("Feedback non pris en charge : observabilité Mastra non configurée");
-    await addFeedback.call(mastra.observability, { traceId, feedback: feedback as never });
+  const store = async (): Promise<ObservabilityStore> => {
+    const s = (await mastra.getStorage()?.getStore("observability")) as unknown as ObservabilityStore | undefined;
+    if (!s?.createFeedback) throw new Error("Stockage d'observabilité sans feedback (PostgresStoreVNext requis)");
+    return s;
   };
+  const write = async (t: FeedbackTarget, fields: Record<string, unknown>) =>
+    (await store()).createFeedback({
+      feedback: {
+        feedbackId: randomUUID(),
+        timestamp: new Date(),
+        traceId: t.traceId,
+        ...(t.spanId ? { spanId: t.spanId } : {}),
+        feedbackSource: "user",
+        feedbackUserId: t.pseudo,
+        entityType: "agent",
+        entityId: "aec",
+        entityName: "aec",
+        serviceName: "aecbot",
+        ...fields,
+      },
+    });
   return {
-    vote: ({ traceId, pseudo, value }) =>
-      add(traceId, { feedbackSource: "user", feedbackType: "thumbs", value, feedbackUserId: pseudo }),
-    comment: ({ traceId, pseudo, comment }) =>
-      add(traceId, { feedbackSource: "user", feedbackType: "comment", value: comment, comment, feedbackUserId: pseudo }),
+    vote: ({ value, ...t }) => write(t, { feedbackType: "thumbs", value }),
+    comment: ({ comment, ...t }) => write(t, { feedbackType: "comment", value: comment, comment }),
     forgetTraces: async (traceIds) => {
       if (traceIds.length === 0) return;
-      const store = await mastra.getStorage()?.getStore("observability");
-      const del = (store as { batchDeleteTraces?: (a: { traceIds: string[] }) => Promise<void> } | undefined)
-        ?.batchDeleteTraces;
-      if (del) await del.call(store, { traceIds });
+      const s = await store();
+      await s.batchDeleteTraces?.({ traceIds });
     },
   };
 }

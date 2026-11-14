@@ -39,6 +39,7 @@ export class BotStore {
         CREATE INDEX IF NOT EXISTS aec_conversations_pseudo ON aec_conversations (pseudo, created_at DESC);
         -- Trace Mastra de la réponse : relie un vote à sa trace, et permet de l'effacer avec /oublier.
         ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS trace_id text;
+        ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS span_id text;
         CREATE INDEX IF NOT EXISTS aec_conversations_trace ON aec_conversations (trace_id) WHERE trace_id IS NOT NULL;
         -- Après un 👎, la question « qu'est-ce qui n'allait pas ? » en attente de réponse.
         CREATE TABLE IF NOT EXISTS aec_feedback_prompts (
@@ -81,23 +82,30 @@ export class BotStore {
     return rows as HistoryMessage[];
   }
 
-  async append(pseudo: string, question: string, answer: string, traceId?: string): Promise<void> {
+  async append(pseudo: string, question: string, answer: string, traceId?: string, spanId?: string): Promise<void> {
     await this.init();
     await this.pool.query(
-      `INSERT INTO aec_conversations (pseudo, role, content, trace_id)
-       VALUES ($1, 'user', $2, NULL), ($1, 'assistant', $3, $4)`,
-      [pseudo, question, answer, traceId ?? null],
+      `INSERT INTO aec_conversations (pseudo, role, content, trace_id, span_id)
+       VALUES ($1, 'user', $2, NULL, NULL), ($1, 'assistant', $3, $4, $5)`,
+      [pseudo, question, answer, traceId ?? null, spanId ?? null],
     );
   }
 
-  /** La réponse de cette trace a-t-elle bien été donnée à cette personne ? (le bouton vient du client) */
-  async ownsTrace(pseudo: string, traceId: string): Promise<boolean> {
+  /**
+   * La réponse de cette trace a-t-elle bien été donnée à cette personne ? (le bouton vient du client)
+   * Renvoie le span racine de la réponse, ou undefined si ce n'est pas le cas.
+   */
+  async answerOf(pseudo: string, traceId: string): Promise<{ spanId: string | null } | undefined> {
     await this.init();
     const { rows } = await this.pool.query(
-      `SELECT 1 FROM aec_conversations WHERE pseudo = $1 AND trace_id = $2 LIMIT 1`,
+      `SELECT span_id FROM aec_conversations WHERE pseudo = $1 AND trace_id = $2 LIMIT 1`,
       [pseudo, traceId],
     );
-    return rows.length > 0;
+    return rows[0] ? { spanId: rows[0].span_id } : undefined;
+  }
+
+  async ownsTrace(pseudo: string, traceId: string): Promise<boolean> {
+    return (await this.answerOf(pseudo, traceId)) !== undefined;
   }
 
   async traceIds(pseudo: string): Promise<string[]> {
@@ -119,7 +127,10 @@ export class BotStore {
   }
 
   /** Consomme la demande de commentaire à laquelle ce message répond, s'il y en a une. */
-  async takeFeedbackPrompt(pseudo: string, promptMessageId: number): Promise<string | undefined> {
+  async takeFeedbackPrompt(
+    pseudo: string,
+    promptMessageId: number,
+  ): Promise<{ traceId: string; spanId: string | null } | undefined> {
     await this.init();
     const { rows } = await this.pool.query(
       `DELETE FROM aec_feedback_prompts WHERE pseudo = $1 AND prompt_message_id = $2
@@ -127,7 +138,9 @@ export class BotStore {
        RETURNING trace_id`,
       [pseudo, promptMessageId],
     );
-    return rows[0]?.trace_id;
+    const traceId = rows[0]?.trace_id as string | undefined;
+    if (!traceId) return undefined;
+    return { traceId, spanId: (await this.answerOf(pseudo, traceId))?.spanId ?? null };
   }
 
   /** Droit à l'effacement : /oublier. */

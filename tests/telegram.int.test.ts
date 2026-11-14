@@ -182,11 +182,13 @@ describe.skipIf(!DB)("bot Telegram", () => {
   });
 
   describe("feedback 👍/👎", () => {
-    const votes: { kind: string; traceId: string; pseudo: string; value?: number; comment?: string }[] = [];
+    const votes: { kind: string; traceId: string; spanId: string | null; pseudo: string; value?: number; comment?: string }[] = [];
     const forgotten: string[][] = [];
     const feedback = {
-      vote: async (a: { traceId: string; pseudo: string; value: 1 | -1 }) => void votes.push({ kind: "vote", ...a }),
-      comment: async (a: { traceId: string; pseudo: string; comment: string }) => void votes.push({ kind: "comment", ...a }),
+      vote: async (a: { traceId: string; spanId: string | null; pseudo: string; value: 1 | -1 }) =>
+        void votes.push({ kind: "vote", ...a }),
+      comment: async (a: { traceId: string; spanId: string | null; pseudo: string; comment: string }) =>
+        void votes.push({ kind: "comment", ...a }),
       forgetTraces: async (ids: string[]) => void forgotten.push(ids),
     };
     const TRACE = "0123456789abcdef0123456789abcdef";
@@ -235,7 +237,7 @@ describe.skipIf(!DB)("bot Telegram", () => {
       await bot.handleUpdate(message("Et la retraite ?") as never);
       sent.length = 0;
       await bot.handleUpdate(click(`fb:up:${TRACE}`) as never);
-      expect(votes).toEqual([{ kind: "vote", traceId: TRACE, pseudo: pseudo(), value: 1 }]);
+      expect(votes).toEqual([{ kind: "vote", traceId: TRACE, spanId: null, pseudo: pseudo(), value: 1 }]);
       expect(sent.map((x) => x.method)).toEqual(["answerCallbackQuery", "editMessageReplyMarkup"]);
       expect(sent[0]!.payload.text).toBe(MESSAGES.merci);
     });
@@ -256,8 +258,8 @@ describe.skipIf(!DB)("bot Telegram", () => {
       };
       await bot.handleUpdate(reply as never);
       expect(votes).toEqual([
-        { kind: "vote", traceId: TRACE, pseudo: pseudo(), value: -1 },
-        { kind: "comment", traceId: TRACE, pseudo: pseudo(), comment: "Le chiffre de 1 400 € est celui de 2022" },
+        { kind: "vote", traceId: TRACE, spanId: null, pseudo: pseudo(), value: -1 },
+        { kind: "comment", traceId: TRACE, spanId: null, pseudo: pseudo(), comment: "Le chiffre de 1 400 € est celui de 2022" },
       ]);
       expect(asked).toHaveLength(0);
       expect(sent.at(-1)!.payload.text).toBe(MESSAGES.commentaireNote);

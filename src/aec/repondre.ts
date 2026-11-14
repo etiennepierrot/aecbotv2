@@ -18,6 +18,8 @@ export interface RepondreResult {
   passages: ReferencedPassage[];
   usage: { inputTokens: number; outputTokens: number };
   traceId?: string;
+  /** Span racine de la trace : le feedback s'y attache. */
+  spanId?: string;
 }
 
 /**
@@ -38,6 +40,9 @@ export async function repondre(question: string, opts: RepondreOptions = {}): Pr
   ];
   const result = await aecAgent.generate(messages, {
     requestContext,
+    // Première étape : appel de l'outil obligatoire. Sans ça, le modèle répond parfois
+    // « INTROUVABLE » de lui-même, sans avoir cherché (question polémique, suite de conversation).
+    prepareStep: ({ stepNumber }) => (stepNumber === 0 ? { toolChoice: "required" as const } : undefined),
     ...(opts.model ? { model: opts.model as never } : {}),
   });
   if (result.error) throw result.error;
@@ -55,5 +60,6 @@ export async function repondre(question: string, opts: RepondreOptions = {}): Pr
       outputTokens: result.totalUsage?.outputTokens ?? 0,
     },
     traceId: result.traceId,
+    spanId: result.spanId,
   };
 }

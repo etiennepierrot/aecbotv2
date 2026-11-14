@@ -84,10 +84,10 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
     // Réponse à « qu'est-ce qui n'allait pas ? » : c'est un commentaire, pas une question.
     const repliedTo = ctx.message.reply_to_message?.message_id;
     if (repliedTo && deps.feedback) {
-      const traceId = await deps.store.takeFeedbackPrompt(pseudo, repliedTo);
-      if (traceId) {
-        await deps.feedback.comment({ traceId, pseudo, comment: question.slice(0, MAX_COMMENT) });
-        log?.info("commentaire reçu", { pseudo, traceId });
+      const target = await deps.store.takeFeedbackPrompt(pseudo, repliedTo);
+      if (target) {
+        await deps.feedback.comment({ ...target, pseudo, comment: question.slice(0, MAX_COMMENT) });
+        log?.info("commentaire reçu", { pseudo, traceId: target.traceId });
         return void (await ctx.reply(MESSAGES.commentaireNote));
       }
     }
@@ -101,13 +101,13 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
     const started = Date.now();
     try {
       const historique = await deps.store.history(pseudo);
-      const { reponse, usage, traceId } = await deps.repondre(question, { historique });
+      const { reponse, usage, traceId, spanId } = await deps.repondre(question, { historique });
       await ctx.reply(formatAnswer(reponse), {
         parse_mode: "HTML",
         link_preview_options: { is_disabled: true },
         ...(traceId && deps.feedback ? { reply_markup: voteKeyboard(traceId) } : {}),
       });
-      await deps.store.append(pseudo, question, answerForMemory(reponse), traceId);
+      await deps.store.append(pseudo, question, answerForMemory(reponse), traceId, spanId);
       // Ni question, ni réponse, ni identifiant dans les journaux.
       log?.info("question traitée", {
         pseudo,
@@ -126,12 +126,13 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
     const pseudo = pseudoOf(ctx, deps);
     const [, sens, traceId] = ctx.match as RegExpMatchArray;
     // Le bouton vient du client : on vérifie que cette réponse a bien été donnée à cette personne.
-    if (!pseudo || !deps.feedback || !(await deps.store.ownsTrace(pseudo, traceId!))) {
+    const answer = pseudo && deps.feedback ? await deps.store.answerOf(pseudo, traceId!) : undefined;
+    if (!pseudo || !deps.feedback || !answer) {
       return void (await ctx.answerCallbackQuery({ text: MESSAGES.voteExpire }));
     }
     const value = sens === "up" ? 1 : -1;
     try {
-      await deps.feedback.vote({ traceId: traceId!, pseudo, value });
+      await deps.feedback.vote({ traceId: traceId!, spanId: answer.spanId, pseudo, value });
     } catch (e) {
       log?.error("échec du vote", { pseudo, erreur: e instanceof Error ? e.message : String(e) });
       return void (await ctx.answerCallbackQuery({ text: MESSAGES.erreur }));
