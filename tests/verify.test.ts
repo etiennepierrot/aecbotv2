@@ -26,14 +26,14 @@ describe("verifyAnswer", () => {
       }),
     );
 
-  it("renumérote les références et fusionne les passages d'une même page", () => {
+  it("renumérote les références : un numéro par document, avec ses pages", () => {
     const a = verifyAnswer(
       "Le programme prévoit la retraite à 60 ans [P1]. Après 40 annuités [P2]. Le livret Emploi le confirme [P3].",
       c(),
     );
     expect(a.statut).toBe("repondu");
     expect(a.texte).toBe("Le programme prévoit la retraite à 60 ans [1]. Après 40 annuités [1]. Le livret Emploi le confirme [2].");
-    expect(a.sources.map((s) => [s.n, s.page])).toEqual([[1, 33], [2, 23]]);
+    expect(a.sources.map((s) => [s.n, s.pages])).toEqual([[1, [33]], [2, [23]]]);
     expect(a.avertissements).toEqual(["Programme provisoire : une édition plus récente peut exister."]);
     expect(a.controle).toMatchObject({ citationsValides: 3, citationsRejetees: 0, phrasesRetirees: 0 });
   });
@@ -64,6 +64,18 @@ describe("verifyAnswer", () => {
     expect(verifyAnswer("Le programme prévoit la retraite à 60 ans.", c()).statut).toBe("introuvable");
     const allFake = verifyAnswer("Le programme interdit TikTok [P42].", c());
     expect(allFake).toMatchObject({ statut: "introuvable", controle: { citationsRejetees: 1 } });
+  });
+
+  it("regroupe plusieurs pages d'un même document sous un seul numéro", () => {
+    const col = collectorWith(
+      passage("d#p21#0", { page: 21, url: "https://x/paix.pdf", title: "Livret paix" }),
+      passage("d#p3#0", { page: 3, url: "https://x/paix.pdf", title: "Livret paix" }),
+      passage("d#p23#0", { page: 23, url: "https://x/paix.pdf", title: "Livret paix" }),
+    );
+    const a = verifyAnswer("Non-alignement [P1][P2]. Sortie de l'OTAN [P3].", col);
+    expect(a.texte).toBe("Non-alignement [1]. Sortie de l'OTAN [1].");
+    expect(a.sources).toHaveLength(1);
+    expect(a.sources[0]!.pages).toEqual([3, 21, 23]);
   });
 
   it("dit explicitement qu'une réponse s'appuie sur la version 2022, pas à jour", () => {

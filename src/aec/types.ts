@@ -19,11 +19,13 @@ export interface ReferencedPassage extends RetrievedPassage {
   ref: string;
 }
 
+/** Un document cité ; plusieurs pages d'un même document partagent son numéro. */
 export interface Source {
   n: number;
   title: string;
   url: string;
-  page: number | null;
+  /** Pages citées, dans l'ordre (vide pour une page web). */
+  pages: number[];
   category: Category;
   corpus: Corpus;
   provisional: boolean;

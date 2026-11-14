@@ -39,7 +39,7 @@ export const sourceAttendueScorer = createScorer<{ question: string }, ScoredRun
   if (expected.length === 0) return 1;
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
   return run.output.reponse.sources.some((s) =>
-    expected.some((e) => norm(s.title).includes(norm(e.document)) && (!e.pages?.length || e.pages.includes(s.page ?? -1))),
+    expected.some((e) => norm(s.title).includes(norm(e.document)) && (!e.pages?.length || s.pages.some((pg) => e.pages!.includes(pg)))),
   )
     ? 1
     : 0;
@@ -70,11 +70,12 @@ export const createFideliteScorer = (judgeModel: string | object = DEFAULT_JUDGE
     }),
     createPrompt: ({ run }) => {
       const { reponse, passages } = run.output;
-      const cited = new Set(reponse.sources.map((s) => `${s.url}#${s.page ?? ""}`));
+      const citedSource = (p: ReferencedPassage) =>
+        reponse.sources.find((s) => s.url === p.url && (p.page === null || s.pages.includes(p.page)));
       const context = passages
-        .filter((p) => cited.has(`${p.url}#${p.page ?? ""}`))
+        .filter((p) => citedSource(p))
         .map((p) => {
-          const n = reponse.sources.find((s) => s.url === p.url && s.page === p.page)?.n;
+          const n = citedSource(p)?.n;
           return `[${n}] ${p.title}, page ${p.page ?? "web"}\n${p.text}`;
         })
         .join("\n\n");

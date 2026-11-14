@@ -54,7 +54,7 @@ describe("repondre", () => {
     expect(res.reponse).toMatchObject({
       statut: "repondu",
       texte: "Le programme prévoit de rétablir la retraite à 60 ans [1].",
-      sources: [{ n: 1, page: 33, title: "PROGRAMME SITE 2025" }],
+      sources: [{ n: 1, pages: [33], title: "PROGRAMME SITE 2025" }],
       controle: { passagesRecuperes: 1, citationsValides: 1, citationsRejetees: 1, phrasesRetirees: 1 },
     });
     expect(res.usage).toEqual({ inputTokens: 200, outputTokens: 40 });
@@ -69,10 +69,14 @@ describe("repondre", () => {
       embedder: { dimension: 3, embed: async () => { throw new Error("password authentication failed for user 'neondb_owner'"); } },
       vector: previous.vector,
     });
-    const model = fakeModel((_p, call) =>
-      call === 1 ? { tool: "recherche", input: { requete: "SMIC" } } : { text: "INTROUVABLE" },
-    );
+    const model = fakeModel((prompt, call) => {
+      if (call === 1) return { tool: "recherche", input: { requete: "SMIC" } };
+      // Le modèle est prié de ne pas réessayer en boucle.
+      expect(lastToolOutput(prompt)).toContain("Ne réessaie pas");
+      return { text: "INTROUVABLE" };
+    });
     await expect(repondre("Et le SMIC ?", { model })).rejects.toThrow(/Recherche impossible : password authentication failed/);
+    expect(model.calls).toHaveLength(2);
     deps.setRetrievalDeps(previous);
   });
 

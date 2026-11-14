@@ -23,16 +23,22 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
 
   const sources: Source[] = [];
   const sourceKey = new Map<string, number>();
+  // Un numéro par document (pas par page) : une réponse qui cite 3 pages du même livret
+  // affiche [4] et « pages 3, 21, 23 » plutôt que trois sources.
   const numberFor = (p: ReferencedPassage): number => {
-    const key = `${p.url}#${p.page ?? ""}`;
-    let n = sourceKey.get(key);
+    let n = sourceKey.get(p.url);
     if (n === undefined) {
       n = sources.length + 1;
-      sourceKey.set(key, n);
+      sourceKey.set(p.url, n);
       sources.push({
-        n, title: p.title, url: p.url, page: p.page,
+        n, title: p.title, url: p.url, pages: [],
         category: p.category, corpus: p.corpus, provisional: p.provisional,
       });
+    }
+    const source = sources[n - 1]!;
+    if (p.page !== null && !source.pages.includes(p.page)) {
+      source.pages.push(p.page);
+      source.pages.sort((a, b) => a - b);
     }
     return n;
   };
@@ -61,6 +67,11 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
             .filter((p): p is ReferencedPassage => !!p)
             .map(numberFor);
           return [...new Set(ns)].map((n) => `[${n}]`).join("");
+        })
+        // [P1][P2] sur deux pages du même document donnent [1][1] : on fusionne.
+        .replace(/(?:\[\d+\]\s*){2,}/g, (run) => {
+          const ns = [...new Set(run.match(/\d+/g)!)];
+          return ns.map((n) => `[${n}]`).join("") + (/\s$/.test(run) ? " " : "");
         }),
       );
     }

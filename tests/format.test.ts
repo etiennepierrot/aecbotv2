@@ -7,8 +7,8 @@ const answer: Answer = {
   statut: "repondu",
   texte: "Retraite à 60 ans [1]. Le livret <Emploi> & co le confirme [2].",
   sources: [
-    { n: 1, title: "PROGRAMME SITE 2025", url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf", page: 33, category: "programme", corpus: "aec2027", provisional: true },
-    { n: 2, title: "Livret_UP_21_EMPLOI_web-ok", url: "https://melenchon2027.fr/x.pdf?a=1&b=\"2\"", page: 23, category: "livret", corpus: "aec2027", provisional: false },
+    { n: 1, title: "PROGRAMME SITE 2025", url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf", pages: [33], category: "programme", corpus: "aec2027", provisional: true },
+    { n: 2, title: "Livret_UP_21_EMPLOI_web-ok", url: "https://melenchon2027.fr/x.pdf?a=1&b=\"2\"", pages: [23], category: "livret", corpus: "aec2027", provisional: false },
   ],
   avertissements: ["Programme provisoire : une édition plus récente peut exister."],
   controle: { passagesRecuperes: 3, citationsValides: 2, citationsRejetees: 0, phrasesRetirees: 0, phrasesSansSource: 0 },

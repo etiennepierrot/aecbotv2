@@ -33,7 +33,7 @@ describe.skipIf(!DB)("bot Telegram", () => {
   const answered = (texte: string): RepondreResult => ({
     reponse: {
       statut: "repondu", texte,
-      sources: [{ n: 1, title: "PROGRAMME SITE 2025", url: "https://x/p.pdf", page: 33, category: "programme", corpus: "aec2027", provisional: true }],
+      sources: [{ n: 1, title: "PROGRAMME SITE 2025", url: "https://x/p.pdf", pages: [33], category: "programme", corpus: "aec2027", provisional: true }],
       avertissements: [],
       controle: { passagesRecuperes: 4, citationsValides: 1, citationsRejetees: 0, phrasesRetirees: 0, phrasesSansSource: 0 },
     },

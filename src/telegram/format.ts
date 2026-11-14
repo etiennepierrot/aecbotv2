@@ -6,7 +6,7 @@ const MAX_LENGTH = 4000; // Telegram coupe à 4096 caractères
 
 /** Réponse vérifiée → message Telegram (parse_mode HTML). */
 export function formatAnswer(answer: Answer): string {
-  const parts = [escapeHtml(answer.texte)];
+  const parts = [markdownToTelegramHtml(answer.texte)];
   if (answer.sources.length) parts.push(answer.sources.map(formatSource).join("\n"));
   const notes = [...answer.avertissements, DISCLAIMER].map((n) => `<i>${escapeHtml(n)}</i>`).join("\n");
   parts.push(notes);
@@ -15,8 +15,9 @@ export function formatAnswer(answer: Answer): string {
 }
 
 function formatSource(s: Source): string {
-  const href = s.page ? `${s.url}#page=${s.page}` : s.url;
-  const where = s.page ? `, page ${s.page}` : "";
+  const first = s.pages[0];
+  const href = first ? `${s.url}#page=${first}` : s.url;
+  const where = s.pages.length === 0 ? "" : s.pages.length === 1 ? `, page ${first}` : `, pages ${s.pages.join(", ")}`;
   const old = s.corpus === "aec2022" ? " (version 2022, pas à jour)" : "";
   return `[${s.n}] <a href="${escapeAttr(href)}">${escapeHtml(prettyTitle(s.title, s.category, s.corpus))}</a>${where}${old}`;
 }
@@ -24,14 +25,14 @@ function formatSource(s: Source): string {
 function truncate(answer: Answer, notes: string): string {
   const sources = answer.sources.map(formatSource).join("\n");
   const room = MAX_LENGTH - sources.length - notes.length - 10;
-  return [escapeHtml(answer.texte.slice(0, Math.max(room, 200))) + "…", sources, notes].join("\n\n");
+  return [markdownToTelegramHtml(answer.texte.slice(0, Math.max(room, 200))) + "…", sources, notes].join("\n\n");
 }
 
 /** Résumé gardé en mémoire pour les questions de suite : la réponse et ses sources. */
 export function answerForMemory(answer: Answer): string {
   if (answer.statut === "introuvable") return "Rien trouvé dans le corpus.";
   const sources = answer.sources.map(
-    (s) => `[${s.n}] ${prettyTitle(s.title, s.category, s.corpus)}${s.page ? ` p. ${s.page}` : ""}`,
+    (s) => `[${s.n}] ${prettyTitle(s.title, s.category, s.corpus)}${s.pages.length ? ` p. ${s.pages.join(", ")}` : ""}`,
   );
   return `${answer.texte}\nSources : ${sources.join(" ; ")}`;
 }
@@ -83,6 +84,27 @@ export function prettyTitle(title: string, category: Category, corpus: Corpus = 
   if (category === "livret" || (category === "publication_2026" && isLivret)) return `Livret « ${t} »`;
   if (category === "plan" || (category === "publication_2026" && isPlan)) return `Plan « ${t.replace(/^plan /, "")} »`;
   return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+/**
+ * Le peu de Markdown que les modèles écrivent malgré tout → HTML de Telegram.
+ * Le texte est échappé d'abord : rien d'autre que ces balises ne peut passer.
+ */
+export function markdownToTelegramHtml(md: string): string {
+  return md
+    .split("\n")
+    .map((line) => {
+      let l = escapeHtml(line);
+      const heading = /^\s{0,3}#{1,6}\s+(.*)$/.exec(l);
+      if (heading) return `<b>${heading[1]!.replace(/\*\*/g, "")}</b>`;
+      l = l.replace(/^(\s*)[-*+]\s+/, "$1• ");
+      l = l.replace(/\*\*(?=\S)(.+?)(?<=\S)\*\*/g, "<b>$1</b>");
+      l = l.replace(/__(?=\S)(.+?)(?<=\S)__/g, "<b>$1</b>");
+      l = l.replace(/(^|[\s(])\*(?=\S)([^*]+?)(?<=\S)\*(?=[\s.,;:!?)]|$)/g, "$1<i>$2</i>");
+      l = l.replace(/(^|[\s(])_(?=\S)([^_]+?)(?<=\S)_(?=[\s.,;:!?)]|$)/g, "$1<i>$2</i>");
+      return l.replace(/\*\*/g, ""); // gras non refermé : on retire les astérisques
+    })
+    .join("\n");
 }
 
 export function escapeHtml(s: string): string {

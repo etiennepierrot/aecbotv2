@@ -20,7 +20,9 @@ if (!question) {
 assertModelKey(values.model ?? DEFAULT_MODEL);
 const { reponse, brut, usage } = await repondre(question, { model: values.model });
 console.log(`\n${reponse.texte}\n`);
-for (const s of reponse.sources) console.log(`[${s.n}] ${s.title} — ${s.page ? `page ${s.page}` : "page web"}  ${s.url}`);
+for (const s of reponse.sources) {
+  console.log(`[${s.n}] ${s.title} — ${s.pages.length ? `p. ${s.pages.join(", ")}` : "page web"}  ${s.url}`);
+}
 for (const a of reponse.avertissements) console.log(`⚠ ${a}`);
 const c = reponse.controle;
 console.log(
