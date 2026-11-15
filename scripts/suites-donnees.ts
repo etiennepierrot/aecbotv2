@@ -94,8 +94,8 @@ if (avecReelles) {
   });
   console.log(`Suites réelles : ${n} dans ${racines.length} trace(s) des ${values.jours} derniers jours`);
 
-  // Sans traces en base : on rejoue les questions encore en mémoire. `brut` est le texte du modèle
-  // avant vérification, donc avec toutes ses suites, y compris celles que le seuil aurait retirées.
+  // Sans traces en base : on rejoue les questions encore en mémoire, et on garde les suites
+  // avant le filtre par score, y compris celles que le seuil aurait retirées.
   if (racines.length === 0) {
     const { rows } = await pool.query(
       `SELECT DISTINCT content FROM aec_conversations
@@ -106,7 +106,8 @@ if (avecReelles) {
     let m = 0;
     await enParallele(rows as { content: string }[], 3, async ({ content }) => {
       try {
-        const suites = suitesDeSortie((await repondre(content)).brut);
+        // Les suites que la vérification garde (elles citent un passage reçu), avant le filtre par score.
+        const suites = (await repondre(content)).suitesAvantFiltre;
         m += suites.length;
         // Comme plus haut : la suite seule, jamais la question de l'utilisateur.
         for (const question of suites) brutes.push({ question, origine: "reelle" });

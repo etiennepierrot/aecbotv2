@@ -69,13 +69,15 @@ describe("repondre", () => {
     const model = fakeModel((_prompt, call) =>
       call === 1
         ? { tool: "recherche", input: { requete: "retraite" } }
-        : { text: "Retraite à 60 ans [P1].\nSUITES :\n1. Comment serait-elle financée ?\n2. Et le football ?" },
+        : { text: "Retraite à 60 ans [P1].\nSUITES :\n1. Comment serait-elle financée ? [P1]\n2. Et le football ? [P1]" },
     );
     // La recherche simulée ne trouve rien pour un filtre multi-éditions : score 0, suites écartées.
     const res = await repondre("Et la retraite ?", { model });
     expect(res.reponse.texte).toBe("Retraite à 60 ans [1].");
     expect(res.reponse.suites).toEqual([]);
     expect(res.reponse.controle.suitesRetirees).toBe(2);
+    // Avant le filtre par score, les deux suites citaient un passage reçu.
+    expect(res.suitesAvantFiltre).toEqual(["Comment serait-elle financée ?", "Et le football ?"]);
   });
 
   it("une panne de la recherche remonte comme une erreur, pas comme « introuvable »", async () => {

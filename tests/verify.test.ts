@@ -118,12 +118,28 @@ describe("suites d'approfondissement", () => {
 
   it("sépare le bloc SUITES de la réponse, sans le compter comme phrases sans source", () => {
     const a = verifyAnswer(
-      "Retraite à 60 ans [P1].\n\nSUITES :\n1. Comment serait-elle financée ? [P1]\n2. **Et les carrières longues ?**\n3. Et la pénibilité ?",
+      "Retraite à 60 ans [P1].\n\nSUITES :\n1. Comment serait-elle financée ? [P1]\n2. **Et les carrières longues ?** [P1]\n3. Et la pénibilité ? [P1, P9]",
       c(),
     );
     expect(a.texte).toBe("Retraite à 60 ans [1].");
     expect(a.suites).toEqual(["Comment serait-elle financée ?", "Et les carrières longues ?", "Et la pénibilité ?"]);
     expect(a.controle.phrasesSansSource).toBe(0);
+    expect(a.controle.suitesSansPassage).toBe(0);
+  });
+
+  it("écarte une suite sans référence, ou dont la référence n'a pas été renvoyée", () => {
+    const a = verifyAnswer(
+      "Retraite à 60 ans [P1].\nSUITES :\n1. Et le financement ?\n2. Et le calendrier ? [P7]\n3. Et les carrières longues ? [P1]",
+      c(),
+    );
+    expect(a.suites).toEqual(["Et les carrières longues ?"]);
+    expect(a.controle.suitesSansPassage).toBe(2);
+  });
+
+  it("garde 3 suites au plus parmi celles qui citent un passage", () => {
+    const lignes = ["A ?", "B ?", "C ?", "D ?", "E ?"].map((q, i) => `${i + 1}. Question ${q}${i === 0 ? "" : " [P1]"}`);
+    const a = verifyAnswer(`Retraite à 60 ans [P1].\nSUITES :\n${lignes.join("\n")}`, c());
+    expect(a.suites).toEqual(["Question B ?", "Question C ?", "Question D ?"]);
   });
 
   it("accepte « Pour aller plus loin », ne garde que de vraies questions courtes, 3 au plus, sans doublon", () => {

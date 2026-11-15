@@ -11,14 +11,14 @@ const MARKER = /\[\s*(P\d+(?:\s*[,;]\s*P\d+)*)\s*\]/gi;
  * - s'il ne reste aucune citation valide, la réponse devient « introuvable ».
  */
 export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
-  const controle = {
+  const controle: Answer["controle"] = {
     passagesRecuperes: collector.size,
     citationsValides: 0,
     citationsRejetees: 0,
     phrasesRetirees: 0,
     phrasesSansSource: 0,
   };
-  const { texte: text, suites } = extractSuites(raw);
+  const { texte: text, suites: brutes } = parseSuites(raw);
   if (!text || /^\W*INTROUVABLE\b/i.test(text)) return introuvable(controle);
 
   const sources: Source[] = [];
@@ -96,6 +96,8 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
         "le programme 2027 n'est pas encore publié en entier.",
     );
   }
+  const { gardees: suites, sansPassage } = suitesVerifiees(brutes, collector);
+  if (brutes.length) controle.suitesSansPassage = sansPassage;
   return { statut: "repondu", texte, sources, avertissements, suites, controle };
 }
 
@@ -103,29 +105,49 @@ const SUITES_HEADING = /^\s*(?:\*\*)?\s*(?:SUITES|Pour aller plus loin)\s*(?:\*\
 export const MAX_SUITES = 3;
 const MAX_SUITE_LENGTH = 120;
 
+export interface SuiteBrute {
+  question: string;
+  /** Références [Pn] écrites par le modèle : le passage qui répond à la suite. */
+  refs: string[];
+}
+
 /**
  * Sépare le bloc « SUITES : » (questions d'approfondissement) du corps de la réponse.
- * Les questions ne sont pas vérifiées comme des affirmations : on retire leurs références
- * et on ne garde que de vraies questions, courtes.
+ * Ne garde que de vraies questions, courtes, sans doublon ; les références sont mises à part.
  */
-export function extractSuites(raw: string): { texte: string; suites: string[] } {
+export function parseSuites(raw: string): { texte: string; suites: SuiteBrute[] } {
   const text = raw.trim();
   const m = SUITES_HEADING.exec(text);
   if (!m) return { texte: text, suites: [] };
-  const suites: string[] = [];
+  const suites: SuiteBrute[] = [];
   for (const line of text.slice(m.index + m[0].length).split("\n")) {
     const item = /^\s*(?:\d+\s*[.)]|[-*•])\s*(.+)$/.exec(line)?.[1];
     if (!item) continue;
-    const q = item
+    const refs = [...item.matchAll(MARKER)].flatMap((r) => r[1]!.split(/[,;]/).map((x) => x.trim()));
+    const question = item
       .replace(MARKER, "")
       .replace(/\*\*|__|[*_`]/g, "")
       .replace(/\s+/g, " ")
       .trim();
-    if (q.length < 8 || q.length > MAX_SUITE_LENGTH || !q.endsWith("?")) continue;
-    if (!suites.some((s) => s.toLowerCase() === q.toLowerCase())) suites.push(q);
-    if (suites.length === MAX_SUITES) break;
+    if (question.length < 8 || question.length > MAX_SUITE_LENGTH || !question.endsWith("?")) continue;
+    if (!suites.some((s) => s.question.toLowerCase() === question.toLowerCase())) suites.push({ question, refs });
   }
   return { texte: text.slice(0, m.index).trim(), suites };
+}
+
+/** Les questions de suite seules (3 au plus), sans vérifier leurs références. */
+export function extractSuites(raw: string): { texte: string; suites: string[] } {
+  const { texte, suites } = parseSuites(raw);
+  return { texte, suites: suites.slice(0, MAX_SUITES).map((s) => s.question) };
+}
+
+/**
+ * Comme pour les affirmations : une suite n'est gardée que si elle cite un passage que
+ * la recherche a vraiment renvoyé. Sans passage, rien ne dit que le corpus sait y répondre.
+ */
+export function suitesVerifiees(suites: SuiteBrute[], collector: PassageCollector): { gardees: string[]; sansPassage: number } {
+  const avecPassage = suites.filter((s) => s.refs.some((r) => collector.get(r)));
+  return { gardees: avecPassage.slice(0, MAX_SUITES).map((s) => s.question), sansPassage: suites.length - avecPassage.length };
 }
 
 function introuvable(controle: Answer["controle"]): Answer {

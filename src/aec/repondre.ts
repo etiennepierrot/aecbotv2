@@ -16,6 +16,8 @@ export interface RepondreResult {
   reponse: Answer;
   /** Texte brut du modèle, avant vérification. */
   brut: string;
+  /** Suites qui citent un passage valide, avant le filtre par score (calibrage, mesures). */
+  suitesAvantFiltre: string[];
   passages: ReferencedPassage[];
   usage: { inputTokens: number; outputTokens: number };
   traceId?: string;
@@ -53,6 +55,7 @@ export async function repondre(question: string, opts: RepondreOptions = {}): Pr
   }
 
   const reponse = verifyAnswer(result.text, collector);
+  const suitesAvantFiltre = reponse.suites ?? [];
   // On ne propose que des suites que le corpus sait servir.
   if (reponse.suites?.length) {
     const { gardees, retirees } = await filtrerSuites(reponse.suites);
@@ -63,6 +66,7 @@ export async function repondre(question: string, opts: RepondreOptions = {}): Pr
   return {
     reponse,
     brut: result.text,
+    suitesAvantFiltre,
     passages: collector.all(),
     usage: {
       inputTokens: result.totalUsage?.inputTokens ?? 0,

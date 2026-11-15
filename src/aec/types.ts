@@ -48,6 +48,8 @@ export interface Answer {
     phrasesSansSource: number;
     /** Suites proposées par le modèle mais écartées : le corpus ne permettrait pas d'y répondre. */
     suitesRetirees?: number;
+    /** Suites écartées parce qu'elles ne citent aucun passage renvoyé par la recherche. */
+    suitesSansPassage?: number;
   };
 }
 
