@@ -4,7 +4,7 @@
  *   pnpm ask --model openai/gpt-5-mini "…"
  */
 import { parseArgs } from "node:util";
-import "../src/mastra/index.js";
+import { mastra } from "../src/mastra/index.js";
 import { repondre } from "../src/aec/repondre.js";
 import { pgVector } from "../src/corpus/deps.js";
 import { assertModelKey } from "../src/config.js";
@@ -30,4 +30,6 @@ console.log(
     `${c.phrasesRetirees} phrases retirées · ${usage.inputTokens}+${usage.outputTokens} jetons`,
 );
 if (c.citationsRejetees || c.phrasesRetirees) console.log(`\nTexte brut du modèle :\n${brut}`);
+// Les spans partent par lots : les écrire en base avant de quitter.
+await (mastra.observability as unknown as { flush?: () => Promise<void> }).flush?.();
 await pgVector().pool.end();

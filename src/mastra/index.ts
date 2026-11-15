@@ -1,9 +1,11 @@
 import { Mastra } from "@mastra/core";
 import { PinoLogger } from "@mastra/loggers";
-import { MastraStorageExporter, Observability, SamplingStrategyType } from "@mastra/observability";
+import { Observability, SamplingStrategyType } from "@mastra/observability";
 import { PostgresStoreVNext } from "@mastra/pg";
 import { COLLECTOR_KEY } from "../aec/collector.js";
 import { cloudExporter } from "./cloud-exporter.js";
+import { NeonStorageExporter } from "./storage-exporter.js";
+import { verifierTraces } from "./traces-check.js";
 import { registerApiRoute, SimpleAuth } from "@mastra/core/server";
 import { config, PASSAGES_INDEX } from "../config.js";
 import { pgVector } from "../corpus/deps.js";
@@ -30,7 +32,10 @@ const statusRoute = registerApiRoute("/status", {
         return c.json({ status: "index absent", version }, 503);
       }
       const n = await pgVector().pool.query(`SELECT count(*)::int AS n FROM ${PASSAGES_INDEX}`);
-      return c.json({ status: "ok", version, passages: n.rows[0].n });
+      // Réponses des dernières 24 h sans leur trace en base : à 0 attendu. Signalé sans passer
+      // en 503, pour ne pas bloquer le test après déploiement sur un défaut d'observabilité.
+      const traces = await verifierTraces(pgVector().pool).catch(() => undefined);
+      return c.json({ status: "ok", version, passages: n.rows[0].n, ...(traces ? { traces } : {}) });
     } catch {
       return c.json({ status: "base injoignable", version }, 503);
     }
@@ -83,7 +88,8 @@ export const mastra = new Mastra({
       default: {
         serviceName: "aecbot",
         // Neon (Studio, /oublier, purge) et, si un token est fourni, Mastra Cloud.
-        exporters: [new MastraStorageExporter(), cloudExporter],
+        // Pas MastraStorageExporter directement : Mastra Cloud le retire (voir storage-exporter.ts).
+        exporters: [new NeonStorageExporter(), cloudExporter],
         sampling: { type: SamplingStrategyType.CUSTOM, sampler: (o) => o?.requestContext?.get(COLLECTOR_KEY as never) !== undefined },
         logging: { enabled: false },
       },
