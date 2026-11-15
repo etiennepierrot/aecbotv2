@@ -48,6 +48,27 @@ jobs:
           TEST_DATABASE_URL: postgresql://aecbot:aecbot@localhost:5432/aecbot_test
       - name: Build Mastra
         run: pnpm build
+      - name: Build lancé comme sur Mastra Platform (traces écrites dans Postgres)
+        # MASTRA_DEPLOYMENT_ID fait retirer MastraStorageExporter par @mastra/observability :
+        # /status dit si l'exporteur vers la base a survécu (voir src/mastra/storage-exporter.ts).
+        env:
+          MASTRA_DEPLOYMENT_ID: ci
+          DATABASE_URL: postgresql://aecbot:aecbot@localhost:5432/aecbot_test
+          PORT: "4111"
+        run: |
+          node .mastra/output/index.mjs > server.log 2>&1 &
+          for i in $(seq 1 30); do
+            body=$(curl -sS localhost:4111/status || true)
+            if [ -n "$body" ]; then break; fi
+            sleep 1
+          done
+          kill %1 || true
+          echo "/status : $body"
+          if ! echo "$body" | grep -q '"traces":true'; then
+            cat server.log
+            echo "::error::Le build ne garde pas l'exporteur vers Postgres : les traces seraient perdues en production"
+            exit 1
+          fi
 
   deployer:
     name: Déployer en production
@@ -95,6 +116,11 @@ jobs:
             body=$(curl -fsS "${{ vars.PROD_URL }}/status" || true)
             echo "essai $i : $body"
             if echo "$body" | grep -q "\"version\":\"$expected\""; then echo "Version $expected en ligne"; exit 0; fi
+            # 503 « traces non enregistrées » : curl -f échoue, on le dit plutôt que d'attendre.
+            raw=$(curl -sS "${{ vars.PROD_URL }}/status" || true)
+            if echo "$raw" | grep -q "\"version\":\"$expected\".*\"traces\":false"; then
+              echo "::error::Version $expected en ligne, mais les traces ne sont pas écrites dans Neon : $raw"; exit 1
+            fi
             sleep 10
           done
           echo "::error::/status ne renvoie pas la version $expected après 5 minutes"
