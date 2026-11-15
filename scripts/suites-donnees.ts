@@ -2,6 +2,8 @@
  * Construit evals/suites.json, le jeu de données du calibrage de SUITES_MIN_SCORE.
  *   pnpm suites:donnees:prod                         les trois sources, valeurs par défaut
  *   pnpm suites:donnees:prod --reelles --jours 30    seulement les suites proposées en production
+ *   pnpm suites:donnees:prod --rejouer               rejoue les questions récentes avec le prompt actuel
+ *                                                    (sans lire les traces : pour mesurer un changement de prompt)
  *   pnpm suites:donnees:prod --passages 50           seulement des questions écrites depuis des passages
  *   pnpm suites:donnees:prod --voisines 50           seulement des questions voisines, a priori sans réponse
  *
@@ -37,16 +39,17 @@ import {
 const { values } = parseArgs({
   options: {
     reelles: { type: "boolean", default: false },
+    rejouer: { type: "boolean", default: false },
     jours: { type: "string", default: "30" },
     passages: { type: "string" },
     voisines: { type: "string" },
     sortie: { type: "string", default: "evals/suites.json" },
   },
 });
-const toutes = !values.reelles && values.passages === undefined && values.voisines === undefined;
+const toutes = !values.reelles && !values.rejouer && values.passages === undefined && values.voisines === undefined;
 const nPassages = Number(values.passages ?? (toutes ? 50 : 0));
 const nVoisines = Number(values.voisines ?? (toutes ? 50 : 0));
-const avecReelles = toutes || values.reelles;
+const avecReelles = toutes || values.reelles || values.rejouer;
 const LLM_CONCURRENCE = 4;
 const TOP_K = 8;
 
@@ -74,7 +77,7 @@ if (avecReelles) {
   const obs = (await mastra.getStorage()?.getStore("observability")) as any;
   const start = new Date(Date.now() - Number(values.jours) * 86_400_000);
   const racines: { traceId: string; output?: unknown }[] = [];
-  for (let page = 0; ; page++) {
+  for (let page = 0; !values.rejouer; page++) {
     const res = (await obs.listTraces({
       filters: { startedAt: { start } },
       pagination: { page, perPage: 100 },
@@ -92,7 +95,7 @@ if (avecReelles) {
     // survivre à MEMORY_DAYS. La suite, écrite par le modèle, ne dit rien de la personne.
     for (const question of suites) brutes.push({ question, origine: "reelle" });
   });
-  console.log(`Suites réelles : ${n} dans ${racines.length} trace(s) des ${values.jours} derniers jours`);
+  if (!values.rejouer) console.log(`Suites réelles : ${n} dans ${racines.length} trace(s) des ${values.jours} derniers jours`);
 
   // Sans traces en base : on rejoue les questions encore en mémoire, et on garde les suites
   // avant le filtre par score, y compris celles que le seuil aurait retirées.
@@ -102,7 +105,7 @@ if (avecReelles) {
         WHERE role = 'user' AND created_at > now() - make_interval(days => $1) AND length(content) >= 10`,
       [Number(values.jours)],
     );
-    console.log(`Pas de trace : ${rows.length} question(s) rejouée(s) depuis aec_conversations…`);
+    console.log(`${values.rejouer ? "Rejeu demandé" : "Pas de trace"} : ${rows.length} question(s) rejouée(s) depuis aec_conversations…`);
     let m = 0;
     await enParallele(rows as { content: string }[], 3, async ({ content }) => {
       try {
