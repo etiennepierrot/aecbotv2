@@ -1,5 +1,6 @@
 import { config, PASSAGES_INDEX } from "../config.js";
 import { retrievalDeps } from "../corpus/deps.js";
+import { enParallele } from "./suites-donnees.js";
 
 export interface SuiteScore {
   question: string;
@@ -16,26 +17,14 @@ export async function scoreQuestions(questions: string[]): Promise<SuiteScore[]>
   const { embedder, vector } = await retrievalDeps();
   const vectors = await embedder.embed(questions);
   const filter = { corpus: { $in: config().EDITIONS } };
-  const scores: SuiteScore[] = new Array(questions.length);
-  let next = 0;
-  // Pas plus de QUERY_CONCURRENCY requêtes à la fois : le pool de PgVector (~20 connexions,
-  // court délai d'attente) lâche « timeout exceeded when trying to connect » au-delà, surtout
-  // vers une base distante (calibrage sur toutes les questions d'évals).
-  const worker = async () => {
-    while (next < questions.length) {
-      const i = next++;
-      const question = questions[i]!;
-      const queryVector = vectors[i];
-      if (!queryVector) {
-        scores[i] = { question, score: 0 };
-        continue;
-      }
-      const [best] = await vector.query({ indexName: PASSAGES_INDEX, queryVector, topK: 1, filter: filter as never });
-      scores[i] = { question, score: best?.score ?? 0 };
-    }
-  };
-  await Promise.all(Array.from({ length: Math.min(QUERY_CONCURRENCY, questions.length) }, worker));
-  return scores;
+  // Pas plus de QUERY_CONCURRENCY requêtes à la fois : le pool de PgVector (20 connexions, 2 s
+  // d'attente) lâche « timeout exceeded when trying to connect » au-delà, vers une base distante.
+  return enParallele(questions, QUERY_CONCURRENCY, async (question, i) => {
+    const queryVector = vectors[i];
+    if (!queryVector) return { question, score: 0 };
+    const [best] = await vector.query({ indexName: PASSAGES_INDEX, queryVector, topK: 1, filter: filter as never });
+    return { question, score: best?.score ?? 0 };
+  });
 }
 
 const QUERY_CONCURRENCY = 5;
