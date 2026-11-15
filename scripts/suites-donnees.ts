@@ -5,7 +5,8 @@
  *   pnpm suites:donnees:prod --passages 50           seulement des questions écrites depuis des passages
  *   pnpm suites:donnees:prod --voisines 50           seulement des questions voisines, a priori sans réponse
  *
- * 1. reelles   : les suites que le modèle a proposées en production, AVANT filtrage (lues dans les traces).
+ * 1. reelles   : les suites que le modèle a proposées en production, AVANT filtrage (lues dans les traces ;
+ *               sans trace en base, les questions encore dans aec_conversations sont rejouées).
  * 2. passages  : des passages tirés au hasard ; un LLM écrit une question à laquelle le passage répond.
  * 3. voisines  : un LLM écrit des questions proches d'un thème du programme mais qu'il ne traite pas.
  * Puis un juge LLM lit les 8 meilleurs passages de chaque question : repondu, partiel ou introuvable.
@@ -19,6 +20,7 @@ import { z } from "zod";
 import { mastra } from "../src/mastra/index.js";
 import { assertModelKey, config, PASSAGES_INDEX } from "../src/config.js";
 import { pgVector, retrievalDeps } from "../src/corpus/deps.js";
+import { repondre } from "../src/aec/repondre.js";
 import { DEFAULT_JUDGE_MODEL } from "../src/mastra/scorers/index.js";
 import {
   enParallele,
@@ -91,6 +93,29 @@ if (avecReelles) {
     for (const question of suites) brutes.push({ question, origine: "reelle" });
   });
   console.log(`Suites réelles : ${n} dans ${racines.length} trace(s) des ${values.jours} derniers jours`);
+
+  // Sans traces en base : on rejoue les questions encore en mémoire. `brut` est le texte du modèle
+  // avant vérification, donc avec toutes ses suites, y compris celles que le seuil aurait retirées.
+  if (racines.length === 0) {
+    const { rows } = await pool.query(
+      `SELECT DISTINCT content FROM aec_conversations
+        WHERE role = 'user' AND created_at > now() - make_interval(days => $1) AND length(content) >= 10`,
+      [Number(values.jours)],
+    );
+    console.log(`Pas de trace : ${rows.length} question(s) rejouée(s) depuis aec_conversations…`);
+    let m = 0;
+    await enParallele(rows as { content: string }[], 3, async ({ content }) => {
+      try {
+        const suites = suitesDeSortie((await repondre(content)).brut);
+        m += suites.length;
+        // Comme plus haut : la suite seule, jamais la question de l'utilisateur.
+        for (const question of suites) brutes.push({ question, origine: "reelle" });
+      } catch (e) {
+        console.log(`  échec d'une question rejouée : ${(e as Error).message}`);
+      }
+    });
+    console.log(`Suites réelles (rejouées) : ${m}`);
+  }
 }
 
 // Passages tirés au hasard, répartis entre les documents des éditions interrogées.
