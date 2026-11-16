@@ -5,7 +5,7 @@ import { answerForMemory, DISCLAIMER, escapeHtml, formatAnswer } from "./format.
 import { openChatId, pseudonymize, sealChatId } from "./privacy.js";
 import type { DocumentResult } from "../corpus/schemas.js";
 import type { FeedbackSink } from "./feedback.js";
-import type { BotStore } from "./store.js";
+import type { BotStore, ReponseMeta } from "./store.js";
 
 export interface BotDeps {
   repondre: typeof repondreFn;
@@ -328,7 +328,10 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
     if (question.length > MAX_QUESTION) return void (await ctx.reply(MESSAGES.tropLong));
 
     const hit = await deps.store.hit(pseudo, deps.ratePerHour);
-    if (!hit.allowed) return void (await ctx.reply(MESSAGES.limite(deps.ratePerHour, hit.resetAt)));
+    if (!hit.allowed) {
+      await deps.store.recordIncident("limite").catch(() => {});
+      return void (await ctx.reply(MESSAGES.limite(deps.ratePerHour, hit.resetAt)));
+    }
 
     await ctx.replyWithChatAction("typing").catch(() => {});
     const started = Date.now();
@@ -343,7 +346,18 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
         link_preview_options: { is_disabled: true },
         ...(keyboard ? { reply_markup: keyboard } : {}),
       });
-      await deps.store.append(pseudo, question, answerForMemory(reponse), traceId, spanId, suites);
+      const meta: ReponseMeta = {
+        statut: reponse.statut,
+        origine: rappel ? "suite" : "question",
+        sources: reponse.sources.length,
+        citationsRejetees: reponse.controle.citationsRejetees,
+        phrasesRetirees: reponse.controle.phrasesRetirees,
+        ...(reponse.controle.objet ? { objet: reponse.controle.objet.verdict } : {}),
+        inputTokens: usage.inputTokens,
+        outputTokens: usage.outputTokens,
+        ms: Date.now() - started,
+      };
+      await deps.store.append(pseudo, question, answerForMemory(reponse), traceId, spanId, suites, meta);
       // Ni question, ni réponse, ni identifiant dans les journaux.
       log?.info("question traitée", {
         pseudo,
@@ -357,6 +371,7 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
       });
     } catch (e) {
       log?.error("échec de la réponse", { pseudo, erreur: e instanceof Error ? e.message : String(e) });
+      await deps.store.recordIncident("erreur").catch(() => {});
       await ctx.reply(MESSAGES.erreur).catch(() => {});
     }
   };

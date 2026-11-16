@@ -154,6 +154,40 @@ describe.skipIf(!DB)("bot Telegram", () => {
     expect(replies().at(-1)).toBe(MESSAGES.erreur);
   });
 
+  it("rapport : compte questions, introuvables, pannes et refus, sans identifiant Telegram", async () => {
+    const { collecterRapport, formatRapport } = await import("../src/telegram/rapport.js");
+    await pool.query("DELETE FROM aec_conversations; DELETE FROM aec_rate_limit; DELETE FROM aec_incidents;");
+    const depuis = new Date(Date.now() - 60_000);
+    const bot = makeBot(2);
+    await bot.handleUpdate(message("Et la retraite ?") as never);
+    nextAnswer = async () => ({
+      ...answered(""),
+      reponse: {
+        ...answered("").reponse, statut: "introuvable", texte: INTROUVABLE_TEXTE, sources: [],
+        controle: { ...answered("").reponse.controle, objet: { verdict: "non" as const, objet: "le Bitcoin" } },
+      },
+    });
+    await bot.handleUpdate(message("Et le <Bitcoin> ?") as never);
+    await bot.handleUpdate(message("Et la santé ?") as never); // 3e question : limite de 2 par heure
+    nextAnswer = async () => { throw new Error("Mistral HTTP 503"); };
+    await makeBot(100).handleUpdate(message("Et l'école ?") as never);
+
+    const d = await collecterRapport({ store, votesDepuis: async () => [] }, depuis, new Date(Date.now() + 60_000));
+    expect(d.echanges.map((e) => [e.question, e.meta?.statut, e.meta?.objet])).toEqual([
+      ["Et la retraite ?", "repondu", undefined],
+      ["Et le <Bitcoin> ?", "introuvable", "non"],
+    ]);
+    expect(d.echanges[0]!.meta).toMatchObject({ origine: "question", sources: 1, inputTokens: 1000, outputTokens: 100 });
+    expect(d.incidents).toEqual({ erreur: 1, limite: 1 });
+    const html = formatRapport(d);
+    expect(html).toContain("<b>2</b> questions de <b>1</b> personne");
+    expect(html).toContain("introuvables : 1 (50 %)");
+    expect(html).toContain("« Et le &lt;Bitcoin&gt; ? »");
+    expect(html).toContain("(écartée par le contrôle)");
+    expect(html).toContain("pannes : 1 · refus pour limite horaire : 1");
+    expect(html).not.toContain(String(USER_ID));
+  });
+
   it("ignore les groupes, refuse les questions trop longues et les messages non texte", async () => {
     const bot = makeBot(100);
     await bot.handleUpdate(message("Et la retraite ?", "group") as never);
