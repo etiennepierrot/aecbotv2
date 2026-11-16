@@ -109,8 +109,10 @@ detecter ─▶ foreach(document) ─▶ resumer
 2. **Récupérer** : PDF → texte page par page (unpdf) ; HTML → Markdown (turndown). Un échec de
    téléchargement n'arrête pas le scan : le document est retenté la nuit suivante.
 3. **Classer** : `programme` (le livre seulement), `livret`, `plan`, `publication_2026`, `page`,
-   `ajout_manuel`. Sont écartés : anciennes versions du programme, archives NFP 2024, dossiers de
-   presse et documents non classés (sans même être téléchargés),
+   `ajout_manuel`. Sont écartés : anciennes versions du programme (PDF 2025, Synthèse des contributions
+   de juillet 2026 sous `/programme/synthese-des-contributions/`), comparateurs avec d'autres partis
+   (titre « Comparateur… » ou adresse `/comparateur-…`), archives NFP 2024, dossiers de presse et
+   documents non classés (sans même être téléchargés),
    PDF sans texte exploitable, doublons exacts (le plus récent est gardé). Les règles reproduisent
    les 75 décisions de l'ancien pipeline (`tests/classify.test.ts`).
 4. **Découper** : `MDocument`, un découpage par page pour garder `page` en métadonnée.
@@ -130,8 +132,12 @@ question ─▶ agent aec ──▶ outil recherche (pgvector, édition 2027 par
 
 `repondre(question)` (`src/aec/repondre.ts`) est le point d'entrée du bot et des évals.
 
-- **Outil `recherche`** : embeddings `mistral-embed` de la requête, recherche filtrée sur `corpus`
-  (`aec2027`, ou `aec2022` si la question le demande). Le modèle voit des passages numérotés
+- **Outil `recherche`** : recherche **hybride** filtrée sur `corpus` (`aec2027`, ou `aec2022` si la
+  question le demande). Dans chaque édition, la recherche vectorielle (`mistral-embed`) et une recherche
+  plein texte Postgres en français (`src/corpus/fulltext.ts`, index GIN créé au démarrage de l'ingestion)
+  sont fusionnées par rangs (RRF). Le plein texte ne garde que les mots qui distinguent (ni mots vides,
+  ni « programme », « prévoit »…) : un mot cité une seule fois dans une liste (« corrida ») remonte son
+  passage. `score` reste la similarité cosinus. Le modèle voit des passages numérotés
   P1, P2… avec titre, page et type de document, sans URL. Tous les passages renvoyés sont
   gardés dans un collecteur propre à la question.
 - **Vérification** (`src/aec/verify.ts`) : une référence que l'outil n'a pas renvoyée est

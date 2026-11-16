@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import manifest from "./fixtures/manifest-ancien-pipeline.json" with { type: "json" };
-import { ANCIEN_PROGRAMME, classifyByMetadata, isExtractionUsable } from "../src/corpus/classify.js";
+import { ANCIEN_PROGRAMME, classifyByMetadata, isExtractionUsable, SYNTHESE } from "../src/corpus/classify.js";
 import type { SourceItem } from "../src/corpus/types.js";
 
 const pdf = (title: string, url: string): SourceItem => ({
@@ -50,6 +50,26 @@ describe("classifyByMetadata", () => {
     expect(classifyByMetadata(livre)).toEqual({
       category: "programme", corpus: "aec2027", included: true, reason: "", provisional: false,
     });
+  });
+
+  it("écarte toute page d'un comparateur, même sans le mot dans son titre", () => {
+    const chantier: SourceItem = {
+      id: "wp:post:9", origin: "wordpress", kind: "html", modified: "2025-06-30T16:18:18Z",
+      title: "Chantier cadre : Retrouver les moyens d’agir, financer nos ambitions",
+      url: "https://melenchon2027.fr/programme/2022-2025/comparateur-place-publique-2025/chantier-cadre-retrouver-les-moyens-dagir-financer-nos-ambitions/",
+    };
+    expect(classifyByMetadata(chantier)).toMatchObject({ included: false, reason: "Comparateur avec le programme d'un autre parti" });
+  });
+
+  it("écarte la Synthèse des contributions, remplacée par le livre", () => {
+    const chapitre: SourceItem = {
+      id: "wp:post:7", origin: "wordpress", kind: "html", modified: "2026-07-17T15:29:15Z",
+      title: "Chapitre 15 : Une approche de santé globale",
+      url: "https://melenchon2027.fr/programme/synthese-des-contributions/chapitre-15-une-approche-de-sante-globale/",
+    };
+    expect(classifyByMetadata(chapitre)).toMatchObject({ category: "programme", included: false, reason: SYNTHESE });
+    // Un autre « Chapitre … » sous /programme/ reste une page du site.
+    expect(classifyByMetadata({ ...chapitre, url: "https://melenchon2027.fr/programme/chapitre-1/" })).toMatchObject({ included: true });
   });
 
   it("range les pages HTML et les ajouts manuels à part", () => {

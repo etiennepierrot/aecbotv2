@@ -17,9 +17,16 @@ export function classifyByMetadata(item: SourceItem): Classification {
   }
   if (item.kind === "html") {
     // Les « Comparateurs » résument le programme d'AUTRES partis : jamais dans le corpus,
-    // sinon l'agent pourrait attribuer leurs mesures à L'Avenir en commun.
-    if (/^\s*COMPARATEUR\b/.test(item.title.toUpperCase())) {
+    // sinon l'agent pourrait attribuer leurs mesures à L'Avenir en commun. Reconnus aussi à
+    // leur adresse : « Chantier cadre : Retrouver les moyens d'agir… » est une page du
+    // Comparateur Place Publique 2025 sans le mot dans son titre.
+    if (/^\s*COMPARATEUR\b/.test(item.title.toUpperCase()) || /\/comparateur-/i.test(item.url)) {
       return { ...base, category: "autre", included: false, reason: "Comparateur avec le programme d'un autre parti" };
+    }
+    // La « Synthèse des contributions » (juillet 2026, 18 chapitres) a précédé le livre :
+    // une ancienne version du programme, qui ne fait plus foi.
+    if (/\/programme\/synthese-des-contributions\//i.test(item.url)) {
+      return { ...base, category: "programme", included: false, reason: SYNTHESE };
     }
     // Articles : seuls les chapitres et chantiers du programme ; les tribunes et réactions
     // à l'actualité publiées sous /programme/ ne sont pas le programme.
@@ -56,6 +63,7 @@ export function classifyByMetadata(item: SourceItem): Classification {
 }
 
 export const ANCIEN_PROGRAMME = "Ancienne version du programme, remplacée par le livre 2026";
+export const SYNTHESE = "Synthèse des contributions, remplacée par le livre 2026";
 
 /**
  * Documents de la campagne 2022 : marqueur « UP » (Union populaire) dans le nom, ou fichiers

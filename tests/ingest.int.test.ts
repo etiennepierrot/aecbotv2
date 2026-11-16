@@ -230,6 +230,29 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     expect((await searchPassages({ requete: rows[0].text, categories: ["livret"] })).every((h) => h.category === "livret")).toBe(true);
   });
 
+  it("recherche hybride : un mot exact de la question remonte son passage, même loin par le sens", async () => {
+    const deps = await import("../src/corpus/deps.js");
+    const { textSearchFrom } = await import("../src/corpus/fulltext.js");
+    const { searchPassages } = await import("../src/aec/search.js");
+    // L'embedder simulé n'est pas sémantique : seule la recherche plein texte peut trouver « pensions ».
+    const requete = "Que prévoit le programme sur les pensions ?";
+    deps.setRetrievalDeps({ embedder, vector: deps.pgVector() });
+    const seule = await searchPassages({ requete, edition: "aec2027", elargir: false });
+    const rangSeule = seule.findIndex((h) => h.text.includes("pensions"));
+
+    deps.setRetrievalDeps({ embedder, vector: deps.pgVector(), textSearch: textSearchFrom(deps.pgVector()) });
+    const hybride = await searchPassages({ requete, edition: "aec2027", elargir: false });
+    const rang = hybride.findIndex((h) => h.text.includes("pensions"));
+    expect(rang).toBeGreaterThanOrEqual(0);
+    if (rangSeule >= 0) expect(rang).toBeLessThanOrEqual(rangSeule); // jamais moins bien classé
+    const trouve = hybride[rang];
+    expect(trouve).toMatchObject({ docId: "manual:livre-aec", section: expect.stringMatching(/Garantir une retraite digne$/) });
+    expect(trouve!.score).toBeGreaterThan(-1); // similarité cosinus, comme la recherche vectorielle
+    // Une question faite seulement de mots vides ne casse rien.
+    await expect(searchPassages({ requete: "Que propose Mélenchon ?", elargir: false })).resolves.toBeDefined();
+    deps.setRetrievalDeps({ embedder, vector: deps.pgVector() });
+  });
+
   it("recherche : élargit chaque passage à sa page entière", async () => {
     const deps = await import("../src/corpus/deps.js");
     deps.setRetrievalDeps({ embedder, vector: deps.pgVector(), pageChunks: deps.pageChunksFrom(deps.pgVector()) });

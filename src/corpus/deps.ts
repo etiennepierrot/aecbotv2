@@ -1,6 +1,7 @@
 import { PgVector } from "@mastra/pg";
 import { config, EMBEDDING_DIMENSION, PASSAGES_INDEX } from "../config.js";
 import { embedderFromKeys, type Embedder } from "./embed.js";
+import { textSearchFrom, type TextSearch } from "./fulltext.js";
 import { CompositeSource, EDITION_2022, StaticSource } from "./sources.js";
 import { CorpusStore } from "./store.js";
 import { WordPressSource } from "./wordpress.js";
@@ -50,6 +51,8 @@ export interface RetrievalDeps {
   vector: Pick<PgVector, "query">;
   /** Tous les passages d'une page, dans l'ordre (absent : pas d'élargissement à la page). */
   pageChunks?: (docId: string, page: number) => Promise<string[]>;
+  /** Recherche plein texte, fusionnée avec la vectorielle (absent : recherche vectorielle seule). */
+  textSearch?: TextSearch;
 }
 
 let retrieval: RetrievalDeps | undefined;
@@ -58,7 +61,7 @@ let retrieval: RetrievalDeps | undefined;
 export async function retrievalDeps(): Promise<RetrievalDeps> {
   if (!retrieval) {
     const vector = pgVector();
-    retrieval = { embedder: embedderFromEnv(), vector, pageChunks: pageChunksFrom(vector) };
+    retrieval = { embedder: embedderFromEnv(), vector, pageChunks: pageChunksFrom(vector), textSearch: textSearchFrom(vector) };
   }
   return retrieval;
 }

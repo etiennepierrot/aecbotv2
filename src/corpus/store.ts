@@ -1,3 +1,4 @@
+import { TSV_EXPR } from "./fulltext.js";
 import type { PgVector } from "@mastra/pg";
 import { PASSAGES_INDEX } from "../config.js";
 import type { Passage } from "./chunk.js";
@@ -61,6 +62,8 @@ export class CorpusStore {
         indexed_at       timestamptz NOT NULL DEFAULT now()
       );
       CREATE INDEX IF NOT EXISTS aec_documents_hash ON aec_documents (content_hash) WHERE included;
+      -- Recherche plein texte (src/corpus/fulltext.ts) : même expression que TSV_EXPR.
+      CREATE INDEX IF NOT EXISTS aec_passages_fulltext ON ${PASSAGES_INDEX} USING gin ((${TSV_EXPR}));
       -- Journal des ajouts et suppressions faits par l'équipe (qui, quoi, quand).
       CREATE TABLE IF NOT EXISTS aec_admin_log (
         id       bigserial PRIMARY KEY,

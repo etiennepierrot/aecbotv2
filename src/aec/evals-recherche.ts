@@ -25,6 +25,7 @@ export interface ResultatRecherche {
   /** Meilleur score, pertinent ou non : sert à calibrer un seuil (questions hors corpus). */
   scoreMax: number | null;
   /** Les premiers résultats, pour comprendre un échec. */
+  /** `page` est null pour le livre : son rang de section n'est pas une page. */
   top: { rang: number; titre: string; page: number | null; score: number; pertinent: boolean }[];
   erreur?: string;
 }
@@ -87,7 +88,7 @@ export async function evaluerQuestion(q: EvalQuestion, recherche: Recherche): Pr
       : null,
     scorePertinent: idx >= 0 ? found[idx]!.score : null,
     scoreMax: found.length ? Math.max(...found.map((p) => p.score)) : null,
-    top: found.slice(0, 5).map((p, i) => ({ rang: i + 1, titre: p.section ? `${p.title} › ${sectionTitle(p.section)}` : p.title, page: p.page, score: p.score, pertinent: pertinent(p) })),
+    top: found.slice(0, 5).map((p, i) => ({ rang: i + 1, titre: p.section ? `${p.title} › ${sectionTitle(p.section)}` : p.title, page: p.section ? null : p.page, score: p.score, pertinent: pertinent(p) })),
   };
 }
 
