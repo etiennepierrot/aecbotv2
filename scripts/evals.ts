@@ -42,7 +42,9 @@ const onProgress = (r: QuestionResult) => {
   const ok = r.erreur ? "ERREUR" : r.scores.statut === 1 ? "ok    " : "RATÉ  ";
   const fid = r.scores.fidelite !== undefined ? ` fidélité ${r.scores.fidelite.toFixed(2)}` : "";
   const rej = r.citationsRejetees ? ` ${r.citationsRejetees} citation(s) rejetée(s)` : "";
-  console.log(`  ${ok} ${r.id.padEnd(20)} ${r.statut ?? ""}${fid}${rej}${r.erreur ? ` ${r.erreur}` : ""}`);
+  // Réponse partielle contrôlée : « objet oui » (gardée), « objet non » (devenue introuvable).
+  const obj = r.objet ? ` · objet ${r.objet.verdict}${r.objet.objet ? ` (${r.objet.objet})` : ""}` : "";
+  console.log(`  ${ok} ${r.id.padEnd(20)} ${r.statut ?? ""}${fid}${rej}${obj}${r.erreur ? ` ${r.erreur}` : ""}`);
 };
 
 // --only ne porte que sur quelques questions : un experiment partiel fausserait les comparaisons.

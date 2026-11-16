@@ -65,6 +65,57 @@ describe("repondre", () => {
     expect(queries.slice(-2).map((q) => q.filter)).toEqual([{ corpus: { $eq: "aec2027" } }, { corpus: { $eq: "aec2022" } }]);
   });
 
+  describe("réponse partielle : contrôle de l'objet de la question", () => {
+    const partielle = (suite: string) =>
+      fakeModel((_p, call) =>
+        call === 1
+          ? { tool: "recherche", input: { requete: "retraite" } }
+          : { text: `Je ne trouve pas de passage qui réponde précisément à cette question.\n\n${suite} [P1].` },
+      );
+
+    it("devient introuvable quand les passages cités ne traitent que d'un thème voisin", async () => {
+      const vus: { question: string; refs: string[] }[] = [];
+      const res = await repondre("Le programme veut-il supprimer le changement d'heure ?", {
+        model: partielle("Le programme prévoit la retraite à 60 ans"),
+        controleObjet: async (question, passages) => {
+          vus.push({ question, refs: passages.map((p) => p.ref) });
+          return { objet: "le changement d'heure", traite: false, raison: "le passage parle de la retraite" };
+        },
+      });
+      expect(vus).toEqual([{ question: "Le programme veut-il supprimer le changement d'heure ?", refs: ["P1"] }]);
+      expect(res.reponse).toMatchObject({ statut: "introuvable", sources: [], controle: { objet: { verdict: "non", objet: "le changement d'heure" } } });
+    });
+
+    it("reste répondue quand un passage traite de l'objet précis", async () => {
+      const res = await repondre("Partira-t-on à 60 ans pour toutes les carrières ?", {
+        model: partielle("Le programme prévoit la retraite à 60 ans après quarante annuités"),
+        controleObjet: async () => ({ objet: "l'âge de départ à la retraite", traite: true, raison: "même mesure" }),
+      });
+      expect(res.reponse).toMatchObject({ statut: "repondu", controle: { objet: { verdict: "oui" } } });
+    });
+
+    it("garde la réponse si le contrôle tombe en panne", async () => {
+      const res = await repondre("Partira-t-on à 60 ans ?", {
+        model: partielle("Le programme prévoit la retraite à 60 ans"),
+        controleObjet: async () => {
+          throw new Error("429");
+        },
+      });
+      expect(res.reponse).toMatchObject({ statut: "repondu", controle: { objet: { verdict: "erreur", raison: "429" } } });
+    });
+
+    it("n'appelle pas le contrôle pour une réponse directe", async () => {
+      let appels = 0;
+      const model = fakeModel((_p, call) =>
+        call === 1 ? { tool: "recherche", input: { requete: "retraite" } } : { text: "Retraite à 60 ans [P1].\n\n---" },
+      );
+      const res = await repondre("Et la retraite ?", { model, controleObjet: async () => (appels++, { objet: "", traite: false, raison: "" }) });
+      expect(appels).toBe(0);
+      expect(res.reponse).toMatchObject({ statut: "repondu", texte: "Retraite à 60 ans [1]." }); // séparateur « --- » retiré
+      expect(res.reponse.controle.objet).toBeUndefined();
+    });
+  });
+
   it("ne garde que les suites que le corpus sait servir", async () => {
     const model = fakeModel((_prompt, call) =>
       call === 1

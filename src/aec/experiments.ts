@@ -158,6 +158,7 @@ export function toQuestionResult(item: ItemWithScores): QuestionResult {
     },
     fideliteRaison: item.scores.find((s) => s.scorerId === fideliteScorer.id)?.reason || undefined,
     citationsRejetees: output.reponse.controle.citationsRejetees,
+    objet: output.reponse.controle.objet,
     inputTokens: output.usage.inputTokens,
     outputTokens: output.usage.outputTokens,
   };

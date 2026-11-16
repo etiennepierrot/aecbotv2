@@ -1,15 +1,18 @@
 import { RequestContext } from "@mastra/core/request-context";
 import { aecAgent } from "../mastra/agents/aec.js";
 import { COLLECTOR_KEY, PassageCollector } from "./collector.js";
-import type { Answer, ReferencedPassage } from "./types.js";
+import { controleObjet, estPartielle, type ControleObjet } from "./objet.js";
+import { INTROUVABLE_TEXTE, type Answer, type ReferencedPassage } from "./types.js";
 import { filtrerSuites } from "./suites.js";
-import { verifyAnswer } from "./verify.js";
+import { passagesCites, verifyAnswer } from "./verify.js";
 
 export interface RepondreOptions {
   /** Remplace le modèle de l'agent (comparaison dans les évals). */
   model?: string | object;
   /** Échanges précédents, pour les questions de suite. */
   historique?: { role: "user" | "assistant"; content: string }[];
+  /** Contrôle des réponses partielles (remplaçable en test). */
+  controleObjet?: ControleObjet;
 }
 
 export interface RepondreResult {
@@ -54,7 +57,24 @@ export async function repondre(question: string, opts: RepondreOptions = {}): Pr
     throw new Error(`Recherche impossible : ${collector.errors[0]}`);
   }
 
-  const reponse = verifyAnswer(result.text, collector);
+  let reponse = verifyAnswer(result.text, collector);
+
+  // Réponse partielle : le modèle a tendance à la remplir de mesures voisines (sécurité routière
+  // pour une question sur les 80 km/h). Un contrôle court, seulement dans ce cas, vérifie que les
+  // passages cités traitent de l'objet précis de la question ; sinon, la réponse est introuvable.
+  if (reponse.statut === "repondu" && estPartielle(reponse.texte)) {
+    try {
+      const v = await (opts.controleObjet ?? controleObjet)(question, passagesCites(result.text, collector));
+      const objet = { verdict: v.traite ? ("oui" as const) : ("non" as const), objet: v.objet, raison: v.raison };
+      reponse = v.traite
+        ? { ...reponse, controle: { ...reponse.controle, objet } }
+        : { statut: "introuvable", texte: INTROUVABLE_TEXTE, sources: [], avertissements: [], controle: { ...reponse.controle, objet } };
+    } catch (e) {
+      // Panne du contrôle : la réponse, déjà vérifiée citation par citation, est gardée.
+      reponse.controle.objet = { verdict: "erreur", raison: e instanceof Error ? e.message : String(e) };
+    }
+  }
+
   const suitesAvantFiltre = reponse.suites ?? [];
   // On ne propose que des suites que le corpus sait servir.
   if (reponse.suites?.length) {

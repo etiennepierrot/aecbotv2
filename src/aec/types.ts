@@ -55,6 +55,11 @@ export interface Answer {
     suitesRetirees?: number;
     /** Suites écartées parce qu'elles ne citent aucun passage renvoyé par la recherche. */
     suitesSansPassage?: number;
+    /**
+     * Réponse partielle (« Je ne trouve pas de passage qui réponde précisément… ») : les passages
+     * cités traitent-ils de l'objet précis de la question ? « non » : la réponse devient introuvable.
+     */
+    objet?: { verdict: "oui" | "non" | "erreur"; objet?: string; raison?: string };
   };
 }
 

@@ -1,3 +1,4 @@
+import type { Answer } from "./types.js";
 import { repondre, type RepondreResult } from "./repondre.js";
 import type { Attendu } from "../mastra/scorers/index.js";
 import { citationsScorer, fideliteScorer, sourceAttendueScorer, statutScorer } from "../mastra/scorers/index.js";
@@ -25,6 +26,8 @@ export interface QuestionResult {
   inputTokens: number;
   outputTokens: number;
   erreur?: string;
+  /** Réponse partielle : verdict du contrôle de l'objet de la question. */
+  objet?: Answer["controle"]["objet"];
 }
 
 export interface EvalReport {
@@ -95,6 +98,7 @@ export async function runEvalSuite(args: {
       },
       fideliteRaison: fidelite?.reason || undefined,
       citationsRejetees: res.reponse.controle.citationsRejetees,
+      objet: res.reponse.controle.objet,
       inputTokens: res.usage.inputTokens,
       outputTokens: res.usage.outputTokens,
     };
