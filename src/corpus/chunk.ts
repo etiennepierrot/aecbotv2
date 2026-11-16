@@ -31,7 +31,11 @@ export async function chunkDocument(
       if (!chunkText) return;
       passages.push({
         id: `${item.id}#p${page ?? 0}#${i}`,
-        text: chunkText,
+        // EPUB : chaque passage est embarqué avec le chemin de sa section, pas seulement le premier
+        // (« corrida », au milieu d'une liste, n'a de sens que sous « Rompre avec la maltraitance animale »).
+        // Le texte rendu à l'agent (metadata.text) reste le passage seul : l'élargissement à la
+        // section entière ne répète pas le titre.
+        text: section && !chunkText.startsWith(section) ? `${section}\n\n${chunkText}` : chunkText,
         metadata: {
           docId: item.id,
           title: item.title,
