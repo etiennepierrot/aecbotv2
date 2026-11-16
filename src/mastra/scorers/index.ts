@@ -91,7 +91,10 @@ Passages cités :
 ${context}
 
 Découpe la réponse en affirmations factuelles. Pour chacune, indique si les passages cités la soutiennent.
-Une phrase purement introductive (« Le programme prévoit plusieurs mesures : ») n'est pas une affirmation.`;
+Une phrase purement introductive (« Le programme prévoit plusieurs mesures : ») n'est pas une affirmation.
+Les mentions que les règles de l'assistant imposent ne sont pas des affirmations à vérifier : la date ou
+l'édition d'un document (« le livret 2022, qui n'est pas à jour »), son type (programme général, livret),
+et la phrase « Je ne trouve pas de passage qui réponde précisément à cette question ».`;
     },
   })
   .generateScore(({ run, results }) => {
