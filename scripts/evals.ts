@@ -3,12 +3,18 @@
  *   pnpm evals                                           modèle par défaut (AEC_MODEL)
  *   pnpm evals --model mistral/mistral-small-latest --model openai/gpt-5-mini
  *   pnpm evals --sans-juge                               sans le juge de fidélité (gratuit hors modèle)
- *   pnpm evals --only smic --only otan                   quelques questions
+ *   pnpm evals --only smic --only otan                   quelques questions (passe locale, non enregistrée)
+ *   pnpm evals --local                                   sans enregistrer d'experiment en base
+ *
+ * Par défaut, chaque modèle donne un experiment Mastra sur le dataset « Questions types »
+ * (synchronisé depuis evals/questions.json) : réponses, scores et traces restent en base,
+ * consultables et comparables dans Studio (pnpm dev → Datasets).
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
-import "../src/mastra/index.js";
-import { runEvalSuite, SEUILS, type EvalQuestion, type EvalReport, type Prix } from "../src/aec/evals.js";
+import { mastra } from "../src/mastra/index.js";
+import { runEvalSuite, SEUILS, type EvalQuestion, type EvalReport, type Prix, type QuestionResult } from "../src/aec/evals.js";
+import { ecartsEntreExperiments, runModelExperiment, syncQuestionsDataset } from "../src/aec/experiments.js";
 import { DEFAULT_MODEL } from "../src/mastra/agents/aec.js";
 import { pgVector } from "../src/corpus/deps.js";
 import { assertModelKey } from "../src/config.js";
@@ -19,6 +25,8 @@ const { values } = parseArgs({
     model: { type: "string", multiple: true },
     only: { type: "string", multiple: true },
     "sans-juge": { type: "boolean", default: false },
+    local: { type: "boolean", default: false },
+    concurrence: { type: "string", default: "3" },
   },
 });
 
@@ -30,22 +38,38 @@ const models = values.model?.length ? values.model : [DEFAULT_MODEL];
 for (const m of models) assertModelKey(m);
 if (!values["sans-juge"]) assertModelKey(DEFAULT_JUDGE_MODEL);
 
+const onProgress = (r: QuestionResult) => {
+  const ok = r.erreur ? "ERREUR" : r.scores.statut === 1 ? "ok    " : "RATÉ  ";
+  const fid = r.scores.fidelite !== undefined ? ` fidélité ${r.scores.fidelite.toFixed(2)}` : "";
+  const rej = r.citationsRejetees ? ` ${r.citationsRejetees} citation(s) rejetée(s)` : "";
+  console.log(`  ${ok} ${r.id.padEnd(20)} ${r.statut ?? ""}${fid}${rej}${r.erreur ? ` ${r.erreur}` : ""}`);
+};
+
+// --only ne porte que sur quelques questions : un experiment partiel fausserait les comparaisons.
+const enregistre = !values.local && !values.only?.length;
 const reports: EvalReport[] = [];
+const experimentIds: string[] = [];
+const dataset = enregistre ? await syncQuestionsDataset(mastra, all) : null;
+if (dataset) {
+  const { ajoutees, modifiees, retirees } = dataset;
+  if (ajoutees + modifiees + retirees) console.log(`Dataset mis à jour : +${ajoutees} ~${modifiees} -${retirees}`);
+}
+
 for (const model of models) {
   console.log(`\n▶ ${model} — ${questions.length} questions`);
-  const report = await runEvalSuite({
-    questions,
-    model,
-    prix: prixTable[model],
-    juge: !values["sans-juge"],
-    onProgress: (r) => {
-      const ok = r.erreur ? "ERREUR" : r.scores.statut === 1 ? "ok    " : "RATÉ  ";
-      const fid = r.scores.fidelite !== undefined ? ` fidélité ${r.scores.fidelite.toFixed(2)}` : "";
-      const rej = r.citationsRejetees ? ` ${r.citationsRejetees} citation(s) rejetée(s)` : "";
-      console.log(`  ${ok} ${r.id.padEnd(20)} ${r.statut ?? ""}${fid}${rej}${r.erreur ? ` ${r.erreur}` : ""}`);
-    },
-  });
-  reports.push(report);
+  const common = { model, prix: prixTable[model], juge: !values["sans-juge"], onProgress };
+  if (dataset) {
+    const { experimentId, report } = await runModelExperiment({
+      ...common,
+      dataset: dataset.dataset,
+      maxConcurrency: Number(values.concurrence) || 3,
+    });
+    console.log(`  experiment ${experimentId}`);
+    experimentIds.push(experimentId);
+    reports.push(report);
+  } else {
+    reports.push(await runEvalSuite({ ...common, questions }));
+  }
 }
 
 const pct = (x: number | null) => (x === null ? "—" : `${Math.round(x * 100)} %`);
@@ -78,8 +102,23 @@ if (passing.length) {
   console.log(`\n→ Le moins cher qui passe les seuils : ${best.model}`);
 }
 
+if (dataset && experimentIds.length >= 2) {
+  const ecarts = await ecartsEntreExperiments(mastra, dataset.dataset, experimentIds);
+  console.log(`\nQuestions où les modèles diffèrent de ${models[0]} : ${ecarts.length}`);
+  for (const e of ecarts) {
+    const cells = experimentIds.map((id, i) => {
+      const v = e.parExperiment[id];
+      const fid = v?.fidelite == null ? "" : ` fid ${v.fidelite.toFixed(2)}`;
+      return `${models[i]} : ${v ? (v.statut === 1 ? "ok" : "raté") + fid : "—"}`;
+    });
+    console.log(`  ${e.qid.padEnd(20)} ${cells.join(" | ")}`);
+  }
+  console.log("Détail côte à côte : pnpm dev → Datasets → Questions types → Experiments → Compare.");
+}
+
 await mkdir(new URL("../evals/resultats/", import.meta.url), { recursive: true });
 const file = new URL(`../evals/resultats/${new Date().toISOString().replace(/[:.]/g, "-")}.json`, import.meta.url);
 await writeFile(file, JSON.stringify(reports, null, 2));
 console.log(`\nDétail : ${file.pathname}`);
 await pgVector().pool.end();
+process.exit(0);

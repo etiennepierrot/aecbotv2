@@ -1,4 +1,4 @@
-import { createScorer } from "@mastra/core/evals";
+import { createScorer, notScorable } from "@mastra/core/evals";
 import { z } from "zod";
 import type { Answer, ReferencedPassage } from "../../aec/types.js";
 import { defaultModels } from "../../config.js";
@@ -34,7 +34,10 @@ export const statutScorer = createScorer<{ question: string }, ScoredRun>({
 export const sourceAttendueScorer = createScorer<{ question: string }, ScoredRun>({
   id: "source-attendue",
   description: "1 si au moins une source attendue (document et page) est citée.",
-}).generateScore(({ run }) => {
+})
+  // Question hors corpus : pas de source attendue, la compter à 1 gonflerait la moyenne.
+  .preprocess(({ run }) => ((run.groundTruth as Attendu | undefined)?.attendu === "introuvable" ? notScorable("question hors corpus") : {}))
+  .generateScore(({ run }) => {
   const expected = (run.groundTruth as Attendu).sources ?? [];
   if (expected.length === 0) return 1;
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -63,6 +66,8 @@ export const createFideliteScorer = (judgeModel: string | object = DEFAULT_JUDGE
       "cité dit la même chose, sans ajout ni extrapolation. Tu réponds en JSON.",
   },
 })
+  // Rien à vérifier (et pas d'appel au juge) quand l'agent répond « introuvable ».
+  .preprocess(({ run }) => (run.output.reponse.statut === "introuvable" ? notScorable("réponse « introuvable »") : {}))
   .analyze({
     description: "Vérifie chaque affirmation contre les passages",
     outputSchema: z.object({
