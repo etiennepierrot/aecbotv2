@@ -1,5 +1,6 @@
 import { config, PASSAGES_INDEX } from "../config.js";
 import { retrievalDeps } from "../corpus/deps.js";
+import { enParallele } from "./suites-donnees.js";
 
 export interface SuiteScore {
   question: string;
@@ -16,15 +17,17 @@ export async function scoreQuestions(questions: string[]): Promise<SuiteScore[]>
   const { embedder, vector } = await retrievalDeps();
   const vectors = await embedder.embed(questions);
   const filter = { corpus: { $in: config().EDITIONS } };
-  return Promise.all(
-    questions.map(async (question, i) => {
-      const queryVector = vectors[i];
-      if (!queryVector) return { question, score: 0 };
-      const [best] = await vector.query({ indexName: PASSAGES_INDEX, queryVector, topK: 1, filter: filter as never });
-      return { question, score: best?.score ?? 0 };
-    }),
-  );
+  // Pas plus de QUERY_CONCURRENCY requêtes à la fois : le pool de PgVector (20 connexions, 2 s
+  // d'attente) lâche « timeout exceeded when trying to connect » au-delà, vers une base distante.
+  return enParallele(questions, QUERY_CONCURRENCY, async (question, i) => {
+    const queryVector = vectors[i];
+    if (!queryVector) return { question, score: 0 };
+    const [best] = await vector.query({ indexName: PASSAGES_INDEX, queryVector, topK: 1, filter: filter as never });
+    return { question, score: best?.score ?? 0 };
+  });
 }
+
+const QUERY_CONCURRENCY = 5;
 
 /**
  * Ne garde que les suites que le corpus permet de servir : celles dont un passage est

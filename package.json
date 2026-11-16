@@ -31,7 +31,9 @@
     "avis": "tsx --env-file-if-exists=.env scripts/avis.ts",
     "avis:prod": "tsx --import ./scripts/prod-env.ts scripts/avis.ts",
     "suites:calibrer": "tsx --env-file-if-exists=.env scripts/suites-calibrer.ts",
-    "suites:calibrer:prod": "tsx --import ./scripts/prod-env.ts scripts/suites-calibrer.ts"
+    "suites:calibrer:prod": "tsx --import ./scripts/prod-env.ts scripts/suites-calibrer.ts",
+    "suites:donnees": "tsx --env-file-if-exists=.env scripts/suites-donnees.ts",
+    "suites:donnees:prod": "tsx --import ./scripts/prod-env.ts scripts/suites-donnees.ts"
   },
   "dependencies": {
     "@mastra/core": "1.80.0",

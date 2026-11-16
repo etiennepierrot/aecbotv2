@@ -37,7 +37,7 @@ describe.skipIf(!DB)("bot Telegram", () => {
       avertissements: [],
       controle: { passagesRecuperes: 4, citationsValides: 1, citationsRejetees: 0, phrasesRetirees: 0, phrasesSansSource: 0 },
     },
-    brut: texte, passages: [], usage: { inputTokens: 1000, outputTokens: 100 },
+    brut: texte, suitesAvantFiltre: [], passages: [], usage: { inputTokens: 1000, outputTokens: 100 },
   });
 
   const logs: { msg: string; meta?: object }[] = [];

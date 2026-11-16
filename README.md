@@ -217,9 +217,11 @@ Les boutons utilisent les `callback_query` de Telegram : après le déploiement,
 
 ### Suites numérotées (« Pour aller plus loin »)
 
-Après une réponse trouvée, l'agent ajoute un bloc `SUITES :` de 2 ou 3 questions de suite, tirées des
-passages reçus. `extractSuites()` (src/aec/verify.ts) les sépare du texte vérifié : seules de vraies
-questions courtes (« ? », 120 caractères au plus) sont gardées, sans références.
+Après une réponse trouvée, l'agent ajoute un bloc `SUITES :` de 3 questions de suite au plus. Chacune
+porte sur un point qu'un passage reçu traite et cite ce passage (`… ? [P4]`). `parseSuites()`
+(src/aec/verify.ts) les sépare du texte vérifié : seules de vraies questions courtes (« ? », 120
+caractères au plus) sont gardées, et **seulement si elles citent un passage que la recherche a renvoyé**
+(sinon `controle.suitesSansPassage`). La référence n'est pas affichée.
 
 - Affichées sous les sources, numérotées, avec un bouton par suite (`sx:<n>:<traceId>`) sous 👍/👎.
 - Toucher un bouton, ou envoyer « 2 » au clavier, pose la question proposée ; elle est rappelée en
@@ -229,9 +231,13 @@ questions courtes (« ? », 120 caractères au plus) sont gardées, sans référ
 - **Seulement des suites qu'on sait servir** : chaque suite est cherchée dans l'index avant d'être
   affichée (un seul appel d'embeddings pour toutes, `src/aec/suites.ts`). Elle n'est gardée que si
   son meilleur passage atteint `SUITES_MIN_SCORE` (0,8 par défaut). En cas de panne : aucune suite.
-- **Calibrer le seuil** : `pnpm suites:calibrer:prod` score les questions d'évals (répondues /
-  introuvables) et propose un seuil qui sépare les deux groupes ; `pnpm suites:calibrer:prod "question"`
-  teste une question. En production, le journal « question traitée » donne `origine: "suite"`,
+- **Jeu de données** : `pnpm suites:donnees:prod` construit `evals/suites.json` (suites réelles avant
+  filtre, questions écrites depuis des passages, questions voisines sans réponse), étiqueté par un juge
+  LLM ; les désaccords sont marqués `aRelire`, à trancher à la main.
+- **Calibrer le seuil** : `pnpm suites:calibrer:prod` score ce jeu et affiche, par seuil, les
+  introuvables proposées à tort et les bonnes suites retirées ; `pnpm suites:calibrer:prod "question"`
+  teste une question. Premier calibrage (209 questions) : le score seul ne sépare pas les groupes,
+  d'où l'exigence d'un passage cité. En production, le journal « question traitée » donne `origine: "suite"`,
   `suitesProposees` et `suitesRetirees` : une suite choisie qui finit introuvable = seuil trop bas.
 - Coût : quelques dizaines de jetons de sortie et un appel d'embeddings par réponse.
 
