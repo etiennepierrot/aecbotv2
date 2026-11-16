@@ -150,6 +150,11 @@ question ─▶ agent aec ──▶ outil recherche (pgvector, édition 2027 par
   citation valide, y compris quand le modèle répond de mémoire sans chercher, la réponse
   devient « introuvable ». Le modèle ne rédige jamais la liste des sources : elle vient des
   métadonnées.
+- **Réponse partielle contrôlée** (`src/aec/objet.ts`) : quand l'agent commence par « Je ne trouve
+  pas de passage qui réponde précisément… », un appel court (`AEC_CHECK_MODEL`, par défaut le modèle
+  du juge) vérifie qu'un passage cité traite de l'objet précis de la question, pas seulement du même
+  thème. Sinon la réponse devient « introuvable ». Le verdict est dans `controle.objet` (traces,
+  évals). En cas de panne du contrôle, la réponse, déjà vérifiée citation par citation, est gardée.
 - **Sortie** : le modèle écrit du texte avec des références, que la vérification transforme en
   objet. Une sortie JSON native aurait demandé une seconde passe de structuration (coût d'entrée
   doublé) ou risqué que le modèle réponde sans appeler l'outil.

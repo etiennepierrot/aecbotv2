@@ -90,6 +90,7 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
 
   const texte = lines
     .join("\n")
+    .replace(/^[ \t]*(?:-{3,}|\*{3,}|_{3,})[ \t]*$/gm, "") // séparateur Markdown, affiché tel quel dans Telegram
     .replace(/[ \t]+([.,])/g, "$1") // espace laissé par une référence retirée ; « : ; ! ? » gardent la leur
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -141,6 +142,18 @@ export function parseSuites(raw: string): { texte: string; suites: SuiteBrute[] 
     if (!suites.some((s) => s.question.toLowerCase() === question.toLowerCase())) suites.push({ question, refs });
   }
   return { texte: text.slice(0, m.index).trim(), suites };
+}
+
+/** Les passages que le texte du modèle cite réellement (références [Pn] valides), sans doublon. */
+export function passagesCites(raw: string, collector: PassageCollector): ReferencedPassage[] {
+  const { texte } = parseSuites(raw);
+  const refs = [...texte.matchAll(MARKER)].flatMap((m) => m[1]!.split(/[,;]/).map((r) => r.trim()));
+  const vus = new Map<string, ReferencedPassage>();
+  for (const r of refs) {
+    const p = collector.get(r);
+    if (p) vus.set(p.ref, p);
+  }
+  return [...vus.values()];
 }
 
 /** Les questions de suite seules (3 au plus), sans vérifier leurs références. */
