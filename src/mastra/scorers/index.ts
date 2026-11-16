@@ -2,6 +2,7 @@ import { createScorer, notScorable } from "@mastra/core/evals";
 import { z } from "zod";
 import type { Answer, ReferencedPassage } from "../../aec/types.js";
 import { defaultModels } from "../../config.js";
+import { correspondA, type SourceAttendue } from "../../aec/sources-attendues.js";
 
 /** Ce que les scorers évaluent : une réponse vérifiée et les passages vus par l'agent. */
 export interface ScoredRun {
@@ -12,7 +13,7 @@ export interface ScoredRun {
 export interface Attendu {
   attendu: "repondu" | "introuvable";
   /** Au moins une de ces sources devrait être citée (titre contenant `document`, page parmi `pages`). */
-  sources?: { document: string; pages?: number[] }[];
+  sources?: SourceAttendue[];
 }
 
 /** Part des citations du modèle qui renvoient à un passage réellement récupéré. Seuil : 1. */
@@ -40,10 +41,7 @@ export const sourceAttendueScorer = createScorer<{ question: string }, ScoredRun
   .generateScore(({ run }) => {
   const expected = (run.groundTruth as Attendu).sources ?? [];
   if (expected.length === 0) return 1;
-  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  return run.output.reponse.sources.some((s) =>
-    expected.some((e) => norm(s.title).includes(norm(e.document)) && (!e.pages?.length || s.pages.some((pg) => e.pages!.includes(pg)))),
-  )
+  return run.output.reponse.sources.some((s) => expected.some((e) => correspondA(s.title, s.pages, e)))
     ? 1
     : 0;
 });

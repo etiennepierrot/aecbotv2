@@ -24,6 +24,7 @@ pnpm ingest --limit 3         # essai sur 3 documents
 pnpm ingest                   # scan complet
 pnpm ask "Que dit le programme sur la retraite ?"
 pnpm evals                    # les 21 questions types, grille de décision
+pnpm evals:recherche          # la recherche seule, sans LLM : recall@k et MRR
 pnpm bot                      # le bot en local (long polling), avec TELEGRAM_BOT_TOKEN
 pnpm dev                      # Mastra Studio sur http://localhost:4111
 ```
@@ -147,6 +148,23 @@ puis chaque modèle donne un experiment avec réponses, scores et traces par que
 met plusieurs passes côte à côte. Avec plusieurs `--model`, le script liste aussi les questions
 où les modèles diffèrent du premier. Les questions passent 3 par 3 (`--concurrence N` pour changer) ;
 `--local` (ou `--only`) revient à une passe non enregistrée. Le code est dans `src/aec/experiments.ts`.
+
+
+### Éval de la recherche seule
+
+```bash
+pnpm evals:recherche                 # réglages de l'outil : top 10, toutes éditions
+pnpm evals:recherche --only smic     # détail des 5 premiers résultats
+```
+
+Sans LLM, avec un embedding par question : la recherche remonte-t-elle une des sources
+attendues de `evals/questions.json`, et à quel rang ? On obtient le **recall@k** (part des
+questions dont une source attendue figure dans les k premières pages), le **MRR** (moyenne de
+1/rang) et la **couverture** (part des sources attendues trouvées). Ce sont les chiffres à
+comparer avant et après un changement de découpage, de quotas, de recherche hybride ou de
+reranking. Le script affiche aussi le meilleur score des questions avec réponse et des questions
+hors corpus, pour savoir si un seuil de score les séparerait. La requête est la question brute :
+l'agent, lui, la reformule en mots-clés, donc ces chiffres sont plutôt un plancher.
 
 ## Le bot Telegram
 
