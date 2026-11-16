@@ -21,6 +21,9 @@ describe.skipIf(!DB)("feedback Mastra (Postgres réel)", () => {
 
   beforeAll(async () => {
     process.env.DATABASE_URL = DB;
+    // Comme en production sur Mastra Platform : sans ça, le retrait silencieux de
+    // MastraStorageExporter par la plateforme passait inaperçu (voir storage-exporter.ts).
+    process.env.MASTRA_DEPLOYMENT_ID ??= "dep_test";
     process.env.OPENROUTER_API_KEY ??= "test";
     const deps = await import("../src/corpus/deps.js");
     deps.setRetrievalDeps({
@@ -76,6 +79,9 @@ describe.skipIf(!DB)("feedback Mastra (Postgres réel)", () => {
     await flush();
     const trace = await obs.getTrace({ traceId: res.traceId });
     expect(trace?.spans?.length).toBeGreaterThan(0);
+    // Le span racine porte le traceId que le bot range dans aec_conversations.trace_id.
+    const racine = trace.spans.find((s: any) => !s.parentSpanId);
+    expect(racine).toMatchObject({ traceId: res.traceId, spanId: res.spanId });
 
     await sink.forgetTraces([res.traceId!]);
     expect(await obs.getTrace({ traceId: res.traceId })).toBeNull();

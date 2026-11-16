@@ -200,6 +200,11 @@ la réponse à ce message est enregistrée comme commentaire (elle ne compte pas
 - Les traces sont stockées dans la base Neon (UE) : `PostgresStoreVNext`, la variante dont
   l'observabilité gère le feedback. Elles suivent la même règle que la mémoire : `MEMORY_DAYS` jours
   (purge nocturne via `storage.prune()`), effacées par `/oublier`.
+- Sur Mastra Platform, `@mastra/observability` retire sans prévenir tout `MastraStorageExporter`
+  (les traces n'iraient qu'à Mastra Cloud). On passe donc par `NeonStorageExporter`
+  (`src/mastra/storage-exporter.ts`), qui l'enveloppe. `GET /status` renvoie `"traces": true`
+  quand l'exporteur vers Neon est actif, et 503 « traces non enregistrées » sinon ; la CI lance le
+  build avec `MASTRA_DEPLOYMENT_ID` pour le vérifier avant chaque déploiement.
 - Un vote n'est accepté que si la réponse a bien été donnée à cette personne.
 - **Copie vers Mastra Cloud** : avec `MASTRA_PLATFORM_ACCESS_TOKEN` et `MASTRA_PROJECT_ID` dans les
   variables de production, traces, votes et commentaires partent aussi vers le tableau de bord

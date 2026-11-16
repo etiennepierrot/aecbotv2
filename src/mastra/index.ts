@@ -1,9 +1,10 @@
 import { Mastra } from "@mastra/core";
 import { PinoLogger } from "@mastra/loggers";
-import { MastraStorageExporter, Observability, SamplingStrategyType } from "@mastra/observability";
+import { Observability, SamplingStrategyType } from "@mastra/observability";
 import { PostgresStoreVNext } from "@mastra/pg";
 import { COLLECTOR_KEY } from "../aec/collector.js";
 import { cloudExporter } from "./cloud-exporter.js";
+import { NeonStorageExporter, neonExporterActive } from "./storage-exporter.js";
 import { registerApiRoute, SimpleAuth } from "@mastra/core/server";
 import { config, PASSAGES_INDEX } from "../config.js";
 import { pgVector } from "../corpus/deps.js";
@@ -21,18 +22,21 @@ const statusRoute = registerApiRoute("/status", {
   method: "GET",
   handler: async (c) => {
     const version = process.env.AEC_VERSION ?? "dev";
+    // Faux = les réponses ne laissent aucune trace dans Neon (feedback orphelin, Studio vide).
+    const traces = neonExporterActive(c.get("mastra"));
     try {
       const { rows } = await pgVector().pool.query(
         `SELECT to_regclass('${PASSAGES_INDEX}') IS NOT NULL AS index_present`,
       );
       if (!rows[0].index_present) {
         // Base joignable mais sans index : mauvaise base, ou aucun scan encore fait sur celle-ci.
-        return c.json({ status: "index absent", version }, 503);
+        return c.json({ status: "index absent", version, traces }, 503);
       }
       const n = await pgVector().pool.query(`SELECT count(*)::int AS n FROM ${PASSAGES_INDEX}`);
-      return c.json({ status: "ok", version, passages: n.rows[0].n });
+      if (!traces) return c.json({ status: "traces non enregistrées", version, passages: n.rows[0].n, traces }, 503);
+      return c.json({ status: "ok", version, passages: n.rows[0].n, traces });
     } catch {
-      return c.json({ status: "base injoignable", version }, 503);
+      return c.json({ status: "base injoignable", version, traces }, 503);
     }
   },
 });
@@ -83,7 +87,8 @@ export const mastra = new Mastra({
       default: {
         serviceName: "aecbot",
         // Neon (Studio, /oublier, purge) et, si un token est fourni, Mastra Cloud.
-        exporters: [new MastraStorageExporter(), cloudExporter],
+        // Pas de MastraStorageExporter nu : Mastra Platform le retire en silence (voir storage-exporter.ts).
+        exporters: [new NeonStorageExporter(), cloudExporter],
         sampling: { type: SamplingStrategyType.CUSTOM, sampler: (o) => o?.requestContext?.get(COLLECTOR_KEY as never) !== undefined },
         logging: { enabled: false },
       },
