@@ -5,6 +5,9 @@ import { rechercheTool } from "../tools/recherche.js";
 /** Modèle de réponse par défaut ; comparer d'autres modèles avec `pnpm evals --model …`. */
 export const DEFAULT_MODEL = process.env.AEC_MODEL?.trim() || defaultModels().answer;
 
+/** Plafond de sortie par appel du modèle : borne le coût d'une question, même détournée. */
+export const MAX_OUTPUT_TOKENS = 1000;
+
 export const AEC_INSTRUCTIONS = `
 Tu es AECBot, un assistant documentaire NON OFFICIEL sur le programme « L'Avenir en commun » (AEC).
 Tu réponds à des militants, en français.
@@ -75,5 +78,8 @@ export const aecAgent = new Agent({
   instructions: AEC_INSTRUCTIONS,
   model: DEFAULT_MODEL,
   tools: { recherche: rechercheTool },
-  defaultOptions: { maxSteps: 5, modelSettings: { temperature: 0 } },
+  // maxOutputTokens : une réponse fait 150 à 500 jetons (900 pour la plus longue de l'éval). Sans
+  // plafond, une tentative de détournement a produit 9 400 jetons, écartés ensuite par la vérification
+  // mais payés. Le plafond vaut par appel du modèle.
+  defaultOptions: { maxSteps: 5, modelSettings: { temperature: 0, maxOutputTokens: MAX_OUTPUT_TOKENS } },
 });

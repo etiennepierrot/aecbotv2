@@ -61,6 +61,8 @@ describe("repondre", () => {
     // La première étape impose l'appel de l'outil ; la suivante laisse le modèle libre.
     expect(model.calls[0]!.toolChoice).toEqual({ type: "required" });
     expect(model.calls[1]!.toolChoice).not.toEqual({ type: "required" });
+    // Chaque appel du modèle est plafonné : une question détournée ne peut pas coûter des milliers de jetons.
+    expect(model.calls.map((c) => c.maxOutputTokens)).toEqual([1000, 1000]);
     // Par défaut : une requête par édition de EDITIONS (2027 puis 2022), chacune avec son quota.
     expect(queries.slice(-2).map((q) => q.filter)).toEqual([{ corpus: { $eq: "aec2027" } }, { corpus: { $eq: "aec2022" } }]);
   });

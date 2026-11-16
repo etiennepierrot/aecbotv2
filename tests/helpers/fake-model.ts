@@ -5,19 +5,19 @@
 export type FakeTurn = { tool: string; input: Record<string, unknown> } | { text: string };
 
 export interface FakeModel {
-  calls: { prompt: unknown[]; toolChoice?: unknown }[];
+  calls: { prompt: unknown[]; toolChoice?: unknown; maxOutputTokens?: number }[];
 }
 
 export function fakeModel(script: (prompt: any[], call: number) => FakeTurn): FakeModel & Record<string, unknown> {
-  const calls: { prompt: unknown[]; toolChoice?: unknown }[] = [];
+  const calls: { prompt: unknown[]; toolChoice?: unknown; maxOutputTokens?: number }[] = [];
   const model = {
     specificationVersion: "v2",
     provider: "fake",
     modelId: "fake-model",
     supportedUrls: {},
     calls,
-    async doGenerate(opts: { prompt: any[]; toolChoice?: unknown }) {
-      calls.push({ prompt: opts.prompt, toolChoice: opts.toolChoice });
+    async doGenerate(opts: { prompt: any[]; toolChoice?: unknown; maxOutputTokens?: number }) {
+      calls.push({ prompt: opts.prompt, toolChoice: opts.toolChoice, maxOutputTokens: opts.maxOutputTokens });
       const turn = script(opts.prompt, calls.length);
       const usage = { inputTokens: 100, outputTokens: 20, totalTokens: 120 };
       if ("tool" in turn) {
