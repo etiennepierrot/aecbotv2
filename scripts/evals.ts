@@ -91,7 +91,7 @@ for (const r of reports) {
         ? `${g.jetonsMoyens.entree}+${g.jetonsMoyens.sortie} jetons`
         : `${(g.coutParQuestionUsd * 100).toFixed(2)} ¢`
       ).padEnd(15),
-      r.passe ? "PASSE" : "échoue",
+      r.passe ? "PASSE" : g.erreurs ? `échoue (${g.erreurs} erreur${g.erreurs > 1 ? "s" : ""})` : "échoue",
     ].join(" | "),
   );
 }

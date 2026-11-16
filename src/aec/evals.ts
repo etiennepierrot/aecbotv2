@@ -32,7 +32,7 @@ export interface EvalReport {
   questions: QuestionResult[];
   grille: {
     citationsRejetees: number;
-    horsCorpusIntrouvable: number;
+    horsCorpusIntrouvable: number | null;
     fideliteMoyenne: number | null;
     statutCorrect: number;
     sourceAttendue: number;
@@ -119,7 +119,8 @@ export function summarize(model: string, results: QuestionResult[], prix?: Prix)
 
   const grille = {
     citationsRejetees: ok.reduce((n, r) => n + r.citationsRejetees, 0),
-    horsCorpusIntrouvable: hors.length ? hors.filter((r) => r.statut === "introuvable").length / hors.length : 1,
+    // null : aucune question hors corpus n'a abouti (toutes en erreur, ou --only sans elles).
+    horsCorpusIntrouvable: hors.length ? hors.filter((r) => r.statut === "introuvable").length / hors.length : null,
     fideliteMoyenne: mean(fid),
     statutCorrect: mean(ok.map((r) => r.scores.statut ?? 0)) ?? 0,
     sourceAttendue: mean(src) ?? 0,
@@ -130,7 +131,7 @@ export function summarize(model: string, results: QuestionResult[], prix?: Prix)
   const passe =
     grille.erreurs === 0 &&
     grille.citationsRejetees <= SEUILS.citationsRejetees &&
-    grille.horsCorpusIntrouvable >= SEUILS.horsCorpusIntrouvable &&
+    (grille.horsCorpusIntrouvable ?? 1) >= SEUILS.horsCorpusIntrouvable &&
     (grille.fideliteMoyenne === null || grille.fideliteMoyenne >= SEUILS.fidelite);
 
   return { model, questions: results, grille, passe };
