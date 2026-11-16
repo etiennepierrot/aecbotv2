@@ -56,3 +56,18 @@ describe("readEpub", () => {
     });
   });
 });
+
+describe("chunkDocument : livre EPUB", () => {
+  it("embarque chaque passage avec le chemin de sa section, sans le répéter dans le texte rendu", async () => {
+    const section = "Partie 1 : P › Chapitre 3 : C › Rompre avec la maltraitance animale";
+    const corps = Array.from({ length: 40 }, (_, i) => `Mesure ${i} contre la chasse a courre et la corrida.`).join(" ");
+    const item: SourceItem = {
+      id: "manual:livre-aec", origin: "manuel", kind: "pdf", title: "Livre", url: "", modified: "2026-11-10T00:00:00Z",
+      forced: { category: "programme", corpus: "aec2027" },
+    };
+    const passages = await chunkDocument(item, { pages: [{ page: 9, section, text: `${section}\n\n${corps}` }] }, classifyByMetadata(item));
+    expect(passages.length).toBeGreaterThan(1);
+    for (const p of passages) expect(p.text.startsWith(section)).toBe(true);
+    expect(passages.slice(1).every((p) => !p.metadata.text.startsWith(section))).toBe(true);
+  });
+});
