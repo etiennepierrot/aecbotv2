@@ -23,7 +23,8 @@ pnpm db:up                    # Postgres 17 + pgvector
 pnpm ingest --limit 3         # essai sur 3 documents
 pnpm ingest                   # scan complet
 pnpm ask "Que dit le programme sur la retraite ?"
-pnpm evals                    # les 21 questions types, grille de décision
+pnpm evals                    # les 21 questions types, grille de décision (base et clés de .env)
+pnpm evals:prod               # idem contre l'index de production (.env.production)
 pnpm evals:recherche          # la recherche seule, sans LLM : recall@k et MRR
 pnpm bot                      # le bot en local (long polling), avec TELEGRAM_BOT_TOKEN
 pnpm dev                      # Mastra Studio sur http://localhost:4111
