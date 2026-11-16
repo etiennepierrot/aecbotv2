@@ -19,13 +19,20 @@ const MAX_PAGE_CHARS = 6000;
 
 /** Constante de la fusion par rangs (Reciprocal Rank Fusion) : 60 est la valeur d'usage. */
 const RRF_K = 60;
+/**
+ * Passages trouvés par les mots seulement, ajoutés au plus par édition. La recherche plein
+ * texte ne fait qu'ajouter : elle ne pousse jamais dehors un passage trouvé par le sens
+ * (« cryptomonnaies » ne correspond à aucun mot de « crypto-actifs », seul le sens le relie).
+ */
+const MAX_PAR_MOTS = 3;
 
 /**
  * Recherche hybride filtrée par édition, en deux temps :
  * 1. les passages les plus proches, avec une part réservée à chaque édition, pour que
  *    l'édition la plus récente ne soit pas noyée sous les nombreux livrets 2022. Dans chaque
- *    édition, la recherche vectorielle et la recherche plein texte (mots exacts : « corrida »)
- *    sont fusionnées par rangs ; `score` reste la similarité cosinus ;
+ *    édition, la recherche plein texte (mots exacts : « corrida ») ajoute au plus MAX_PAR_MOTS
+ *    passages à ceux de la recherche vectorielle, tous gardés ; l'ordre vient de la fusion par
+ *    rangs, `score` reste la similarité cosinus ;
  * 2. chaque passage est élargi à toute sa page PDF (ou section du livre) : un chiffre
  *    (« SMIC à 1 600 € ») est souvent dans le passage voisin de celui qui a été trouvé.
  */
@@ -56,10 +63,10 @@ export async function searchPassages({
         vector.query({ indexName: PASSAGES_INDEX, queryVector, topK: quota, filter: filter as never }),
         textSearch ? textSearch({ requete, queryVector, corpus: ed, categories, topK: quota }) : Promise.resolve([]),
       ]);
-      return fuse(
+      return hybride(
         parSens.map((r) => toPassage(r.id, r.score, (r.metadata ?? {}) as Record<string, unknown>)),
         parMots.map((r) => toPassage(r.id, r.score, r.metadata)),
-      ).slice(0, quota);
+      );
     }),
   );
 
@@ -94,6 +101,17 @@ export function fuse(...listes: RetrievedPassage[][]): (RetrievedPassage & { fus
     });
   }
   return [...byId.values()].sort((a, b) => b.fused - a.fused || b.score - a.score);
+}
+
+/**
+ * Tous les passages trouvés par le sens, plus au plus MAX_PAR_MOTS trouvés par les mots seuls,
+ * dans l'ordre de la fusion par rangs. Rien de ce que trouve la recherche vectorielle ne disparaît.
+ */
+export function hybride(parSens: RetrievedPassage[], parMots: RetrievedPassage[], maxParMots = MAX_PAR_MOTS) {
+  const sens = new Set(parSens.map((p) => p.id));
+  const ajouts = parMots.filter((p) => !sens.has(p.id)).slice(0, maxParMots);
+  const gardes = new Set([...sens, ...ajouts.map((p) => p.id)]);
+  return fuse(parSens, parMots).filter((p) => gardes.has(p.id));
 }
 
 /** Un seul passage par (document, page), le mieux classé, dans l'ordre reçu. */

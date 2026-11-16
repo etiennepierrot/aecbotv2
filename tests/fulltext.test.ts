@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fuse } from "../src/aec/search.js";
+import { fuse, hybride } from "../src/aec/search.js";
 import type { RetrievedPassage } from "../src/aec/types.js";
 import { termesRecherche } from "../src/corpus/fulltext.js";
 
@@ -25,6 +25,17 @@ describe("fuse", () => {
     const parSens = [p("a", 0.86), p("b", 0.85), p("c", 0.84)];
     const parMots = [p("corrida", 0.79), p("b", 0.85)];
     expect(fuse(parSens, parMots).map((x) => x.id)).toEqual(["b", "a", "corrida", "c"]);
+  });
+
+  it("hybride : ne retire jamais un passage trouvé par le sens, ajoute au plus 3 passages trouvés par les mots", () => {
+    const parSens = ["s1", "s2", "s3", "s4", "s5", "crypto-actifs"].map((id, i) => p(id, 0.8 - i / 100));
+    const parMots = ["blockchain-1", "s2", "blockchain-2", "blockchain-3", "blockchain-4"].map((id) => p(id, 0.7));
+    const ids = hybride(parSens, parMots).map((x) => x.id);
+    for (const s of parSens) expect(ids).toContain(s.id);
+    expect(ids.filter((id) => id.startsWith("blockchain"))).toEqual(["blockchain-1", "blockchain-2", "blockchain-3"]);
+    expect(ids[0]).toBe("s2"); // trouvé des deux façons
+    // Aucun mot trouvé (« cryptomonnaies ») : la liste du sens, inchangée.
+    expect(hybride(parSens, []).map((x) => x.id)).toEqual(parSens.map((x) => x.id));
   });
 
   it("garde le score cosinus de chaque passage", () => {

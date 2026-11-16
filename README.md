@@ -135,9 +135,12 @@ question ─▶ agent aec ──▶ outil recherche (pgvector, édition 2027 par
 - **Outil `recherche`** : recherche **hybride** filtrée sur `corpus` (`aec2027`, ou `aec2022` si la
   question le demande). Dans chaque édition, la recherche vectorielle (`mistral-embed`) et une recherche
   plein texte Postgres en français (`src/corpus/fulltext.ts`, index GIN créé au démarrage de l'ingestion)
-  sont fusionnées par rangs (RRF). Le plein texte ne garde que les mots qui distinguent (ni mots vides,
-  ni « programme », « prévoit »…) : un mot cité une seule fois dans une liste (« corrida ») remonte son
-  passage. `score` reste la similarité cosinus. Le modèle voit des passages numérotés
+  se combinent : tous les passages trouvés par le sens sont gardés, et le plein texte en **ajoute** au
+  plus 3 par édition, le tout ordonné par fusion des rangs (RRF). Il ne peut donc pas faire perdre un
+  passage trouvé par le sens (« cryptomonnaies » ne partage aucun mot avec « crypto-actifs »). Le plein
+  texte ne garde que les mots qui distinguent (ni mots vides, ni « programme », « prévoit »…) : un mot
+  cité une seule fois dans une liste (« corrida ») remonte son passage. `score` reste la similarité
+  cosinus. L'agent reçoit donc jusqu'à 16 passages au lieu de 10. Le modèle voit des passages numérotés
   P1, P2… avec titre, page et type de document, sans URL. Tous les passages renvoyés sont
   gardés dans un collecteur propre à la question.
 - **Vérification** (`src/aec/verify.ts`) : une référence que l'outil n'a pas renvoyée est
