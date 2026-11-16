@@ -140,6 +140,14 @@ attendue est citée. Renseigner les prix Mistral dans `evals/prix.json` avant de
 `--sans-juge` évite les appels au juge ; `--only <id>` restreint aux questions choisies.
 Le détail de chaque passe est écrit dans `evals/resultats/`.
 
+Chaque passe est aussi enregistrée comme **experiment Mastra** : `evals/questions.json` est
+synchronisé vers le dataset « Questions types » (versionné en base : ajout, modification, retrait),
+puis chaque modèle donne un experiment avec réponses, scores et traces par question. Dans Studio
+(`pnpm dev` → Datasets → Questions types → Experiments), on relit les réponses et **Compare**
+met plusieurs passes côte à côte. Avec plusieurs `--model`, le script liste aussi les questions
+où les modèles diffèrent du premier. Les questions passent 3 par 3 (`--concurrence N` pour changer) ;
+`--local` (ou `--only`) revient à une passe non enregistrée. Le code est dans `src/aec/experiments.ts`.
+
 ## Le bot Telegram
 
 ```
