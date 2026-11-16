@@ -16,6 +16,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "evals": "tsx --env-file-if-exists=.env scripts/evals.ts",
+    "evals:recherche": "tsx --env-file-if-exists=.env scripts/evals-recherche.ts",
+    "evals:recherche:prod": "tsx --import ./scripts/prod-env.ts scripts/evals-recherche.ts",
     "ask": "tsx --env-file-if-exists=.env scripts/ask.ts",
     "bot": "tsx --env-file-if-exists=.env scripts/bot.ts",
     "webhook": "tsx --env-file-if-exists=.env scripts/telegram-webhook.ts",

@@ -10,6 +10,8 @@ export interface SearchParams {
   categories?: Category[];
   /** Nombre de passages tirés de l'index, avant regroupement par page. */
   topK?: number;
+  /** Élargir chaque passage à toute sa page (par défaut). L'éval de la recherche s'en passe. */
+  elargir?: boolean;
 }
 
 /** Au-delà, le texte d'une page est coupé (une page A5 fait 1 500 à 3 000 caractères). */
@@ -27,6 +29,7 @@ export async function searchPassages({
   edition = "toutes",
   categories,
   topK = 10,
+  elargir = true,
 }: SearchParams): Promise<RetrievedPassage[]> {
   const { embedder, vector, pageChunks } = await retrievalDeps();
   const [queryVector] = await embedder.embed([requete]);
@@ -49,23 +52,29 @@ export async function searchPassages({
 
   const hits = batches.flat().map((r) => toPassage(r.id, r.score, (r.metadata ?? {}) as Record<string, unknown>));
   hits.sort((a, b) => b.score - a.score);
+  if (!elargir) return groupByPage(hits);
   if (!pageChunks) return hits;
 
-  // Regroupement par page : un seul passage par (document, page), avec le texte complet.
-  const byPage = new Map<string, RetrievedPassage>();
-  for (const h of hits) {
-    const key = h.page === null ? h.id : `${h.docId}#p${h.page}`;
-    if (byPage.has(key)) continue;
-    byPage.set(key, { ...h, id: key });
-  }
+  const byPage = groupByPage(hits);
   await Promise.all(
-    [...byPage.values()]
+    byPage
       .filter((p) => p.page !== null)
       .map(async (p) => {
         const chunks = await pageChunks(p.docId, p.page!);
         if (chunks.length) p.text = joinChunks(chunks).slice(0, MAX_PAGE_CHARS);
       }),
   );
+  return byPage;
+}
+
+/** Un seul passage par (document, page), le mieux classé, dans l'ordre des scores. */
+function groupByPage(hits: RetrievedPassage[]): RetrievedPassage[] {
+  const byPage = new Map<string, RetrievedPassage>();
+  for (const h of hits) {
+    const key = h.page === null ? h.id : `${h.docId}#p${h.page}`;
+    if (byPage.has(key)) continue;
+    byPage.set(key, { ...h, id: key });
+  }
   return [...byPage.values()];
 }
 
