@@ -1,0 +1,2350 @@
+[
+  {
+    "question": "Comment rendre la fiscalité plus équitable et efficace ?",
+    "origine": "passage",
+    "contexte": "Chantier cadre : Retrouver les moyens d’agir, financer nos ambitions, p. null",
+    "id": "passage-comment-rendre-la-fiscalite-plus-equitable",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] répond directement à la question en détaillant les mesures pour une fiscalité plus équitable et efficace, comme le rééquilibrage entre travail, capital et héritage, la taxation des superprofits, et la suppression des niches fiscales inefficaces."
+    }
+  },
+  {
+    "question": "Comment protéger nos entreprises spatiales des rachats étrangers ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_16_ESPACE_web-ok, p. 13",
+    "id": "passage-comment-proteger-nos-entreprises-spatiales-des",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] (page 13) précise que des mesures seront prises pour empêcher toute prise de participation majoritaire de capitaux étrangers dans les entreprises spatiales stratégiques, via le décret Montebourg de 2014."
+    }
+  },
+  {
+    "question": "Quelles mesures urgentes contre la malbouffe chez les jeunes sont prévues ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_27_JEUNESSE_web-ok, p. 18",
+    "id": "passage-quelles-mesures-urgentes-contre-la-malbouffe",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement les mesures urgentes contre la malbouffe chez les jeunes, comme l'interdiction des additifs controversés, la fixation de taux maximaux de sel/sucre/gras, le Nutri-Score obligatoire, l'interdiction de la publicité alimentaire pour les jeunes et l'éducation nutritionnelle à l'école."
+    }
+  },
+  {
+    "question": "Quelles idées nouvelles pour la justice sont proposées par les militants ?",
+    "origine": "passage",
+    "contexte": "Chapitre 7 : La force de l’entraide, p. null",
+    "id": "passage-quelles-idees-nouvelles-pour-la-justice",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1] et [2] mentionnent explicitement des idées nouvelles pour la justice proposées par les militants, comme la gratuité des procédures et la simplification du langage juridique."
+    }
+  },
+  {
+    "question": "Quelles sont les priorités pour améliorer la vie en campagne ?",
+    "origine": "passage",
+    "contexte": "Les plans thématiques, p. null",
+    "id": "passage-quelles-sont-les-priorites-pour-ameliorer",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] énumère des priorités concrètes pour améliorer la vie en campagne, comme la rénovation des équipements sportifs, le soutien au patrimoine rural et aux événements locaux."
+    }
+  },
+  {
+    "question": "Pourquoi relocaliser l'industrie textile en France ?",
+    "origine": "passage",
+    "contexte": "Plan_investisssement_TEXTILE, p. 8",
+    "id": "passage-pourquoi-relocaliser-l-industrie-textile-en",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [7] répond directement en expliquant que la relocalisation vise à recréer une filière complète (culture, transformation, confection) pour réduire la pollution et les coûts sociaux, tout en rendant les produits accessibles."
+    }
+  },
+  {
+    "question": "Comment rendre le sport plus accessible à tous ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_14_SPORT_web-ok, p. 13",
+    "id": "passage-comment-rendre-le-sport-plus-accessible",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Plusieurs passages répondent directement, notamment [3] (plan national d'urgence pour les équipements, gratuité pour les plus pauvres) et [4] (accessibilité handicap, mixité sociale, natation scolaire)."
+    }
+  },
+  {
+    "question": "Comment réduire les fuites d'eau et garantir l'accès à l'eau pour tous ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_11_EAU_web-2 (1)-ok, p. 19",
+    "id": "passage-comment-reduire-les-fuites-d-eau",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] répond directement en proposant de diviser par deux les fuites en cinq ans et de garantir l'accès à l'eau via des installations publiques gratuites."
+    }
+  },
+  {
+    "question": "Où peut-on acheter le programme de campagne 2022 ?",
+    "origine": "passage",
+    "contexte": "Plan_UP_POUVOIR_ACHAT_web, p. 32",
+    "id": "passage-ou-peut-on-acheter-le-programme",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] (et plusieurs autres) indique que le programme est vendu en librairie (Éditions du Seuil) ou sur le site www.melenchon2022.fr/programme."
+    }
+  },
+  {
+    "question": "Où peut-on acheter le programme de Mélenchon ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_41_DISCRIMINATIONS_web, p. 20",
+    "id": "passage-ou-peut-on-acheter-le-programme-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] indique explicitement où commander le programme via un lien direct (melenchon2027.fr/programme/commander/), et les passages [4] à [8] précisent qu'il est disponible en librairie (Éditions du Seuil) ou sur le site officiel."
+    }
+  },
+  {
+    "question": "Quelles mesures limiteront les contrats précaires dans les entreprises ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_21_EMPLOI_web-ok, p. 20",
+    "id": "passage-quelles-mesures-limiteront-les-contrats-precaires",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1], [2] et [7] mentionnent explicitement l'instauration d'un quota maximal de contrats précaires dans les entreprises (10 % pour les PME, 5 % pour les grandes entreprises)."
+    }
+  },
+  {
+    "question": "Quelles mesures fiscales sont prévues pour financer les projets écologiques ?",
+    "origine": "passage",
+    "contexte": "Chantier cadre : Retrouver les moyens d’agir, financer nos ambitions, p. null",
+    "id": "passage-quelles-mesures-fiscales-sont-prevues-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] détaille les mesures fiscales écologiques comme la suppression des niches fiscales polluantes (6,5 Md€/an) et la taxe kilométrique (5 Md€/an)."
+    }
+  },
+  {
+    "question": "Comment rendre la culture accessible à tous, même hors des grandes villes ?",
+    "origine": "passage",
+    "contexte": "Chapitre 11 : Humaniser par la culture et le sport, p. null",
+    "id": "passage-comment-rendre-la-culture-accessible-a",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] propose un plan d'implantation et d'itinérance des artistes partout dans le pays, notamment via des médiathèques et bibliobus itinérants pour les communes dépourvues d'équipement fixe."
+    }
+  },
+  {
+    "question": "Quelles mesures sont prévues pour préserver les océans ?",
+    "origine": "passage",
+    "contexte": "Chapitre 18 : Nouvelles Frontières de l’Humanité, p. null",
+    "id": "passage-quelles-mesures-sont-prevues-pour-preserver",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [2], [3], [4], [7] et [8] détaillent explicitement les mesures prévues pour préserver les océans, comme la création d'aires marines protégées, la lutte contre la surpêche ou la pollution plastique."
+    }
+  },
+  {
+    "question": "Les transports en commun seront-ils gratuits pour les jeunes et les chômeurs ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_20_TRANSPORT_web-1-ok, p. 11",
+    "id": "passage-les-transports-en-commun-seront-ils",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] mentionne explicitement : « Rendre gratuits les transports en commun urbains dans les villes et les TER et cars »."
+    }
+  },
+  {
+    "question": "Quelles mesures contre les privilèges des élus sont déjà dans le programme ?",
+    "origine": "passage",
+    "contexte": "Chapitre 1 : Le pouvoir au peuple, p. null",
+    "id": "passage-quelles-mesures-contre-les-privileges-des",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1] et [4] mentionnent explicitement des mesures contre les privilèges des élus, comme la fin des privilèges des anciens ministres et présidents, le durcissement des règles contre les conflits d’intérêts et l’interdiction du pantouflage."
+    }
+  },
+  {
+    "question": "Pourquoi le bonus écologique a-t-il été réduit de moitié en 2025 ?",
+    "origine": "passage",
+    "contexte": "Automobile, p. null",
+    "id": "passage-pourquoi-le-bonus-ecologique-a-t",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] explique directement que le gouvernement a divisé par deux le bonus écologique en 2025."
+    }
+  },
+  {
+    "question": "Quelles mesures pour une défense française indépendante et moderne ?",
+    "origine": "passage",
+    "contexte": "Chapitre 16 : une diplomatie altermondialiste pour la paix, p. null",
+    "id": "passage-quelles-mesures-pour-une-defense-francaise",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [2], [3] et [4] détaillent explicitement les mesures pour une défense française indépendante et moderne, comme le retrait de l'OTAN, la création d'un pôle public de l'armement ou l'adaptation aux nouvelles technologies."
+    }
+  },
+  {
+    "question": "Pourquoi les lois sur les médias ne protègent-elles plus contre les monopoles ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_39_MEDIAS_web, p. 8",
+    "id": "passage-pourquoi-les-lois-sur-les-medias",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [7] explique explicitement que les lois actuelles (de 1984 et 1986) sont obsolètes et n'empêchent plus les situations de monopole, notamment à cause de l'évolution technologique (internet, diffusion en ligne)."
+    }
+  },
+  {
+    "question": "Quelles mesures sont prévues pour améliorer l'accès à l'eau potable ?",
+    "origine": "passage",
+    "contexte": "Chapitre 14 : Protection des biens communs et des droits de l’espèce, p. null",
+    "id": "passage-quelles-mesures-sont-prevues-pour-ameliorer",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] mentionne explicitement des mesures comme la gratuité des usages vitaux de l'eau, l'interdiction des méga-bassines, et le maillage du territoire en points d'eau potable et sanitaires."
+    }
+  },
+  {
+    "question": "Comment améliorer la transparence des policiers en intervention ?",
+    "origine": "passage",
+    "contexte": "Chapitre 4 : Étendre le domaine de la liberté, p. null",
+    "id": "passage-comment-ameliorer-la-transparence-des-policiers",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] propose explicitement de faire appliquer l'obligation de porter le numéro d'identification (RIO) de manière visible pour les forces de l'ordre, ce qui améliore directement la transparence des policiers en intervention."
+    }
+  },
+  {
+    "question": "Quel pourcentage du PIB sera alloué à la recherche publique d'ici 2027 ?",
+    "origine": "passage",
+    "contexte": "ASS-LIVRET-ESR_VF_220121_VWEB-ok, p. 8",
+    "id": "passage-quel-pourcentage-du-pib-sera-alloue",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] indique que 1,5 % du PIB sera alloué à la recherche publique en 2027."
+    }
+  },
+  {
+    "question": "Quelles actions concrètes ont été menées pour les Outre-mer par les députés de l’Union populaire ?",
+    "origine": "passage",
+    "contexte": "Plan_UP_OUTRE-MER_WEB, p. 11",
+    "id": "passage-quelles-actions-concretes-ont-ete-menees",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille des actions concrètes menées par les députés de l’Union populaire pour les Outre-mer, comme des propositions de résolution et de loi."
+    }
+  },
+  {
+    "question": "Qui supervise les plans d'investissement pour la production en France ?",
+    "origine": "passage",
+    "contexte": "Les plans d’investissement, p. null",
+    "id": "passage-qui-supervise-les-plans-d-investissement",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] indique que les plans d'investissement productif sont coordonnés par Clémence Guetté et Hadrien Clouet."
+    }
+  },
+  {
+    "question": "Pourquoi le troisième référendum en Nouvelle-Calédonie a-t-il été controversé ?",
+    "origine": "passage",
+    "contexte": "Plan_UP_OUTRE-MER_WEB, p. 25",
+    "id": "passage-pourquoi-le-troisieme-referendum-en-nouvelle",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] et [2] expliquent que le troisième référendum a été controversé car l'État a imposé sa date malgré la demande de report des indépendantistes pour respecter le deuil coutumier et la pandémie, entraînant une faible participation (moins de 50%) et décrédibilisant le processus."
+    }
+  },
+  {
+    "question": "Pourquoi les transports sont-ils de plus en plus privatisés ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_20_TRANSPORT_web-1-ok, p. 5",
+    "id": "passage-pourquoi-les-transports-sont-ils-de",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] explique directement que la privatisation des transports est une priorité libérale (ex. : vente des autoroutes, privatisation des compagnies aériennes) au détriment du service public."
+    }
+  },
+  {
+    "question": "Pourquoi les campagnes sont-elles moins bien dotées que les villes ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_22_RURALITE_web, p. 5",
+    "id": "passage-pourquoi-les-campagnes-sont-elles-moins",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] explique directement les mesures pour rééquilibrer la dotation globale de fonctionnement (DGF) et augmenter les moyens des communes rurales."
+    }
+  },
+  {
+    "question": "Quelles mesures pour protéger les forêts et les animaux sont déjà prévues ?",
+    "origine": "passage",
+    "contexte": "Chapitre 14 : Protection des biens communs et des droits de l’espèce, p. null",
+    "id": "passage-quelles-mesures-pour-proteger-les-forets",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1], [2], [3], [4], [6], [7] et [8] détaillent explicitement des mesures concrètes pour protéger les forêts (interdiction des coupes rases, renforcement de l'ONF, augmentation des forêts publiques) et les animaux (interdiction des pratiques de chasse cruelles, protection des habitats, etc.)."
+    }
+  },
+  {
+    "question": "Quelles mesures pour une agriculture plus écologique et juste ?",
+    "origine": "passage",
+    "contexte": "Chapitre 13 : Les grands chantiers de la bifurcation écologique, p. null",
+    "id": "passage-quelles-mesures-pour-une-agriculture-plus",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1], [2], [4] et [6] détaillent des mesures concrètes pour une agriculture plus écologique (réduction des pesticides, bio, protection des sols) et juste (prix rémunérateurs, aides aux petites exploitations, création d'emplois)."
+    }
+  },
+  {
+    "question": "Comment renforcer les droits des salariés et la démocratie locale ?",
+    "origine": "passage",
+    "contexte": "Chapitre 3 : Citoyens dans l’entreprise et dans la ville, p. null",
+    "id": "passage-comment-renforcer-les-droits-des-salaries",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1], [2], [3], [5], [6], [7] et [8] détaillent des mesures concrètes pour renforcer les droits des salariés (droit de veto, représentation accrue, abrogation des lois libérales, etc.) et la démocratie locale (statut de l'élu, souveraineté municipale, etc.)."
+    }
+  },
+  {
+    "question": "Quelles ont été les causes des révoltes dans les DOM ces dernières années ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_04_OUTRE-MER-ok, p. 6",
+    "id": "passage-quelles-ont-ete-les-causes-des",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [2], [4], [5], [6] et [8] détaillent explicitement les causes des révoltes dans les DOM : vie chère, chômage, ruptures d'accès aux services essentiels (santé, éducation, eau), inégalités sociales et économiques, et sous-investissement chronique de l'État."
+    }
+  },
+  {
+    "question": "Comment financer une couverture santé universelle sans inégalités ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_13_SANTE_web-ok, p. 19",
+    "id": "passage-comment-financer-une-couverture-sante-universelle",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] détaille le financement via le « 100 % Sécu » (intégration des complémentaires privées à la Sécurité sociale) et la suppression de l'ONDAM, avec des ressources propres pour l’Assurance maladie."
+    }
+  },
+  {
+    "question": "Comment réduire la surconsommation tout en garantissant les besoins essentiels ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_07_ECOLOGIE_web-ok, p. 18",
+    "id": "passage-comment-reduire-la-surconsommation-tout-en",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] propose des mesures concrètes pour réduire la surconsommation (interdiction des plastiques à usage unique, service public de réparation, écoconception) tout en garantissant les besoins essentiels via une économie circulaire et durable."
+    }
+  },
+  {
+    "question": "Combien sera investi chaque année pour les transports autonomes collectifs ?",
+    "origine": "passage",
+    "contexte": "Automobile, p. null",
+    "id": "passage-combien-sera-investi-chaque-annee-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [7] indique clairement un investissement de 50 millions d'euros par an pour les minibus autonomes collectifs."
+    }
+  },
+  {
+    "question": "Comment réduire les départs forcés depuis les pays pauvres ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_06_MIGRATION_web-1-ok, p. 10",
+    "id": "passage-comment-reduire-les-departs-forces-depuis",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [4] propose des mesures concrètes comme stopper les accords commerciaux inégaux et permettre la souveraineté des pays pour réduire les causes des départs forcés."
+    }
+  },
+  {
+    "question": "Comment comptez-vous former plus d'artisans pour la rénovation écologique ?",
+    "origine": "passage",
+    "contexte": "BTP et logement, p. null",
+    "id": "passage-comment-comptez-vous-former-plus-d",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] et [4] mentionnent explicitement l'objectif de former 250 000 salarié·es d’ici 2030 via des filières de formation initiale et continue pour répondre au déficit d’artisans qualifiés en rénovation écologique."
+    }
+  },
+  {
+    "question": "Pourquoi les campagnes manquent-elles de médecins ?",
+    "origine": "passage",
+    "contexte": "Comment nous allons garantir l’égalité pour des ruralités où il fait bon vivre, p. null",
+    "id": "passage-pourquoi-les-campagnes-manquent-elles-de",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [4] explique directement les causes des déserts médicaux (politiques austéritaires) et les solutions proposées pour y remédier (maillage territorial, recrutement, etc.)."
+    }
+  },
+  {
+    "question": "Comment lutter contre l'illectronisme selon le programme ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_17_NUMERIQUE_web, p. 11",
+    "id": "passage-comment-lutter-contre-l-illectronisme-selon",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] et [4] détaillent des mesures concrètes pour lutter contre l'illectronisme, comme la coordination des acteurs de la médiation numérique, le maintien de guichets physiques et un service public de proximité pour accompagner les personnes en difficulté."
+    }
+  },
+  {
+    "question": "Comment rendre leur autonomie aux petites communes ?",
+    "origine": "passage",
+    "contexte": "Comment nous allons garantir l’égalité pour des ruralités où il fait bon vivre, p. null",
+    "id": "passage-comment-rendre-leur-autonomie-aux-petites",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] répond directement en détaillant les mesures pour rendre l'autonomie aux communes, comme la suppression des métropoles technocratiques et le refus des fusions forcées."
+    }
+  },
+  {
+    "question": "Pourquoi le glyphosate est-il encore utilisé en France ?",
+    "origine": "passage",
+    "contexte": "PLAN_UP_ALIM_VF2_IMPRESSION_VWEB-2, p. 9",
+    "id": "passage-pourquoi-le-glyphosate-est-il-encore",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] indique clairement que le programme prévoit l'interdiction immédiate du glyphosate par le Parlement."
+    }
+  },
+  {
+    "question": "Quelles actions pour la recherche en mer et aux pôles ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_18_MER_web-ok, p. 21",
+    "id": "passage-quelles-actions-pour-la-recherche-en",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille des actions concrètes pour la recherche en mer et aux pôles, comme le financement de travaux scientifiques, la modernisation des stations en Antarctique, le programme Extraplac et le soutien aux biotechnologies marines."
+    }
+  },
+  {
+    "question": "Où puis-je acheter le programme de la France insoumise ?",
+    "origine": "passage",
+    "contexte": "Commander le programme, p. null",
+    "id": "passage-ou-puis-je-acheter-le-programme",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] indique clairement où acheter le programme (librairies en ligne comme Place des libraires, Fnac, etc.) et le passage [3] propose un lien direct pour commander."
+    }
+  },
+  {
+    "question": "Comment rendre la recherche plus accessible à tous les citoyens ?",
+    "origine": "passage",
+    "contexte": "Plan_ESR, p. 29",
+    "id": "passage-comment-rendre-la-recherche-plus-accessible",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] et [6] détaillent des mesures concrètes pour rendre la recherche accessible (ouverture des données, CCSTI, cours libres, diffusion audiovisuelle)."
+    }
+  },
+  {
+    "question": "Quels secteurs stratégiques doivent être protégés de la privatisation ?",
+    "origine": "passage",
+    "contexte": "Chapitre 2 : Par-delà la propriété privée, p. null",
+    "id": "passage-quels-secteurs-strategiques-doivent-etre-proteges",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] liste explicitement les secteurs stratégiques à protéger : médicaments, transports et mobilité, banque, énergie, armement."
+    }
+  },
+  {
+    "question": "Quelles mesures sont prévues pour protéger l'espace et la filière spatiale française ?",
+    "origine": "passage",
+    "contexte": "Chapitre 18 : Nouvelles Frontières de l’Humanité, p. null",
+    "id": "passage-quelles-mesures-sont-prevues-pour-proteger",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] détaille explicitement les mesures pour protéger la filière spatiale française, comme le retour sur la privatisation d'Arianespace et le renforcement du CNES."
+    }
+  },
+  {
+    "question": "Quels problèmes rencontrent les Français à l'étranger sous Macron ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_29_FRA-ETR_web-ok, p. 4",
+    "id": "passage-quels-problemes-rencontrent-les-francais-a",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement les problèmes rencontrés par les Français de l'étranger sous Macron : fermetures de postes consulaires, non-remplacement des agents, privatisation des institutions éducatives et culturelles, manque de soutien aux petites entreprises, et gestion chaotique de la crise sanitaire."
+    }
+  },
+  {
+    "question": "Pourquoi les coupes budgétaires aggravent-elles le déficit ?",
+    "origine": "passage",
+    "contexte": "Comment nous allons remettre de l ordre dans les comptes publics, p. 17",
+    "id": "passage-pourquoi-les-coupes-budgetaires-aggravent-elles",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [4] explique directement que les coupes budgétaires réduisent le pouvoir d’achat et l’investissement, ce qui fait chuter les recettes et ralentit l’économie, aggravant ainsi le déficit."
+    }
+  },
+  {
+    "question": "Comment renforcer la démocratie dans les communes ?",
+    "origine": "passage",
+    "contexte": "Chapitre 3 : Citoyens dans l’entreprise et dans la ville, p. null",
+    "id": "passage-comment-renforcer-la-democratie-dans-les",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] et d'autres (comme [5] ou [8]) détaillent des mesures concrètes pour renforcer la démocratie locale dans les communes, comme supprimer les métropoles technocratiques, refuser les fusions forcées ou donner plus de moyens financiers et décisionnels."
+    }
+  },
+  {
+    "question": "Combien de logements sociaux étudiants seront construits chaque année ?",
+    "origine": "passage",
+    "contexte": "Livret_UP_09_LOGEMENT-ok, p. 15",
+    "id": "passage-combien-de-logements-sociaux-etudiants-seront",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] indique clairement l'objectif de 15 000 mises en chantier de logements sociaux étudiants par an."
+    }
+  },
+  {
+    "question": "Quand la taxe sur les superprofits entrera-t-elle en vigueur ?",
+    "origine": "voisine",
+    "id": "voisine-quand-la-taxe-sur-les-superprofits",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [2] et [4] mentionnent l'instauration d'une taxe sur les superprofits, mais aucun ne précise explicitement la date d'entrée en vigueur."
+    }
+  },
+  {
+    "question": "Combien coûtera la suppression des niches fiscales inefficaces ?",
+    "origine": "voisine",
+    "id": "voisine-combien-coutera-la-suppression-des-niches",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] indique que la suppression progressive des niches fiscales inefficaces rapporte 46,5 milliards d’euros."
+    }
+  },
+  {
+    "question": "Quel sera le coût exact de l'intégration de la CFE à la Sécurité sociale ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-cout-exact-de",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le coût exact de l'intégration de la CFE à la Sécurité sociale."
+    }
+  },
+  {
+    "question": "Le passe vaccinal sera-t-il remplacé par un autre système ?",
+    "origine": "voisine",
+    "id": "voisine-le-passe-vaccinal-sera-t-il",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le passe vaccinal ou son remplacement par un autre système."
+    }
+  },
+  {
+    "question": "Quel budget précis sera alloué au plan contre les féminicides ?",
+    "origine": "voisine",
+    "id": "voisine-quel-budget-precis-sera-alloue-au",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [8] mentionne explicitement un budget de 2,6 milliards d'euros alloué à la lutte contre les violences faites aux femmes, incluant la formation et les places d'hébergement."
+    }
+  },
+  {
+    "question": "Qui sera la ministre chargée de ce plan ?",
+    "origine": "voisine",
+    "id": "voisine-qui-sera-la-ministre-chargee-de",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement qui sera la ministre chargée du plan « L'Avenir en commun »."
+    }
+  },
+  {
+    "question": "Quel est le budget prévu pour racheter les forêts privées par préemption ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-budget-prevu-pour",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget prévu pour le rachat des forêts privées par préemption."
+    }
+  },
+  {
+    "question": "Qui sera chargé de gérer les parcelles réquisitionnées ?",
+    "origine": "voisine",
+    "id": "voisine-qui-sera-charge-de-gerer-les",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [2] et [3] abordent la réquisition des logements vacants et mentionnent les préfets et les maires comme acteurs, mais ne précisent pas explicitement qui gérera les parcelles réquisitionnées."
+    }
+  },
+  {
+    "question": "Quel est le budget prévu pour la prime au renouvellement des navires ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-budget-prevu-pour-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget prévu pour la prime au renouvellement des navires."
+    }
+  },
+  {
+    "question": "La convention de Hong Kong sera-t-elle appliquée avant 2025 ?",
+    "origine": "voisine",
+    "id": "voisine-la-convention-de-hong-kong-sera",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne la convention de Hong Kong ou son application avant 2025."
+    }
+  },
+  {
+    "question": "Quel sera le budget alloué à ce pôle public de biomédicaments ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-budget-alloue-a",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget alloué au pôle public de biomédicaments."
+    }
+  },
+  {
+    "question": "Comment sera gérée la transition pour les visiteurs médicaux privés ?",
+    "origine": "voisine",
+    "id": "voisine-comment-sera-geree-la-transition-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] indique que les visiteurs médicaux (hospitaliers ou ambulatoires) seront interdits et qu'une reconversion dans le public leur sera proposée."
+    }
+  },
+  {
+    "question": "Quel budget sera alloué au service public de certification professionnelle ?",
+    "origine": "voisine",
+    "id": "voisine-quel-budget-sera-alloue-au-service",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget alloué au service public de certification professionnelle."
+    }
+  },
+  {
+    "question": "Les formations en agroécologie seront-elles obligatoires pour les agriculteurs en activité ?",
+    "origine": "voisine",
+    "id": "voisine-les-formations-en-agroecologie-seront-elles",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages abordent la formation en agroécologie pour les agriculteurs (ex. [1], [3], [6]) mais ne précisent pas si elle sera obligatoire pour ceux déjà en activité."
+    }
+  },
+  {
+    "question": "Quel budget sera alloué à la rénovation des Alliances françaises en Afrique subsaharienne ?",
+    "origine": "voisine",
+    "id": "voisine-quel-budget-sera-alloue-a-la",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget alloué à la rénovation des Alliances françaises en Afrique subsaharienne."
+    }
+  },
+  {
+    "question": "Qui sera le prochain Secrétaire général de l’OIF selon le programme ?",
+    "origine": "voisine",
+    "id": "voisine-qui-sera-le-prochain-secretaire-general",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le nom ou une proposition concernant le prochain Secrétaire général de l’OIF."
+    }
+  },
+  {
+    "question": "Quel est le coût exact de l'impression des livrets pour la campagne ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-cout-exact-de",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le coût exact de l'impression des livrets pour la campagne."
+    }
+  },
+  {
+    "question": "Jean-Luc Mélenchon a-t-il consulté des jeunes de moins de 18 ans pour ce livret ?",
+    "origine": "voisine",
+    "id": "voisine-jean-luc-melenchon-a-t-il",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] indique que le livret a été rédigé par un groupe de travail composé d'étudiant·es et de jeunes travailleur·ses, ce qui implique une consultation de jeunes (mais pas explicitement de moins de 18 ans)."
+    }
+  },
+  {
+    "question": "Quel sera le budget exact alloué à la réouverture des maternités en zone rurale ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-budget-exact-alloue",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne un budget exact alloué à la réouverture des maternités en zone rurale."
+    }
+  },
+  {
+    "question": "Comment le programme compte-t-il gérer les déserts médicaux dans les DOM-TOM ?",
+    "origine": "voisine",
+    "id": "voisine-comment-le-programme-compte-t-il",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] aborde explicitement la situation des déserts médicaux dans les DOM-TOM et les inégalités structurelles, tandis que les passages [4], [7] et [8] détaillent les mesures générales pour lutter contre les déserts médicaux, applicables à l'Outre-mer."
+    }
+  },
+  {
+    "question": "Pourquoi le gouvernement n’a-t-il pas consulté les citoyens sur le changement d’heure ?",
+    "origine": "voisine",
+    "id": "voisine-pourquoi-le-gouvernement-n-a-t",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne traite spécifiquement de la consultation des citoyens sur le changement d'heure."
+    }
+  },
+  {
+    "question": "Quel est le coût exact du démantèlement des centrales nucléaires en France ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-cout-exact-du",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le coût exact du démantèlement des centrales nucléaires en France."
+    }
+  },
+  {
+    "question": "Quel sera le coût exact de la semaine de 32h pour les PME ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-cout-exact-de-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le coût exact de la semaine de 32h pour les PME."
+    }
+  },
+  {
+    "question": "Macron a-t-il réagi à votre projet sur les retraites pénibles ?",
+    "origine": "voisine",
+    "id": "voisine-macron-a-t-il-reagi-a",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne une réaction directe d'Emmanuel Macron au projet de la France insoumise sur les retraites pénibles."
+    }
+  },
+  {
+    "question": "Quel est le budget prévu pour la traçabilité des importations de bois ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-budget-prevu-pour-3",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget prévu pour la traçabilité des importations de bois."
+    }
+  },
+  {
+    "question": "La Chine a-t-elle réagi aux propositions de protectionnisme forestier ?",
+    "origine": "voisine",
+    "id": "voisine-la-chine-a-t-elle-reagi",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne une réaction spécifique de la Chine aux propositions de protectionnisme forestier du programme."
+    }
+  },
+  {
+    "question": "Quel est le budget alloué au guichet unique pour la rénovation ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-budget-alloue-au",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget alloué au guichet unique pour la rénovation."
+    }
+  },
+  {
+    "question": "Qui sera responsable des services publics contre les punaises de lits ?",
+    "origine": "voisine",
+    "id": "voisine-qui-sera-responsable-des-services-publics",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] et [2] mentionnent explicitement la création de services publics locaux dédiés à la prévention et à l'éradication des punaises de lits."
+    }
+  },
+  {
+    "question": "Quel sera le prix exact de la location mensuelle pour un véhicule électrique en 2025 ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-prix-exact-de",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le prix exact de la location mensuelle pour un véhicule électrique en 2025."
+    }
+  },
+  {
+    "question": "Quel est le coût exact de la mise en place de l'encadrement des loyers pour les propriétaires ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-cout-exact-de-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le coût exact de la mise en place de l'encadrement des loyers pour les propriétaires."
+    }
+  },
+  {
+    "question": "Qui sera responsable de la saisie des CDC en cas de non-respect des loyers ?",
+    "origine": "voisine",
+    "id": "voisine-qui-sera-responsable-de-la-saisie",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement la responsabilité de la saisie des CDC (Commissions Départementales de Conciliation) en cas de non-respect des loyers."
+    }
+  },
+  {
+    "question": "Quel budget sera alloué aux campagnes de testing contre les discriminations ?",
+    "origine": "voisine",
+    "id": "voisine-quel-budget-sera-alloue-aux-campagnes",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget alloué aux campagnes de testing contre les discriminations."
+    }
+  },
+  {
+    "question": "Le récépissé de contrôle d’identité s’appliquera-t-il aux mineurs ?",
+    "origine": "voisine",
+    "id": "voisine-le-recepisse-de-controle-d-identite",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [3] mentionne la mise en place du récépissé de contrôle d’identité, mais ne précise pas explicitement son application aux mineurs."
+    }
+  },
+  {
+    "question": "Quel sera le calendrier précis de création des nouveaux magasins ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-calendrier-precis-de",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne un calendrier précis pour la création de nouveaux magasins."
+    }
+  },
+  {
+    "question": "La taxe kilométrique s'appliquera-t-elle aux produits bio importés ?",
+    "origine": "voisine",
+    "id": "voisine-la-taxe-kilometrique-s-appliquera-t",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] mentionne explicitement l'instauration d'une taxe kilométrique sur les produits importés, sans exclusion des produits bio."
+    }
+  },
+  {
+    "question": "Quel est le budget exact alloué à la lutte contre l'isolement des seniors en 2025 ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-budget-exact-alloue",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le budget exact alloué à la lutte contre l'isolement des seniors en 2025."
+    }
+  },
+  {
+    "question": "Le changement d'heure affecte-t-il la santé des personnes âgées ?",
+    "origine": "voisine",
+    "id": "voisine-le-changement-d-heure-affecte-t",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne l'impact du changement d'heure sur la santé des personnes âgées."
+    }
+  },
+  {
+    "question": "Quel est le coût exact pour l'État du remboursement à 100 % des soins de transition ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-cout-exact-pour",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [1] donne le coût global du 100 % Sécu (14,35 milliards d’euros) mais ne détaille pas spécifiquement le coût des soins de transition."
+    }
+  },
+  {
+    "question": "Le changement de prénom sera-t-il possible sans justificatif médical ?",
+    "origine": "voisine",
+    "id": "voisine-le-changement-de-prenom-sera-t",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] mentionne explicitement le droit au changement de la mention du sexe à l'état civil librement et gratuitement, sans condition médicale, ce qui inclut implicitement le changement de prénom."
+    }
+  },
+  {
+    "question": "Quel budget sera alloué à la médecine du travail intégrée au service public ?",
+    "origine": "voisine",
+    "id": "voisine-quel-budget-sera-alloue-a-la-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le budget alloué à la médecine du travail intégrée au service public."
+    }
+  },
+  {
+    "question": "Le burn-out sera-t-il reconnu rétroactivement pour les anciens cas ?",
+    "origine": "voisine",
+    "id": "voisine-le-burn-out-sera-t-il",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement la reconnaissance rétroactive du burn-out pour les anciens cas."
+    }
+  },
+  {
+    "question": "Quel est le coût exact du tourisme spatial pour un vol suborbital ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-cout-exact-du-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le coût exact du tourisme spatial pour un vol suborbital."
+    }
+  },
+  {
+    "question": "La France va-t-elle envoyer des astronautes sur Mars d’ici 2030 ?",
+    "origine": "voisine",
+    "id": "voisine-la-france-va-t-elle-envoyer",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement l'envoi d'astronautes français sur Mars d’ici 2030, bien que le programme évoque des missions interplanétaires et un vol habité à long terme (passage 3)."
+    }
+  },
+  {
+    "question": "Quel sera le budget alloué à la réintégration des moyens de l’AFD au Quai d’Orsay ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-budget-alloue-a-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [3] évoque la réintégration des moyens de l'AFD au Quai d'Orsay, mais sans préciser le budget alloué."
+    }
+  },
+  {
+    "question": "Le plan pour l’enseignement français à l’étranger inclut-il les lycées de Dubai ?",
+    "origine": "voisine",
+    "id": "voisine-le-plan-pour-l-enseignement-francais",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement les lycées français de Dubaï ou une politique spécifique à leur égard."
+    }
+  },
+  {
+    "question": "Quel sera le coût exact de la création du pôle public bancaire ?",
+    "origine": "voisine",
+    "id": "voisine-quel-sera-le-cout-exact-de-3",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le coût exact de la création du pôle public bancaire."
+    }
+  },
+  {
+    "question": "Qui sera nommé à la tête de ce pôle public bancaire ?",
+    "origine": "voisine",
+    "id": "voisine-qui-sera-nomme-a-la-tete",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement la nomination d'une personne à la tête du pôle public bancaire."
+    }
+  },
+  {
+    "question": "Quel est le budget exact alloué à la prévention des maladies chroniques en 2026 ?",
+    "origine": "voisine",
+    "id": "voisine-quel-est-le-budget-exact-alloue-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne le budget exact alloué à la prévention des maladies chroniques en 2026."
+    }
+  },
+  {
+    "question": "Le ministre de la Santé actuel soutient-il ce modèle de santé ?",
+    "origine": "voisine",
+    "id": "voisine-le-ministre-de-la-sante-actuel",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement la position du ministre de la Santé actuel sur le modèle de santé proposé par « L'Avenir en commun »."
+    }
+  },
+  {
+    "question": "Quel est le rôle du président de la République pendant les travaux de la Constituante ?",
+    "origine": "reelle",
+    "id": "reelle-quel-est-le-role-du-president",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] précise que pendant les travaux de la Constituante, le président de la République (Jean-Luc Mélenchon) gouverne avec les règles en vigueur, en s'appuyant sur un gouvernement chargé de mettre en œuvre le programme *L'Avenir en commun* et une majorité parlementaire."
+    }
+  },
+  {
+    "question": "Comment le processus constituant serait-il financé ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-processus-constituant-serait-il",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] et [2] détaillent explicitement le budget alloué (500M€/an en 2023-2024 et 300M€ en 2022) et les postes de dépenses du processus constituant."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les droits des citoyens pendant la Constituante ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] (Livret_UP_40_6e-REP_web, page 15) détaille explicitement les droits des citoyens prévus dans la Constitution, notamment les droits sociaux (travail, logement), l'IVG, et le droit à mourir dans la dignité."
+    }
+  },
+  {
+    "question": "Quels sont les moyens prévus pour réduire les effectifs par classe ?",
+    "origine": "reelle",
+    "id": "reelle-quels-sont-les-moyens-prevus-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [4] mentionne explicitement la réduction massive des effectifs par classe dans les établissements d'éducation prioritaire et le passage [5] précise l'objectif de 19 élèves par classe en moyenne dans le primaire et le secondaire."
+    }
+  },
+  {
+    "question": "Comment le programme aborde-t-il l'inclusion des élèves en situation de handicap ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-aborde-t-il",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] détaille explicitement les mesures du programme pour l'inclusion des élèves en situation de handicap, comme la création d'un service public d'accompagnement, la formation des AESH, ou la suppression des PIAL."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour la formation continue des enseignants ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-la",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] mentionne explicitement la formation continue des enseignant·es-chercheur·ses, prise en compte dans leur service."
+    }
+  },
+  {
+    "question": "Quels sont les autres stupéfiants concernés par une politique de légalisation ou de dépénalisation ?",
+    "origine": "reelle",
+    "id": "reelle-quels-sont-les-autres-stupefiants-concernes",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages mentionnent la légalisation du cannabis (passages 2, 3, 5, 7) et une étude des résultats de la dépénalisation de l'ensemble des drogues au Portugal (passage 1), mais ne précisent pas explicitement quels autres stupéfiants seraient concernés par une politique de légalisation ou dépénalisation."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il de financer les politiques de prévention et de santé publique liées au cannabis ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-de",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] précise que les recettes des taxes sur le cannabis seront affectées à des programmes de lutte contre les addictions, notamment en milieu scolaire, et à une politique de prévention, de réduction des risques et d’aide à la désintoxication."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les salles de consommation à moindre risque ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement les salles de consommation à moindre risque."
+    }
+  },
+  {
+    "question": "Quels sont les critères pour définir un secteur stratégique ?",
+    "origine": "reelle",
+    "id": "reelle-quels-sont-les-criteres-pour-definir",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages évoquent des secteurs stratégiques (ex. semi-conducteurs, médicaments) et des plans de relocalisation, mais aucun ne définit explicitement les critères de définition (passages 1, 2, 7)."
+    }
+  },
+  {
+    "question": "Comment le pôle public bancaire financera-t-il ces nationalisations ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-pole-public-bancaire-financera",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] explique que le pôle public bancaire sera financé notamment par la nationalisation de certaines banques de détail issues de la séparation des grandes banques universelles, et par l'intégration d'établissements déjà publics (Banque postale, CNP Assurances, Bpifrance)."
+    }
+  },
+  {
+    "question": "Quelles entreprises seraient concernées par la réquisition d’intérêt général ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-entreprises-seraient-concernees-par-la",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [1] évoque la réquisition des usines et entreprises d’intérêt général, mais sans préciser quelles entreprises seraient concernées."
+    }
+  },
+  {
+    "question": "Qui nommera le Premier ministre si L'Avenir en commun est élu ?",
+    "origine": "reelle",
+    "id": "reelle-qui-nommera-le-premier-ministre-si",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement qui nommera le Premier ministre en cas d'élection de L'Avenir en commun."
+    }
+  },
+  {
+    "question": "Quel est le rôle prévu pour le Premier ministre dans le programme ?",
+    "origine": "reelle",
+    "id": "reelle-quel-est-le-role-prevu-pour",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le rôle prévu pour le Premier ministre dans le programme."
+    }
+  },
+  {
+    "question": "Quels critères sociaux et écologiques seront appliqués aux prêts du pôle public bancaire ?",
+    "origine": "reelle",
+    "id": "reelle-quels-criteres-sociaux-et-ecologiques-seront",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les critères sociaux et écologiques sont définis par le Conseil à la planification écologique, avec des conditions de prêt avantageuses pour les projets alignés sur la bifurcation écologique et la relocalisation (passage [1])."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il d’augmenter les moyens du pôle public bancaire ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-d",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement les moyens prévus pour augmenter les ressources du pôle public bancaire (SFIL, livrets réglementés, plafond du livret A, rémunération)."
+    }
+  },
+  {
+    "question": "Quel rôle jouera le Parlement dans le contrôle des financements ?",
+    "origine": "reelle",
+    "id": "reelle-quel-role-jouera-le-parlement-dans",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [8] mentionne explicitement la mise en place d'un « suivi citoyen et un contrôle parlementaire de l’évolution de la dette », ce qui répond directement à la question sur le rôle du Parlement dans le contrôle des financements."
+    }
+  },
+  {
+    "question": "Comment le SMIC serait-il indexé après cette revalorisation ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-smic-serait-il-indexe",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [7] indique que le SMIC serait indexé sur l’inflation dans le privé et la fonction publique."
+    }
+  },
+  {
+    "question": "Quelles autres mesures concernent les bas salaires ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-autres-mesures-concernent-les-bas",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] mentionne explicitement des mesures pour les bas salaires, comme l'écart maximal de 1 à 20 et la garantie d'autonomie à 1063 euros."
+    }
+  },
+  {
+    "question": "Quel est le calendrier prévu pour cette augmentation ?",
+    "origine": "reelle",
+    "id": "reelle-quel-est-le-calendrier-prevu-pour",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le calendrier précis de l'augmentation demandée."
+    }
+  },
+  {
+    "question": "Quels financements sont prévus pour l’institut dédié à l’IA ?",
+    "origine": "reelle",
+    "id": "reelle-quels-financements-sont-prevus-pour-l",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1] et [6] mentionnent la création d'un institut dédié à l'IA, mais aucun ne précise les financements alloués."
+    }
+  },
+  {
+    "question": "Comment le programme protège-t-il les données de santé face à l’IA ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-protege-t-il",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] et [5] détaillent explicitement l'encadrement de l'IA en santé, exigeant des algorithmes transparents, explicités et limités à des tâches précises."
+    }
+  },
+  {
+    "question": "L’IA sera-t-elle utilisée dans les services publics ? Si oui, sous quelles conditions ?",
+    "origine": "reelle",
+    "id": "reelle-l-ia-sera-t-elle-utilisee",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] mentionne explicitement l'utilisation de l'IA dans les services publics avec des conditions précises (interdiction de certains usages, développement d'applications utiles aux besoins sociaux et écologiques)."
+    }
+  },
+  {
+    "question": "Comment le SMIC à 1600 € serait-il financé ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-smic-a-1600-serait",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [2] mentionne le coût total (28,7 milliards d’euros) du SMIC revalorisé et sa déconjugalisation, mais ne détaille pas explicitement le financement du SMIC à 1600 €."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les salaires au-dessus du SMIC ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-3",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] et [3] précisent que les très hauts salaires seront plafonnés avec un écart maximal de 1 à 20 entre le salaire le plus bas et le plus haut dans chaque entreprise."
+    }
+  },
+  {
+    "question": "Quand cette mesure serait-elle appliquée ?",
+    "origine": "reelle",
+    "id": "reelle-quand-cette-mesure-serait-elle-appliquee",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne précise une date ou un calendrier d'application pour une mesure spécifique."
+    }
+  },
+  {
+    "question": "Quel est le montant estimé des recettes de cette taxe Zucman ?",
+    "origine": "reelle",
+    "id": "reelle-quel-est-le-montant-estime-des",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage 8 mentionne explicitement que la taxe Zucman rapporterait 15 milliards d'euros pour les personnes possédant plus de 100 millions d'euros de patrimoine."
+    }
+  },
+  {
+    "question": "Comment cette taxe s’articule-t-elle avec le rétablissement de l’ISF ?",
+    "origine": "reelle",
+    "id": "reelle-comment-cette-taxe-s-articule-t",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1], [2], [3] et [5] évoquent le rétablissement et le renforcement de l'ISF ainsi que des réformes fiscales connexes (taxe foncière, impôt sur l'héritage), mais aucun ne détaille explicitement l'articulation entre cette taxe et le rétablissement de l'ISF."
+    }
+  },
+  {
+    "question": "Quelles autres mesures fiscales sont prévues pour les ultra-riches ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-autres-mesures-fiscales-sont-prevues",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] détaille explicitement les mesures fiscales prévues pour les ultra-riches, comme la taxe Zucman (2 % sur le patrimoine des milliardaires), le rétablissement de l'ISF renforcé avec un volet climatique, la suppression de la flat tax et la progressivité de la CSG."
+    }
+  },
+  {
+    "question": "Quels sont les objectifs sociaux et écologiques visés par cette mission nationale de maîtrise de l'IA ?",
+    "origine": "reelle",
+    "id": "reelle-quels-sont-les-objectifs-sociaux-et",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille directement les objectifs sociaux (interdiction d'usages contraires aux droits sociaux) et écologiques (réduction de l'impact du numérique, data centers) de la mission nationale de maîtrise de l'IA."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il de financer ces mesures liées à l'IA ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-de-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [3] et [7] évoquent le financement des plans d'investissement (dont l'IA pourrait faire partie) via l'investissement public, le pôle public bancaire et des dispositifs comme prêts ou garanties, mais aucun ne détaille spécifiquement le financement des mesures liées à l'IA."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les logiciels libres et leur lien avec l'IA ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-4",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] mentionne explicitement la création d'une agence publique des logiciels libres pour développer leur utilisation stratégique, notamment pour les services publics et la souveraineté numérique."
+    }
+  },
+  {
+    "question": "Quelles autres mesures salariales sont prévues pour les bas revenus ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-autres-mesures-salariales-sont-prevues",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] mentionne explicitement la mesure clé de porter le SMIC à 1600 euros net et d'indexer les salaires sur l'inflation, ce qui concerne directement les bas revenus."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les métiers majoritairement féminins ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-5",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] mentionne explicitement la revalorisation des rémunérations des métiers majoritairement féminins."
+    }
+  },
+  {
+    "question": "Quels sont les montants précis de la revalorisation du SMIC prévus ?",
+    "origine": "reelle",
+    "id": "reelle-quels-sont-les-montants-precis-de",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] indique que le SMIC sera porté à 1400 euros nets par mois par décret, et le passage [7] mentionne une revalorisation à 1600 euros nets par mois."
+    }
+  },
+  {
+    "question": "Comment le programme finance-t-il les autres minima sociaux ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-finance-t-il",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1] et [7] évoquent le financement global des politiques sociales (revalorisation des allocations, indexation, etc.) via des économies et une fiscalité ciblée, mais aucun ne détaille spécifiquement le financement des *autres minima sociaux* (hors AAH, APL, retraites mentionnées)."
+    }
+  },
+  {
+    "question": "Quels investissements sont prévus pour créer des emplois ?",
+    "origine": "reelle",
+    "id": "reelle-quels-investissements-sont-prevus-pour-creer",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille les investissements prévus pour créer des emplois, notamment un plan de 200 milliards d'euros pour la bifurcation écologique et sociale, ainsi que des coûts spécifiques pour d'autres mesures."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour le pouvoir d’achat ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-le",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [1] mentionne le pouvoir d’achat dans le sommaire mais ne détaille pas les mesures prévues."
+    }
+  },
+  {
+    "question": "Comment le programme aborde-t-il la transition écologique ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-aborde-t-il-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le programme aborde explicitement la transition écologique via des mesures comme la planification écologique, les éco-régions, ou la règle verte (passages 2, 3, 7)."
+    }
+  },
+  {
+    "question": "Quelles sont les mesures prévues pour les carrières longues dans le programme ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-sont-les-mesures-prevues-pour",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [2] aborde la reconnaissance de la pénibilité et les droits à la retraite, mais sans détailler explicitement les mesures pour les carrières longues."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il de financer la gratuité totale de l’école ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-de-3",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1] et [4] évoquent la gratuité de la cantine et des fournitures scolaires, ainsi que des investissements pour l'éducation, mais aucun ne détaille explicitement le financement de la gratuité *totale* de l’école."
+    }
+  },
+  {
+    "question": "Que propose le programme pour les lycées professionnels ?",
+    "origine": "reelle",
+    "id": "reelle-que-propose-le-programme-pour-les",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement les propositions pour les lycées professionnels, comme le rétablissement du bac pro en 4 ans ou la création de centres polytechniques professionnels."
+    }
+  },
+  {
+    "question": "Quelles mesures sont prévues pour lutter contre l’illettrisme ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-mesures-sont-prevues-pour-lutter",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1], [2] et [3] détaillent explicitement les mesures prévues pour lutter contre l’illettrisme, comme le développement des structures d’alphabétisation, le financement de programmes associatifs, ou la professionnalisation des formateurs."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il de financer ces mesures sur le logement ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-de-4",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] explique que le financement proviendra d'un plan d'investissement public, incluant la réorientation des subventions vers le logement public et la planification écologique."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les sans-abri en plus des logements sociaux ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-6",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] mentionne explicitement la création de 20 000 places d'hébergement d'urgence pour les femmes victimes de violence et 20 000 logements par an en résidences sociales avec accompagnement pluridisciplinaire."
+    }
+  },
+  {
+    "question": "Quelles normes écologiques sont prévues pour les nouveaux logements ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-normes-ecologiques-sont-prevues-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] précise que « l’ensemble des nouveaux logements produits devra correspondre aux meilleures normes écologiques et d’accessibilité »."
+    }
+  },
+  {
+    "question": "Quel sera le montant exact de la garantie d’autonomie pour un couple avec deux enfants ?",
+    "origine": "reelle",
+    "id": "reelle-quel-sera-le-montant-exact-de",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] indique que pour un couple avec deux enfants (un de moins de 14 ans et un de plus de 14 ans), le seuil de pauvreté est de 2 534 euros par mois, et la garantie d’autonomie comble la différence si le revenu est inférieur."
+    }
+  },
+  {
+    "question": "Comment cette mesure sera-t-elle financée ?",
+    "origine": "reelle",
+    "id": "reelle-comment-cette-mesure-sera-t-elle",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] explique directement le financement de la mesure via la transformation des primes en cotisations sociales, les économies sur les frais de gestion, etc."
+    }
+  },
+  {
+    "question": "Le RSA actuel sera-t-il supprimé ou remplacé pour tous les bénéficiaires ?",
+    "origine": "reelle",
+    "id": "reelle-le-rsa-actuel-sera-t-il",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [8] indique que le RSA sera transformé en garantie d’autonomie pour les bénéficiaires."
+    }
+  },
+  {
+    "question": "Quels secteurs bénéficieront des 9 milliards ?",
+    "origine": "reelle",
+    "id": "reelle-quels-secteurs-beneficieront-des-9-milliards",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement les 9 milliards d'euros ni les secteurs concernés par ce montant."
+    }
+  },
+  {
+    "question": "Comment le pôle public bancaire fonctionnera-t-il ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-pole-public-bancaire-fonctionnera",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [4] décrit explicitement la structure et le fonctionnement du pôle public bancaire, incluant la licence bancaire de Bpifrance, le regroupement d'établissements publics et la nationalisation de certaines banques de détail."
+    }
+  },
+  {
+    "question": "Quelles recettes supplémentaires sont prévues pour la Sécu ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-recettes-supplementaires-sont-prevues-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] mentionne explicitement que le transfert des activités des complémentaires vers la Sécurité sociale permettrait d'économiser près de 10 milliards d'euros de frais de gestion, à rediriger vers le remboursement des soins."
+    }
+  },
+  {
+    "question": "Quelles mesures précises sont prévues pour désobéir aux traités européens ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-mesures-precises-sont-prevues-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement les mesures de désobéissance aux traités européens (abrogation des accords de libre-échange, suspension de la participation à certains programmes, etc.)."
+    }
+  },
+  {
+    "question": "Comment le programme compte-t-il renégocier les traités de libre-é échange ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-compte-t-il",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] explique directement la stratégie de renégociation des traités de libre-échange via une coalition européenne et l'utilisation de la présidence française du Conseil de l'UE."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour la politique agricole commune ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-la-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Plusieurs passages (2, 4, 5, 6, 8) détaillent les propositions du programme pour la PAC, comme la refonte des aides, l'orientation vers l'agroécologie ou la souveraineté alimentaire."
+    }
+  },
+  {
+    "question": "Comment le programme finance-t-il ces hausses de salaires ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-finance-t-il-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1], [3], [6] et [8] évoquent des sources de financement (taxes, suppression de niches fiscales, hausse des recettes fiscales) mais aucun ne détaille explicitement comment les hausses de salaires sont financées."
+    }
+  },
+  {
+    "question": "Que prévoit-il pour les apprentis et alternants ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-il-pour-les-apprentis",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] précise que l'apprentissage est réservé aux formations pertinentes pédagogiquement et que les aides aux entreprises seront supprimées au profit des lycées professionnels."
+    }
+  },
+  {
+    "question": "Quelles sanctions sont prévues contre les entreprises qui ne respectent pas l’égalité salariale ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-sanctions-sont-prevues-contre-les",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1] et [2] mentionnent explicitement des sanctions financières et pénales, ainsi que l'interdiction d'attribution de marchés publics pour les entreprises ne respectant pas l'égalité salariale."
+    }
+  },
+  {
+    "question": "Quels moyens sont prévus pour financer ces mesures ?",
+    "origine": "reelle",
+    "id": "reelle-quels-moyens-sont-prevus-pour-financer",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] détaille explicitement les moyens de financement prévus : suppression des niches fiscales injustifiées, contribution des ultra-riches, investissements publics ciblés, etc."
+    }
+  },
+  {
+    "question": "Comment le programme compte-t-il lutter contre les causes de l'entrée dans la prostitution ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-compte-t-il-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille des mesures concrètes pour lutter contre les causes de l'entrée dans la prostitution (protection sanitaire, accès aux droits, reconversion, démantèlement des réseaux, etc.)."
+    }
+  },
+  {
+    "question": "Quels moyens financiers sont prévus pour doubler les effectifs de l’inspection du travail ?",
+    "origine": "reelle",
+    "id": "reelle-quels-moyens-financiers-sont-prevus-pour",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement les moyens financiers alloués pour doubler les effectifs de l’inspection du travail."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les travailleurs des plateformes numériques ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-7",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement les mesures prévues pour les travailleurs des plateformes numériques, comme la présomption légale de salariat, la contestation des algorithmes et l'interdiction des dark kitchens."
+    }
+  },
+  {
+    "question": "Comment le programme compte-t-il lutter contre les maladies professionnelles ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-compte-t-il-3",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [1], [2] et [3] détaillent directement les mesures du programme pour lutter contre les maladies professionnelles, comme la prévention, la reconnaissance simplifiée ou l'élargissement de la médecine du travail."
+    }
+  },
+  {
+    "question": "Quel est le calendrier prévu pour cette réforme fiscale ?",
+    "origine": "reelle",
+    "id": "reelle-quel-est-le-calendrier-prevu-pour-2",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement un calendrier pour la réforme fiscale."
+    }
+  },
+  {
+    "question": "Comment ces recettes supplémentaires seraient-elles utilisées ?",
+    "origine": "reelle",
+    "id": "reelle-comment-ces-recettes-supplementaires-seraient-elles",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1] et [5] évoquent les investissements supplémentaires et l'augmentation des recettes fiscales, mais aucun ne détaille explicitement l'utilisation précise des recettes supplémentaires."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les donations entre vifs ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-8",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement les donations entre vifs dans le programme « L'Avenir en commun »."
+    }
+  },
+  {
+    "question": "Quels secteurs prioritaires seraient financés par ce pôle public bancaire ?",
+    "origine": "reelle",
+    "id": "reelle-quels-secteurs-prioritaires-seraient-finances-par",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] liste explicitement les secteurs prioritaires : « des productions nécessaires à notre souveraineté : numérique, robotique, spatial, etc. ; des réseaux et transports (eau, route, ferroviaire, maritime…) »."
+    }
+  },
+  {
+    "question": "Comment le programme garantit-il que ces investissements ne creuseront pas la dette ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-garantit-il-que",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [7] mentionne explicitement des mesures pour gérer la dette publique, comme faire racheter la dette par la BCE, sortir la dette des marchés, annuler certaines dettes et supprimer la règle des 3 % de déficit public."
+    }
+  },
+  {
+    "question": "Quels exemples concrets de plans d'investissement productif sont déjà détaillés ?",
+    "origine": "reelle",
+    "id": "reelle-quels-exemples-concrets-de-plans-d",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages mentionnent l'existence des plans d'investissement productif (ex. BTP et logement, textile, auto) et leur cadre général, mais aucun ne détaille concrètement les exemples d'investissements (montants, projets précis) demandés."
+    }
+  },
+  {
+    "question": "Que propose le programme pour le SMIC ?",
+    "origine": "reelle",
+    "id": "reelle-que-propose-le-programme-pour-le",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le programme propose d'augmenter le SMIC à 1 400 euros net par mois (passage 8) et de le revaloriser chaque année en plus de l'indexation sur l'inflation (passage 7)."
+    }
+  },
+  {
+    "question": "Comment la Sécu serait-elle défendue ?",
+    "origine": "reelle",
+    "id": "reelle-comment-la-secu-serait-elle-defendue",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] répond directement à la question en détaillant les mesures pour défendre la Sécu, comme l'instauration du « 100 % Sécu » et la suppression de l'ONDAM."
+    }
+  },
+  {
+    "question": "Comment la retraite à 60 ans serait-elle financée ?",
+    "origine": "reelle",
+    "id": "reelle-comment-la-retraite-a-60-ans",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] et [6] détaillent les mesures de financement : augmentation du taux de cotisation vieillesse, soumission à cotisation des revenus financiers, dividendes, etc."
+    }
+  },
+  {
+    "question": "Quels secteurs industriels sont explicitement visés par ces nationalisations ?",
+    "origine": "reelle",
+    "id": "reelle-quels-secteurs-industriels-sont-explicitement-vises",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] cite explicitement les secteurs stratégiques visés par les nationalisations : « médicaments, transports et mobilité, banque, énergie, armement »."
+    }
+  },
+  {
+    "question": "Comment le programme finance-t-il ces nationalisations ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-finance-t-il-3",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages évoquent le financement via le pôle public bancaire et l'investissement public direct (passages 6 et 8), mais ne détaillent pas explicitement les modalités de financement des nationalisations."
+    }
+  },
+  {
+    "question": "Que prévoit l'AEC pour les salariés des entreprises nationalisées ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-l-aec-pour-les",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages abordent les droits des salariés et la gestion des entreprises, mais aucun ne précise explicitement les mesures spécifiques pour les salariés des entreprises nationalisées (ex. [2] évoque la collectivisation, mais sans détail sur leur statut)."
+    }
+  },
+  {
+    "question": "Quelles sont les mesures pour les carrières longues dans le programme ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-sont-les-mesures-pour-les",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] mentionne explicitement la reconnaissance de la pénibilité du travail dans les carrières et les droits à la retraite, incluant les contraintes physiques, le travail de nuit et les horaires alternants."
+    }
+  },
+  {
+    "question": "Comment le programme finance-t-il ces mesures de pouvoir d’achat ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-finance-t-il-4",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1], [3], [6] et [7] évoquent des sources de financement (taxes, suppression de niches fiscales, lutte contre la fraude, etc.) mais sans détailler explicitement comment les mesures de pouvoir d’achat sont financées."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour le logement des jeunes ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-le-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] mentionne explicitement la prévision de 30 000 logements par an adaptés aux jeunes étudiant·es et jeunes actifs, et le passage [3] détaille un plan pour 15 000 logements sociaux étudiants par an."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour la fonction publique ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-la-3",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] mentionne explicitement la titularisation des précaires des 3 fonctions publiques, et le passage [5] évoque la titularisation des fonctionnaires territoriaux précaires ainsi que des mesures spécifiques pour l'outre-mer."
+    }
+  },
+  {
+    "question": "Comment le gouvernement appliquera-t-il le programme une fois élu ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-gouvernement-appliquera-t-il",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] explique explicitement la stratégie d'application du programme, notamment via la construction d'un rapport de force, des mesures unilatérales de désobéissance et l'utilisation du mandat populaire pour lever les blocages européens."
+    }
+  },
+  {
+    "question": "Que dit le programme sur la Constituante et ses effets pendant son mandat ?",
+    "origine": "reelle",
+    "id": "reelle-que-dit-le-programme-sur-la",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] (Livret_UP_40_6e-REP_web, page 13) détaille explicitement les effets pendant le mandat de la Constituante : le gouvernement issu des élections de 2022 continue de gouverner avec les règles en vigueur, tout en mettant en œuvre le programme *L'Avenir en commun*."
+    }
+  },
+  {
+    "question": "Comment cette augmentation du SMIC serait-elle financée ?",
+    "origine": "reelle",
+    "id": "reelle-comment-cette-augmentation-du-smic-serait",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] indique que l'augmentation du SMIC et sa déconjugalisation représentent une dépense de 28,7 milliards d’euros par an, financée par la relance économique qu'elles génèrent."
+    }
+  },
+  {
+    "question": "Quelles sont les autres conditions pour bénéficier de la retraite à 60 ans ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-sont-les-autres-conditions-pour",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] précise que la retraite à 60 ans à taux plein est conditionnée à 40 annuités de cotisations, et le passage [3] confirme cette condition tout en ajoutant des détails sur le financement."
+    }
+  },
+  {
+    "question": "Comment le programme finance-t-il le retour à la retraite à 60 ans ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-finance-t-il-5",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] détaille explicitement les mesures de financement : augmentation du taux de cotisation vieillesse, soumission à cotisation des revenus d’intéressement, de participation, d’épargne salariale et des revenus financiers des entreprises."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les carrières longues ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-9",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Le passage [4] aborde la reconnaissance de la pénibilité dans les carrières et les droits à la retraite, mais ne détaille pas spécifiquement les mesures pour les carrières longues."
+    }
+  },
+  {
+    "question": "Comment le programme propose-t-il de financer ces réformes judiciaires ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-propose-t-il",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages évoquent des moyens humains et financiers pour la justice (passage 5) et des mesures comme le doublement des effectifs contre la délinquance financière (passage 3), mais aucun ne détaille explicitement le financement des réformes judiciaires."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les violences sexistes et sexuelles dans la justice ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-10",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [6] détaille des mesures judiciaires spécifiques comme la fin de la correctionnalisation des viols, la création de pôles judiciaires spécialisés et la formation obligatoire des professionnel·les de la justice."
+    }
+  },
+  {
+    "question": "Quelles mesures sont prévues pour la justice environnementale ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-mesures-sont-prevues-pour-la",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement des mesures pour la justice environnementale, comme l'aide aux victimes de pollutions, la dépollution des régions touchées (ex. chlordécone) et la création d'un fonds d'indemnisation."
+    }
+  },
+  {
+    "question": "Comment le programme propose-t-il de financer ces réformes des médias ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-propose-t-il-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] détaille explicitement les sources de financement des réformes des médias, notamment via un fonds public abondé par une taxation généralisée de la publicité (y compris en ligne) et l'indexation de la fiscalité des GAFAM sur leur chiffre d'affaires réel en France."
+    }
+  },
+  {
+    "question": "Quelles mesures sont prévues pour les médias locaux et associatifs ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-mesures-sont-prevues-pour-les",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] mentionne explicitement l'augmentation des fréquences pour les médias locaux et associatifs, ainsi que des mesures de soutien financier et organisationnel."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour la liberté de la presse face aux pressions politiques ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-la-4",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille des mesures concrètes pour renforcer la liberté de la presse, comme la lutte contre les procédures bâillons et la protection des journalistes couvrant les manifestations."
+    }
+  },
+  {
+    "question": "Comment le programme finance-t-il la revalorisation des salaires des fonctionnaires ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-finance-t-il-6",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] précise que la revalorisation des salaires des fonctionnaires (10 % via le point d’indice) sera financée par une augmentation des revenus de l’État, notamment via des mesures fiscales et sociales."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les carrières longues dans la fonction publique ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-11",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [2] et [4] abordent la pénibilité et les perspectives de carrière dans la fonction publique, mais aucun ne détaille explicitement les mesures pour les carrières longues."
+    }
+  },
+  {
+    "question": "Quelles sont les autres mesures prévues pour les retraités ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-sont-les-autres-mesures-prevues",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Les passages [2] et [3] détaillent plusieurs mesures pour les retraités, comme l'indexation des pensions sur les salaires, la suppression de la décote, ou la création d'un service public de la dépendance."
+    }
+  },
+  {
+    "question": "Quelles autres formes de discriminations sont visées par ce plan interministériel ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-autres-formes-de-discriminations-sont",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] mentionne explicitement les autres formes de discriminations visées : sexe, genre, orientation sexuelle, handicap, âge, classe sociale, origine géographique, en plus du racisme."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il de financer ces mesures de protection des lieux de culte ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-de-5",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [7] et [8] abordent le financement des lieux de culte en refusant explicitement tout financement public pour leur construction ou activités, mais aucun ne détaille comment financer leur protection."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour l'éducation contre les discriminations ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-l",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [5] mentionne explicitement le renforcement de l’éducation à l'égalité, contre le sexisme et les discriminations, dans les programmes scolaires."
+    }
+  },
+  {
+    "question": "Que prévoit le programme contre les discriminations ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-contre-les",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] et [4] détaillent explicitement les mesures contre les discriminations, comme la création d'un Observatoire des discriminations, le récépissé de contrôle d'identité, ou des actions contre le racisme."
+    }
+  },
+  {
+    "question": "Comment le programme aborde-t-il la lutte contre le racisme ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-aborde-t-il-3",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille explicitement les mesures du programme pour lutter contre le racisme, comme la création d'un Observatoire des discriminations ou le récépissé de contrôle d'identité."
+    }
+  },
+  {
+    "question": "Comment la France insoumise propose-t-elle de financer cette politique internationale ?",
+    "origine": "reelle",
+    "id": "reelle-comment-la-france-insoumise-propose-t",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [1] et [4] abordent le financement général des politiques (suppression de niches fiscales, taxation des ultra-riches, lutte contre l'évasion fiscale), mais aucun ne détaille spécifiquement le financement de la politique internationale."
+    }
+  },
+  {
+    "question": "Que prévoit le programme pour les relations avec la Russie après la guerre ?",
+    "origine": "reelle",
+    "id": "reelle-que-prevoit-le-programme-pour-les-12",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages [2] et [3] évoquent une initiative diplomatique avec la Russie (conférence sur les frontières, sécurité en Europe) mais sans préciser explicitement les relations post-guerre."
+    }
+  },
+  {
+    "question": "Quelle est la position sur l’accueil des réfugiés ukrainiens en France ?",
+    "origine": "reelle",
+    "id": "reelle-quelle-est-la-position-sur-l",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "partiel",
+      "raison": "Les passages abordent l'accueil des migrant·es en général (ex. [2], [4], [7]) mais aucun ne mentionne spécifiquement les réfugié·es ukrainien·nes."
+    }
+  },
+  {
+    "question": "Quels secteurs prioritaires seront financés par ce pôle public bancaire ?",
+    "origine": "reelle",
+    "id": "reelle-quels-secteurs-prioritaires-seront-finances-par",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] énumère explicitement les secteurs prioritaires : productions nécessaires à la souveraineté (numérique, robotique, spatial) et réseaux/transports (eau, route, ferroviaire, maritime)."
+    }
+  },
+  {
+    "question": "Comment sera assurée la gouvernance démocratique de ce pôle ?",
+    "origine": "reelle",
+    "id": "reelle-comment-sera-assuree-la-gouvernance-democratique",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne traite explicitement de la gouvernance démocratique du pôle public de santé mentionné dans la question."
+    }
+  },
+  {
+    "question": "Quel montant total est prévu pour les nationalisations dans le programme ?",
+    "origine": "reelle",
+    "id": "reelle-quel-montant-total-est-prevu-pour",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement le montant total prévu pour les nationalisations dans le programme."
+    }
+  },
+  {
+    "question": "Quels sont les autres leviers de financement prévus pour les mesures sociales ?",
+    "origine": "reelle",
+    "id": "reelle-quels-sont-les-autres-leviers-de",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [1] détaille plusieurs leviers de financement pour les mesures sociales, comme la suppression des niches fiscales injustifiées, la contribution des ultra-riches, ou la lutte contre la fraude fiscale."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il de protéger le pouvoir d’achat face à l’inflation ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-de-6",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] détaille des mesures concrètes comme le blocage des prix du carburant, du gaz, de l’électricité et des produits alimentaires de première nécessité, ainsi que l'augmentation du SMIC à 1400 euros nets."
+    }
+  },
+  {
+    "question": "Quelles sont les mesures pour les petites entreprises en cas d’augmentation du SMIC ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-sont-les-mesures-pour-les-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [3] mentionne explicitement une caisse de péréquation interentreprises pour mutualiser les contributions sociales entre petites et grandes entreprises, allégeant ainsi la charge pour les TPE/PME en cas d'augmentation du SMIC."
+    }
+  },
+  {
+    "question": "Quelles sanctions la France insoumise propose-t-elle contre la Russie ?",
+    "origine": "reelle",
+    "id": "reelle-quelles-sanctions-la-france-insoumise-propose",
+    "attendu": "introuvable",
+    "aRelire": false,
+    "juge": {
+      "verdict": "introuvable",
+      "raison": "Aucun passage ne mentionne explicitement les sanctions proposées par la France insoumise contre la Russie."
+    }
+  },
+  {
+    "question": "Comment le programme prévoit-il de soutenir l'Ukraine face à l'invasion ?",
+    "origine": "reelle",
+    "id": "reelle-comment-le-programme-prevoit-il-de-7",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] mentionne explicitement l'action pour créer un cadre diplomatique en Ukraine, incluant un cessez-le-feu, le retrait des troupes russes et des négociations pour une paix durable."
+    }
+  },
+  {
+    "question": "Quelle est la position sur l'envoi d'armes à l'Ukraine ?",
+    "origine": "reelle",
+    "id": "reelle-quelle-est-la-position-sur-l-2",
+    "attendu": "repondu",
+    "aRelire": false,
+    "juge": {
+      "verdict": "repondu",
+      "raison": "Le passage [2] indique clairement que le programme s'oppose à l'envoi d'armes à l'Ukraine, car cela ferait de l'UE un co-belligérant et rompt avec le principe de ne jamais fournir d'armes à des belligérants."
+    }
+  }
+]
