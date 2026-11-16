@@ -174,6 +174,7 @@ describe.skipIf(!DB)("bot Telegram", () => {
     expect(replies()[0]).toContain("👍 ou 👎");
     expect(replies()[0]).toContain("/avis ton message");
     expect(replies()[0]).toContain("Limite : 20 questions par heure");
+    expect(replies()[0]).toContain("@etiennepie");
   });
 
   it("webhook : refuse un appel sans le secret, traite un appel signé", async () => {
