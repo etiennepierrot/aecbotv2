@@ -35,6 +35,7 @@ export const MESSAGES = {
         "• <b>Sur le bot en général</b> (une idée, un sujet qui manque, un problème) : envoie /avis puis ton message, ou directement <code>/avis ton message</code>. L'équipe le lit et peut te répondre ici.",
       ].join("\n"),
       `Tes questions, les réponses et tes avis sont gardés ${memoryDays} jours, sous un pseudonyme, pour comprendre les questions de suite et corriger les erreurs (avec un avis, on garde aussi, chiffré, de quoi te répondre). /oublier efface tout. Limite : ${rate} questions par heure.`,
+      "Une question sur le bot, envie de contacter son créateur ? Écris à @etiennepie.",
       `<i>${escapeHtml(DISCLAIMER)}</i>`,
     ].join("\n\n"),
   oublie: "C'est fait : tes échanges avec moi sont effacés.",
