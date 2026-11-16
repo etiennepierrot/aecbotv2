@@ -23,7 +23,11 @@ turndown.remove(["script", "style", "noscript", "iframe", "form"]);
 
 /** HTML (contenu rendu d'une page WordPress) → Markdown. */
 export function extractHtml(html: string): ExtractedDocument {
-  return { pages: [{ page: null, text: cleanText(turndown.turndown(html)) }] };
+  return { pages: [{ page: null, text: htmlToMarkdown(html) }] };
+}
+
+export function htmlToMarkdown(html: string): string {
+  return cleanText(turndown.turndown(html));
 }
 
 export function extractPlainText(text: string): ExtractedDocument {

@@ -5,7 +5,7 @@ import { correspondA } from "../src/aec/sources-attendues.js";
 import type { RetrievedPassage } from "../src/aec/types.js";
 
 const passage = (title: string, page: number | null, score: number): RetrievedPassage => ({
-  id: `${title}#${page}`, score, docId: title, title, url: `u/${title}`, page,
+  id: `${title}#${page}`, score, docId: title, title, url: `u/${title}`, page, section: null,
   category: "livret", corpus: "aec2027", provisional: false, text: "…",
 });
 

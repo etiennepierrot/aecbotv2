@@ -11,12 +11,12 @@ export const sourceItemSchema = z.object({
   inlineContent: z.string().optional(),
   telegramFileId: z.string().optional(),
   addedBy: z.string().optional(),
-  inlinePages: z.array(z.object({ page: z.number(), text: z.string() })).optional(),
+  inlinePages: z.array(z.object({ page: z.number(), text: z.string(), section: z.string().optional() })).optional(),
   forced: z.object({ category: z.enum(CATEGORIES), corpus: z.enum(["aec2027", "aec2022"]) }).optional(),
 });
 
 export const extractedSchema = z.object({
-  pages: z.array(z.object({ page: z.number().nullable(), text: z.string() })),
+  pages: z.array(z.object({ page: z.number().nullable(), text: z.string(), section: z.string().optional() })),
 });
 
 export const classificationSchema = z.object({

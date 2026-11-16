@@ -41,7 +41,7 @@ export const sourceAttendueScorer = createScorer<{ question: string }, ScoredRun
   .generateScore(({ run }) => {
   const expected = (run.groundTruth as Attendu).sources ?? [];
   if (expected.length === 0) return 1;
-  return run.output.reponse.sources.some((s) => expected.some((e) => correspondA(s.title, s.pages, e)))
+  return run.output.reponse.sources.some((s) => expected.some((e) => correspondA(s.title, s.pages, e, s.sections)))
     ? 1
     : 0;
 });
@@ -74,12 +74,12 @@ export const createFideliteScorer = (judgeModel: string | object = DEFAULT_JUDGE
     createPrompt: ({ run }) => {
       const { reponse, passages } = run.output;
       const citedSource = (p: ReferencedPassage) =>
-        reponse.sources.find((s) => s.url === p.url && (p.page === null || s.pages.includes(p.page)));
+        reponse.sources.find((s) => s.docId === p.docId && (p.page === null || s.pages.includes(p.page)));
       const context = passages
         .filter((p) => citedSource(p))
         .map((p) => {
           const n = citedSource(p)?.n;
-          return `[${n}] ${p.title}, page ${p.page ?? "web"}\n${p.text}`;
+          return `[${n}] ${p.title}, ${p.section ? `section « ${p.section} »` : `page ${p.page ?? "web"}`}\n${p.text}`;
         })
         .join("\n\n");
       return `Question : ${run.input?.question ?? ""}

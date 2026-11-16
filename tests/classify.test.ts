@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import manifest from "./fixtures/manifest-ancien-pipeline.json" with { type: "json" };
-import { classifyByMetadata, isExtractionUsable } from "../src/corpus/classify.js";
+import { ANCIEN_PROGRAMME, classifyByMetadata, isExtractionUsable } from "../src/corpus/classify.js";
 import type { SourceItem } from "../src/corpus/types.js";
 
 const pdf = (title: string, url: string): SourceItem => ({
@@ -14,7 +14,8 @@ describe("classifyByMetadata", () => {
   it.each(byTitle.map((d) => [d.title, d] as const))("%s : même décision que l'ancien pipeline", (_, d) => {
     const cls = classifyByMetadata(pdf(d.title, d.url));
     expect(cls.category).toBe(d.category);
-    expect(cls.included).toBe(d.included);
+    // Seul écart voulu : les anciennes versions du programme ne sont plus interrogées (livre 2026).
+    expect(cls.included).toBe(d.category === "programme" ? false : d.included);
   });
 
   it("classe aussi par catégorie les doublons, qui seront écartés après lecture", () => {
@@ -30,21 +31,24 @@ describe("classifyByMetadata", () => {
     // Seul le plan Europe n'est pas identifié comme document de 2022.
     expect(current).toEqual(["PLAN-EUROPE_AVENIR-EN-COMMUN"]);
     expect(included.length).toBeGreaterThan(50);
-    // Programme 2025 et publications 2026 restent dans l'édition actuelle.
-    for (const d of manifest.filter((x) => x.included && (x.category === "programme" || x.category === "publication_2026"))) {
+    // Les publications 2026 restent dans l'édition actuelle.
+    for (const d of manifest.filter((x) => x.included && x.category === "publication_2026")) {
       expect(corpusOf(d)).toBe("aec2027");
     }
   });
 
-  it("marque le programme général comme provisoire", () => {
+  it("écarte les anciennes versions du programme publiées sur le site", () => {
     const cls = classifyByMetadata(pdf("PROGRAMME SITE 2025", "https://x/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf"));
-    expect(cls).toMatchObject({ category: "programme", provisional: true, corpus: "aec2027" });
+    expect(cls).toMatchObject({ category: "programme", included: false, reason: ANCIEN_PROGRAMME });
   });
 
-  it("respecte le classement imposé de l'édition 2022, malgré « abrégée » dans le titre", async () => {
-    const { EDITION_2022 } = await import("../src/corpus/sources.js");
-    expect(classifyByMetadata(EDITION_2022[0]!)).toEqual({
-      category: "programme", corpus: "aec2022", included: true, reason: "", provisional: false,
+  it("garde le livre du programme, ajouté à la main avec un classement imposé", () => {
+    const livre: SourceItem = {
+      id: "manual:livre-aec", origin: "manuel", kind: "pdf", title: "L'Avenir en commun (livre, édition 2026)",
+      url: "", modified: "2026-11-10T23:00:00Z", forced: { category: "programme", corpus: "aec2027" },
+    };
+    expect(classifyByMetadata(livre)).toEqual({
+      category: "programme", corpus: "aec2027", included: true, reason: "", provisional: false,
     });
   });
 

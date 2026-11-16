@@ -9,6 +9,8 @@ import { EMBEDDING_DIMENSION, PASSAGES_INDEX } from "../src/config.js";
 import type { Embedder } from "../src/corpus/embed.js";
 import type { SourceItem } from "../src/corpus/types.js";
 import { makePdf } from "./helpers/pdf.js";
+import { makeEpub } from "./helpers/epub.js";
+import { ANCIEN_PROGRAMME } from "../src/corpus/classify.js";
 
 const DB = process.env.TEST_DATABASE_URL;
 // Jamais la base de dev : les tables sont supprimées au début du test.
@@ -96,22 +98,19 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     const r = await scan();
     const byId = Object.fromEntries(r.documents.map((d) => [d.id, d]));
 
-    expect(byId["wp:media:15699"]).toMatchObject({ status: "indexé", category: "programme" });
+    // Ancienne version du programme : seul le livre 2026 fait foi.
+    expect(byId["wp:media:15699"]).toMatchObject({ status: "écarté", category: "programme", detail: ANCIEN_PROGRAMME });
     expect(byId["wp:media:12361"]).toMatchObject({ status: "indexé", category: "livret" });
     expect(byId["wp:media:13782"]).toMatchObject({ status: "indexé", category: "plan" });
     expect(byId["wp:media:13769"]).toMatchObject({ status: "écarté", detail: "Doublon exact de wp:media:13782" });
     expect(byId["wp:media:25528"]).toMatchObject({ status: "écarté", category: "autre" });
     expect(byId["wp:media:19642"]).toMatchObject({ status: "écarté", category: "archive" });
     expect(byId["wp:media:22111"]).toMatchObject({ status: "écarté", detail: "Extraction non exploitable" });
-    expect(r).toMatchObject({ indexed: 3, excluded: 4, errors: 0, unchanged: 0 });
+    expect(r).toMatchObject({ indexed: 2, excluded: 5, errors: 0, unchanged: 0 });
 
-    const { rows } = await pool.query(
-      `SELECT metadata FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' = 'wp:media:15699' AND metadata->>'text' LIKE '%60 ans%'`,
-    );
-    expect(rows[0]?.metadata).toMatchObject({ page: 2, category: "programme", provisional: true, corpus: "aec2027" });
     // Rien d'indexé pour les documents écartés.
     const excluded = await pool.query(
-      `SELECT count(*)::int n FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' IN ('wp:media:13769','wp:media:25528','wp:media:19642')`,
+      `SELECT count(*)::int n FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' IN ('wp:media:15699','wp:media:13769','wp:media:25528','wp:media:19642')`,
     );
     expect(excluded.rows[0].n).toBe(0);
   });
@@ -170,7 +169,47 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     site.items.delete("wp:media:30000");
   });
 
-  it("recherche : retrouve le passage avec sa page, filtrée par édition", async () => {
+  it("ancien programme indexé avant le changement de règle : retiré au scan suivant, sans --force", async () => {
+    const { classifyByMetadata } = await import("../src/corpus/classify.js");
+    const item = site.items.get("wp:media:15699")!;
+    // État d'avant : le PDF 2025 était inclus, avec ses passages.
+    const metadata = {
+      docId: item.id, title: item.title, url: item.url, page: 2, section: null, category: "programme",
+      corpus: "aec2027", origin: "wordpress", modified: item.modified, provisional: true, text: "retraite a 60 ans (ancien)",
+    };
+    await store.saveDocument({
+      item, cls: { ...classifyByMetadata(item), included: true, reason: "" }, pages: 2, characters: 100, contentHash: "ancien",
+      passages: [{ id: `${item.id}#p2#0`, text: metadata.text, metadata: metadata as never }],
+      vectors: await embedder.embed([metadata.text]),
+    });
+    const r = await scan();
+    expect(r.documents).toEqual([expect.objectContaining({ id: "wp:media:15699", status: "écarté" })]);
+    const { rows } = await pool.query(`SELECT count(*)::int n FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' = 'wp:media:15699'`);
+    expect(rows[0].n).toBe(0);
+  });
+
+  it("livre du programme (EPUB) : indexé par section, remplacé par une nouvelle version, ignoré par le scan", async () => {
+    const { ajouterLivre, LIVRE_ID } = await import("../src/corpus/manual.js");
+    const v1 = await ajouterLivre(mastra, makeEpub({ modified: "2026-11-01T00:00:00Z", retraite: "version un" }), "cli:test");
+    expect(v1).toMatchObject({ id: LIVRE_ID, status: "indexé", category: "programme", title: "L'Avenir en commun (livre, édition 2026)" });
+    const r = await ajouterLivre(mastra, makeEpub(), "cli:test");
+    expect(r).toMatchObject({ id: LIVRE_ID, status: "indexé" });
+    const { rows } = await pool.query(
+      `SELECT metadata FROM ${PASSAGES_INDEX} WHERE metadata->>'docId' = $1 ORDER BY (metadata->>'page')::int`,
+      [LIVRE_ID],
+    );
+    expect(rows.some((x) => x.metadata.text.includes("version un"))).toBe(false); // l'ancienne version est remplacée
+    expect(rows.find((x) => x.metadata.text.includes("retraite a 60 ans"))?.metadata).toMatchObject({
+      page: 4, section: expect.stringMatching(/› Garantir une retraite digne$/), url: "", category: "programme",
+      corpus: "aec2027", provisional: false, origin: "manuel",
+    });
+    // Le scan WordPress ne le voit pas « disparu ».
+    const s = await scan();
+    expect(s.removed).toEqual([]);
+    expect((await store.listDocuments()).some((d) => d.id === LIVRE_ID)).toBe(true);
+  });
+
+  it("recherche : retrouve le passage avec sa section, filtrée par édition", async () => {
     const deps = await import("../src/corpus/deps.js");
     deps.setRetrievalDeps({ embedder, vector: deps.pgVector() });
     const { searchPassages } = await import("../src/aec/search.js");
@@ -180,14 +219,14 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     // L'embedder simulé n'est pas sémantique : on cherche le texte exact du passage.
     const hits = await searchPassages({ requete: rows[0].text, topK: 3 });
     expect(hits[0]).toMatchObject({
-      docId: "wp:media:15699", page: 2, category: "programme", provisional: true, corpus: "aec2027",
-      url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+      docId: "manual:livre-aec", page: 4, section: expect.stringMatching(/Garantir une retraite digne$/),
+      category: "programme", provisional: false, corpus: "aec2027", url: "",
     });
     expect(hits[0]!.score).toBeGreaterThan(0.99);
     // Le livret Santé « UP » est de la campagne 2022 : seul lui sort quand on filtre sur 2022.
     const old = await searchPassages({ requete: rows[0].text, edition: "aec2022" });
     expect(old.length).toBeGreaterThan(0);
-    expect(old.every((h) => h.corpus === "aec2022" && h.docId !== "wp:media:15699")).toBe(true);
+    expect(old.every((h) => h.corpus === "aec2022" && h.docId !== "manual:livre-aec")).toBe(true);
     expect((await searchPassages({ requete: rows[0].text, categories: ["livret"] })).every((h) => h.category === "livret")).toBe(true);
   });
 

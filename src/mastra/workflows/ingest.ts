@@ -12,7 +12,7 @@ import {
   passageSchema,
   sourceItemSchema,
 } from "../../corpus/schemas.js";
-import type { SourceItem } from "../../corpus/types.js";
+import { CATEGORIES, type SourceItem } from "../../corpus/types.js";
 
 /* ------------------------------------------------------------------ */
 /* Entrées : deux portes, un seul workflow                             */
@@ -35,10 +35,16 @@ const manualInput = z.object({
   url: z.string().url().optional(),
   /** Ou bien le texte lui-même. */
   text: z.string().optional(),
-  /** Ou bien un PDF déjà extrait page par page (fichier envoyé au bot, fichier local). */
-  pages: z.array(z.object({ page: z.number(), text: z.string() })).optional(),
+  /** Ou bien un PDF déjà extrait page par page (fichier envoyé au bot, fichier local), ou les sections d'un EPUB. */
+  pages: z.array(z.object({ page: z.number(), text: z.string(), section: z.string().optional() })).optional(),
   telegramFileId: z.string().optional(),
   addedBy: z.string(),
+  /** Identifiant fixe (manual:…) : un nouvel ajout remplace le précédent au lieu de s'y ajouter. */
+  id: z.string().regex(/^manual:[\w-]+$/).optional(),
+  /** Classement imposé : le livre du programme est le programme, pas un « ajout manuel ». */
+  forced: z.object({ category: z.enum(CATEGORIES), corpus: z.enum(["aec2027", "aec2022"]) }).optional(),
+  /** Date de la version (ISO) ; par défaut, maintenant. */
+  modified: z.string().optional(),
 });
 
 export const ingestInputSchema = z.discriminatedUnion("mode", [scanInput, manualInput]);
@@ -75,12 +81,13 @@ const detecter = createStep({
             ? "pdf"
             : "html";
       const item: SourceItem = {
-        id: `manual:${randomUUID()}`,
+        id: inputData.id ?? `manual:${randomUUID()}`,
         origin: "manuel",
         kind,
         title: inputData.title,
         url: inputData.url ?? "",
-        modified: new Date().toISOString(),
+        modified: inputData.modified ?? new Date().toISOString(),
+        forced: inputData.forced,
         inlineContent: inputData.text,
         inlinePages: inputData.pages,
         telegramFileId: inputData.telegramFileId,
@@ -98,7 +105,13 @@ const detecter = createStep({
 
     const changed = remote.filter((i) => {
       const k = known.get(i.id);
-      return inputData.force || !k || new Date(k.modified).getTime() !== new Date(i.modified).getTime();
+      return (
+        inputData.force ||
+        !k ||
+        new Date(k.modified).getTime() !== new Date(i.modified).getTime() ||
+        // Une règle de classement a changé (ancienne version du programme écartée) : on retire ses passages.
+        (k.included && !classifyByMetadata(i).included)
+      );
     });
 
     const gone = [...known.keys()].filter((id) => !remoteIds.has(id));
@@ -145,7 +158,9 @@ const recuperer = createStep({
     try {
       const { source } = await ingestDeps();
       let extracted;
-      if (item.inlinePages?.length) extracted = { pages: item.inlinePages };
+      // Écarté d'après son titre (archive NFP, ancienne version du programme…) : rien à télécharger.
+      if (!classifyByMetadata(item).included) extracted = { pages: [] };
+      else if (item.inlinePages?.length) extracted = { pages: item.inlinePages };
       else if (item.kind === "text") extracted = extractPlainText(item.inlineContent ?? "");
       else if (item.kind === "html")
         extracted = extractHtml(item.inlineContent ?? new TextDecoder().decode(await source.download(item.url)));

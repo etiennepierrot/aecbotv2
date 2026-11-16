@@ -7,7 +7,7 @@ const MARKER = /\[\s*(P\d+(?:\s*[,;]\s*P\d+)*)\s*\]/gi;
  * Transforme le texte du modèle en réponse vérifiée :
  * - une référence [Pn] que l'outil n'a pas renvoyée est rejetée ;
  * - une phrase dont toutes les références sont rejetées est retirée ;
- * - les références restantes deviennent [1], [2]… (une par document et page) ;
+ * - les références restantes deviennent [1], [2]… (une par document, avec ses pages ou sections) ;
  * - s'il ne reste aucune citation valide, la réponse devient « introuvable ».
  */
 export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
@@ -25,13 +25,15 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
   const sourceKey = new Map<string, number>();
   // Un numéro par document (pas par page) : une réponse qui cite 3 pages du même livret
   // affiche [4] et « pages 3, 21, 23 » plutôt que trois sources.
+  // Clé : le document (deux documents sans lien public ont la même URL vide).
+  const sectionRank = new Map<string, number>();
   const numberFor = (p: ReferencedPassage): number => {
-    let n = sourceKey.get(p.url);
+    let n = sourceKey.get(p.docId);
     if (n === undefined) {
       n = sources.length + 1;
-      sourceKey.set(p.url, n);
+      sourceKey.set(p.docId, n);
       sources.push({
-        n, title: p.title, url: p.url, pages: [],
+        n, docId: p.docId, title: p.title, url: p.url, pages: [], sections: [],
         category: p.category, corpus: p.corpus, provisional: p.provisional,
       });
     }
@@ -39,6 +41,12 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
     if (p.page !== null && !source.pages.includes(p.page)) {
       source.pages.push(p.page);
       source.pages.sort((a, b) => a - b);
+    }
+    // EPUB : une section longue coupée en deux « pages » ne s'affiche qu'une fois, dans l'ordre du livre.
+    if (p.section && !source.sections.includes(p.section)) {
+      sectionRank.set(p.section, p.page ?? 0);
+      source.sections.push(p.section);
+      source.sections.sort((a, b) => sectionRank.get(a)! - sectionRank.get(b)!);
     }
     return n;
   };
@@ -92,8 +100,8 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
   }
   if (sources.some((s) => s.corpus === "aec2022")) {
     avertissements.push(
-      "Cette réponse s'appuie en partie sur la version 2022 du programme, qui n'est pas à jour : " +
-        "le programme 2027 n'est pas encore publié en entier.",
+      "Cette réponse s'appuie en partie sur des documents de la campagne 2022, qui ne sont pas à jour : " +
+        "le programme qui fait foi est le livre L'Avenir en commun (édition 2026).",
     );
   }
   const { gardees: suites, sansPassage } = suitesVerifiees(brutes, collector);

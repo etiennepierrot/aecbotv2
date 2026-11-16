@@ -1,4 +1,5 @@
 import type { Answer, Source } from "../aec/types.js";
+import { sectionTitle } from "../corpus/epub.js";
 import type { Category, Corpus } from "../corpus/types.js";
 
 export const DISCLAIMER = "Initiative non officielle, non endossée par LFI.";
@@ -31,6 +32,14 @@ function formatSuites(suites: string[] | undefined): string {
 
 function formatSource(s: Source): string {
   const first = s.pages[0];
+  if (s.sections?.length) {
+    // Livre (EPUB) : pas de page ni de lien public, on cite les sections.
+    const where = s.sections.map((x) => `« ${sectionTitle(x)} »`).join(", ");
+    const title = escapeHtml(prettyTitle(s.title, s.category, s.corpus));
+    return s.url
+      ? `[${s.n}] <a href="${escapeAttr(s.url)}">${title}</a>, ${escapeHtml(where)}`
+      : `[${s.n}] ${title}, ${escapeHtml(where)}`;
+  }
   if (!s.url) {
     // Document ajouté par l'équipe sans lien public (PDF envoyé au bot, texte).
     const where = s.pages.length ? `, page${s.pages.length > 1 ? "s" : ""} ${s.pages.join(", ")}` : "";
@@ -53,7 +62,14 @@ function truncate(answer: Answer, notes: string, head = "", suites = ""): string
 export function answerForMemory(answer: Answer): string {
   if (answer.statut === "introuvable") return "Rien trouvé dans le corpus.";
   const sources = answer.sources.map(
-    (s) => `[${s.n}] ${prettyTitle(s.title, s.category, s.corpus)}${s.pages.length ? ` p. ${s.pages.join(", ")}` : ""}`,
+    (s) =>
+      `[${s.n}] ${prettyTitle(s.title, s.category, s.corpus)}${
+        s.sections?.length
+          ? `, ${s.sections.map((x) => `« ${sectionTitle(x)} »`).join(", ")}`
+          : s.pages.length
+            ? ` p. ${s.pages.join(", ")}`
+            : ""
+      }`,
   );
   return `${answer.texte}\nSources : ${sources.join(" ; ")}`;
 }
@@ -74,7 +90,9 @@ const ACRONYMS = new Set(["btp", "ess", "lgbti", "esr", "efh", "nfp", "aec", "fa
 /** « Livret_UP_13_SANTE_web-ok » → « Livret « santé » ». Les noms de fichiers WordPress ne sont pas faits pour être lus. */
 export function prettyTitle(title: string, category: Category, corpus: Corpus = "aec2027"): string {
   if (category === "programme") {
-    return corpus === "aec2022" ? "Programme L'Avenir en commun 2022 (version abrégée)" : "Programme L'Avenir en commun";
+    if (corpus === "aec2022") return "Programme L'Avenir en commun 2022 (version abrégée)";
+    // Le livre porte son édition dans son titre (« L'Avenir en commun (livre, édition 2026) »).
+    return /\blivre\b/i.test(title) ? title : "Programme L'Avenir en commun";
   }
   if (category === "page" || category === "ajout_manuel") return title;
 
