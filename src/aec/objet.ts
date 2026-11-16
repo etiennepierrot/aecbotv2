@@ -31,6 +31,10 @@ const controleur = new Agent({
 Tu contrôles un assistant documentaire. On te donne une question et des passages d'un programme politique.
 1. Nomme l'objet précis de la question : la mesure, l'institution ou le dispositif qu'elle désigne,
    en quelques mots (« la gratuité des transports scolaires », pas « les transports »).
+   Une question sur ce que fera une personne (un candidat, un ministre) à propos d'une mesure ou
+   d'une institution porte sur cette mesure ou cette institution : « La ministre quittera-t-elle
+   son poste si le référendum d'initiative citoyenne est adopté ? » porte sur le référendum
+   d'initiative citoyenne. Le programme ne parle pas des intentions des personnes.
 2. Dis si au moins un passage traite de CET objet lui-même : il le nomme, ou décrit une mesure qui
    porte directement sur lui. Un passage qui traite seulement du même thème, ou d'une mesure voisine,
    ne compte pas.
