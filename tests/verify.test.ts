@@ -6,7 +6,7 @@ import { extractSuites, splitSentences, verifyAnswer } from "../src/aec/verify.j
 const passage = (id: string, over: Partial<RetrievedPassage> = {}): RetrievedPassage => ({
   id, score: 0.9, docId: id.split("#")[0]!, title: "PROGRAMME SITE 2025",
   url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
-  page: 33, category: "programme", corpus: "aec2027", provisional: true, text: "…", ...over,
+  page: 33, section: null, category: "programme", corpus: "aec2027", provisional: true, text: "…", ...over,
 });
 
 function collectorWith(...ps: RetrievedPassage[]) {
@@ -81,8 +81,8 @@ describe("verifyAnswer", () => {
   it("dit explicitement qu'une réponse s'appuie sur la version 2022, pas à jour", () => {
     const a = verifyAnswer("Retraite à 60 ans [P1].", collectorWith(passage("x#p1#0", { corpus: "aec2022", provisional: false })));
     expect(a.avertissements).toEqual([
-      "Cette réponse s'appuie en partie sur la version 2022 du programme, qui n'est pas à jour : " +
-        "le programme 2027 n'est pas encore publié en entier.",
+      "Cette réponse s'appuie en partie sur des documents de la campagne 2022, qui ne sont pas à jour : " +
+        "le programme qui fait foi est le livre L'Avenir en commun (édition 2026).",
     ]);
   });
 });
@@ -155,5 +155,40 @@ describe("suites d'approfondissement", () => {
 
   it("pas de suites sur une réponse introuvable", () => {
     expect(verifyAnswer("INTROUVABLE\nSUITES :\n1. Et la retraite ?", c()).suites).toBeUndefined();
+  });
+});
+
+describe("verifyAnswer : livre EPUB, cité par section", () => {
+  const chemin = (s: string) => `Partie 3 : Mettre en sécurité sociale › Chapitre 1 : À chacun selon ses besoins › ${s}`;
+  const livre = (id: string, page: number, section: string) =>
+    passage(id, {
+      docId: "manual:livre-aec", title: "L'Avenir en commun (livre, édition 2026)", url: "", page, section,
+      provisional: false,
+    });
+
+  it("un numéro pour le livre, ses sections dans l'ordre du livre, sans avertissement provisoire", () => {
+    const a = verifyAnswer(
+      "La retraite à 60 ans [P1]. Éradiquer la pauvreté [P2]. Encore la retraite [P3].",
+      collectorWith(
+        livre("manual:livre-aec#p40", 40, chemin("Garantir une retraite digne")),
+        livre("manual:livre-aec#p38", 38, chemin("Éradiquer la pauvreté")),
+        livre("manual:livre-aec#p41", 41, chemin("Garantir une retraite digne")), // suite d'une section longue
+      ),
+    );
+    expect(a.texte).toBe("La retraite à 60 ans [1]. Éradiquer la pauvreté [1]. Encore la retraite [1].");
+    expect(a.sources).toHaveLength(1);
+    expect(a.sources[0]!.sections).toEqual([chemin("Éradiquer la pauvreté"), chemin("Garantir une retraite digne")]);
+    expect(a.avertissements).toEqual([]);
+  });
+
+  it("deux documents sans lien public restent deux sources", () => {
+    const a = verifyAnswer(
+      "Le livre [P1]. La note [P2].",
+      collectorWith(
+        livre("manual:livre-aec#p40", 40, chemin("Garantir une retraite digne")),
+        passage("manual:note#p2#0", { title: "Note", url: "", page: 2, category: "ajout_manuel", provisional: false }),
+      ),
+    );
+    expect(a.sources.map((s) => s.n)).toEqual([1, 2]);
   });
 });

@@ -48,23 +48,47 @@ Via OpenRouter, les questions transitent par un intermédiaire de plus. OpenRout
 les prompts par défaut ; le routage limité à l'Europe est réservé à ses offres Business et
 Enterprise. À trancher avant d'ouvrir le bot au-delà d'un groupe test.
 
-## Édition 2022, en attendant le programme 2027
+## Le programme : le livre 2026 (EPUB), seule version qui fait foi
 
-Le programme 2027 n'est pas encore publié en entier. En attendant, l'index contient aussi
-**L'Avenir en commun 2022** (version abrégée officielle, sur melenchon2022.fr ; la version
-intégrale n'existe pas en PDF), déclaré dans `src/corpus/sources.ts` et rangé dans le corpus
-`aec2022`. Les livrets et plans de la campagne 2022 (Union populaire, `Livret_UP_…`, `Plan_UP_…`,
-livrets Éducation et ESR), re-téléversés en 2024 sur le WordPress actuel, sont eux aussi rangés en
-`aec2022` (`isEdition2022` dans `src/corpus/classify.ts`). Restent dans l'édition actuelle : le
-programme 2025, les publications 2026, les pages du site et le plan Europe (non identifié comme 2022).
-Après un changement de classement, `pnpm ingest --force` réindexe tout.
+Le programme général est **le livre *L'Avenir en commun*** (cinquième édition, 2025-2027, EPUB
+daté de novembre 2026). Les anciennes versions ne sont plus interrogées : le PDF « PROGRAMME SITE
+2025 » du WordPress est écarté au classement (`ANCIEN_PROGRAMME` dans `src/corpus/classify.ts`), et
+la version abrégée 2022 a été retirée de `src/corpus/sources.ts`. Les livrets et les plans restent
+valables, y compris ceux de 2022.
+
+```bash
+pnpm docs:prod livre ~/Téléchargements/LAvenir_en_commun.epub
+```
+
+- **Pas de lien public, pas de texte dans le dépôt** : le dépôt GitHub est public, le livre n'y est
+  donc pas versionné. La commande lit l'EPUB sur ton poste et l'indexe directement dans la base.
+  Relancer la commande avec une nouvelle version remplace l'ancienne (identifiant fixe
+  `manual:livre-aec`). Le scan WordPress ne le touche pas.
+- **Une section = une « page »** : `src/corpus/epub.ts` lit l'EPUB (zip lu sans dépendance) et
+  fait une entrée par section (« Garantir une retraite digne »), plus l'introduction et les
+  ouvertures de partie. Chaque passage porte `section` (« Partie 3 : … › Chapitre 1 : … › Garantir
+  une retraite digne ») ; `page` est le rang de la section, utilisé seulement en interne (regroupement,
+  élargissement à la section entière). Une section de plus de 5 000 caractères (l'introduction) est
+  coupée entre deux paragraphes.
+- **Citation** : « [1] L'Avenir en commun (livre, édition 2026), « Garantir une retraite digne » »,
+  sans page ni lien. Le livre est rangé en `programme`, édition `aec2027`, non provisoire : plus
+  d'avertissement « programme provisoire ».
+- Au déploiement, le scan suivant retire de lui-même les passages du PDF 2025 déjà indexés (un
+  document inclus que les règles excluent désormais est retraité, sans `--force`) ; la version
+  abrégée 2022 disparaît de la même façon, comme un document retiré du site.
+
+### Livrets et plans de 2022
+
+Les livrets et plans de la campagne 2022 (Union populaire, `Livret_UP_…`, `Plan_UP_…`, livrets
+Éducation et ESR), re-téléversés en 2024 sur le WordPress actuel, sont rangés en `aec2022`
+(`isEdition2022` dans `src/corpus/classify.ts`). Restent dans l'édition actuelle : le livre, les
+publications 2026, les pages du site et le plan Europe (non identifié comme 2022). Après un
+changement de classement, `pnpm ingest --force` réindexe tout.
 
 - `EDITIONS=aec2027,aec2022` (défaut) : la recherche porte sur les deux éditions.
-- L'agent doit dire dans sa phrase qu'une information vient de la version 2022, pas à jour, et
+- L'agent doit dire dans sa phrase qu'une information vient d'un document 2022, pas à jour, et
   préférer une source plus récente en cas d'écart. La réponse ajoute un avertissement et la source
   porte la mention « version 2022, pas à jour ».
-- Quand le programme 2027 sera publié : passer `EDITIONS=aec2027`. Les passages 2022 restent
-  indexés mais ne sont plus interrogés que si la question demande explicitement 2022.
 
 ## Le workflow `ingest`
 
@@ -84,15 +108,16 @@ detecter ─▶ foreach(document) ─▶ resumer
    relancer avec `--allow-mass-removal` si c'est voulu).
 2. **Récupérer** : PDF → texte page par page (unpdf) ; HTML → Markdown (turndown). Un échec de
    téléchargement n'arrête pas le scan : le document est retenté la nuit suivante.
-3. **Classer** : `programme` (marqué provisoire), `livret`, `plan`, `publication_2026`, `page`,
-   `ajout_manuel`. Sont écartés : archives NFP 2024, dossiers de presse et documents non classés,
+3. **Classer** : `programme` (le livre seulement), `livret`, `plan`, `publication_2026`, `page`,
+   `ajout_manuel`. Sont écartés : anciennes versions du programme, archives NFP 2024, dossiers de
+   presse et documents non classés (sans même être téléchargés),
    PDF sans texte exploitable, doublons exacts (le plus récent est gardé). Les règles reproduisent
    les 75 décisions de l'ancien pipeline (`tests/classify.test.ts`).
 4. **Découper** : `MDocument`, un découpage par page pour garder `page` en métadonnée.
 5. **Indexer** : embeddings `mistral-embed` (1024 dim., Mistral ou OpenRouter) → upsert dans l'index
    pgvector `aec_passages`, en remplaçant tous les anciens passages du document.
 
-Chaque passage porte : `docId`, `title`, `url`, `page`, `category`, `corpus` (`aec2027`),
+Chaque passage porte : `docId`, `title`, `url`, `page`, `section` (livre EPUB), `category`, `corpus` (`aec2027`),
 `origin`, `modified`, `provisional`, `text`.
 Les documents écartés restent dans le registre avec leur raison, pour ne pas être retéléchargés.
 
@@ -122,7 +147,7 @@ question ─▶ agent aec ──▶ outil recherche (pgvector, édition 2027 par
 ## Évals : la grille de décision
 
 `evals/questions.json` : 17 questions dont la réponse est dans le corpus (sources et pages
-attendues relevées dans le corpus actuel), dont 1 sur l'édition 2022 et 1 à laquelle les textes
+attendues relevées dans le corpus actuel ; pour le livre, les titres de section attendus), dont 1 sur un livret 2022 et 1 à laquelle les textes
 ne répondent qu'en partie (démission et Constituante), 3 hors corpus et 1 tentative de détournement.
 
 ```bash
@@ -199,6 +224,9 @@ membre trouve le sien avec @userinfobot), en message privé au bot :
 | `/docs` | liste les documents ajoutés, avec leur identifiant court |
 | `/supprimer identifiant` | retire le document et tous ses passages |
 
+Un EPUB passé à `pnpm docs ajouter --fichier livre.epub` est aussi lu section par section. Pour le
+livre du programme, utiliser `pnpm docs:prod livre fichier.epub` (voir plus haut).
+
 Les autres utilisateurs reçoivent « commande réservée à l'équipe ». Même chose depuis le terminal :
 
 ```bash
@@ -206,6 +234,7 @@ pnpm docs:prod liste
 pnpm docs:prod ajouter --titre "Note sur les retraites" --fichier note.pdf
 pnpm docs:prod ajouter --titre "Tribune" --url https://exemple.fr/tribune
 pnpm docs:prod supprimer 3f2a9c1b
+pnpm docs:prod livre LAvenir_en_commun.epub     # le livre du programme
 ```
 
 Tout passe par le workflow `ingest` (mode `manuel`) : mêmes contrôles que le scan (PDF sans
@@ -377,6 +406,7 @@ src/
 │  ├─ wordpress.ts           client API WordPress
 │  ├─ manual.ts              ajouts et suppressions par l'équipe
 │  ├─ extract.ts             PDF et HTML → texte
+│  ├─ epub.ts                EPUB (livre du programme) → sections
 │  ├─ classify.ts            catégories, doublons, extraction vide
 │  ├─ chunk.ts               découpage par page
 │  ├─ embed.ts               embeddings (Mistral ou OpenRouter)

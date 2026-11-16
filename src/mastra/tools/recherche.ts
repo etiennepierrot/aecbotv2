@@ -5,7 +5,7 @@ import { searchPassages } from "../../aec/search.js";
 import type { ReferencedPassage } from "../../aec/types.js";
 
 const CATEGORY_LABELS: Record<string, string> = {
-  programme: "programme général, édition provisoire",
+  programme: "programme général",
   livret: "livret thématique",
   plan: "plan",
   publication_2026: "publication 2026",
@@ -18,6 +18,7 @@ const passageOut = z.object({
   title: z.string(),
   url: z.string(),
   page: z.number().nullable(),
+  section: z.string().nullable(),
   category: z.string(),
   corpus: z.string(),
   score: z.number(),
@@ -58,6 +59,7 @@ export const rechercheTool = createTool({
         title: p.title,
         url: p.url,
         page: p.page,
+        section: p.section,
         category: p.category,
         corpus: p.corpus,
         score: p.score,
@@ -75,12 +77,17 @@ export const rechercheTool = createTool({
 });
 
 export function formatForModel(
-  passages: (Pick<ReferencedPassage, "ref" | "title" | "page" | "text"> & { category: string; corpus: string })[],
+  passages: (Pick<ReferencedPassage, "ref" | "title" | "page" | "text"> & {
+    section?: string | null;
+    category: string;
+    corpus: string;
+  })[],
 ): string {
   if (passages.length === 0) return "Aucun passage trouvé pour cette requête.";
   return passages
     .map((p) => {
-      const where = p.page ? `page ${p.page}` : "page web";
+      // EPUB : la section remplace la page (le rang interne n'a pas de sens pour le lecteur).
+      const where = p.section ? `section « ${p.section} »` : p.page ? `page ${p.page}` : "page web";
       const kind = CATEGORY_LABELS[p.category] ?? p.category;
       const archive = p.corpus === "aec2022" ? ", ÉDITION 2022, PAS À JOUR" : "";
       return `[${p.ref}] ${p.title} — ${where} (${kind}${archive})\n${p.text}`;

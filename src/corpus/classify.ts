@@ -34,8 +34,11 @@ export function classifyByMetadata(item: SourceItem): Classification {
   if (/DOSSIER[-_ ]DE[-_ ]PRESSE|LETTRE[-_ ]AUX/.test(hay)) {
     return { ...base, category: "autre", included: false, reason: "Document secondaire exclu par défaut" };
   }
+  // Le programme fait foi dans sa version livre (EPUB 2026, ajouté par `pnpm docs livre`) :
+  // les anciennes versions publiées sur le site (PROGRAMME SITE 2025…) ne sont plus interrogées.
+  // Les livrets et plans, eux, restent valables.
   if (/PROGRAMME/.test(hay) && !/ABREGE|FALC/.test(hay)) {
-    return { ...base, category: "programme", included: true, reason: "", provisional: true };
+    return { ...base, category: "programme", included: false, reason: ANCIEN_PROGRAMME, provisional: true };
   }
   const year = uploadYear(item.url);
   if (year !== undefined && year >= 2026) {
@@ -51,6 +54,8 @@ export function classifyByMetadata(item: SourceItem): Classification {
   }
   return { ...base, category: "autre", included: false, reason: "Document non classé exclu par défaut" };
 }
+
+export const ANCIEN_PROGRAMME = "Ancienne version du programme, remplacée par le livre 2026";
 
 /**
  * Documents de la campagne 2022 : marqueur « UP » (Union populaire) dans le nom, ou fichiers

@@ -8,6 +8,8 @@ export interface RetrievedPassage {
   title: string;
   url: string;
   page: number | null;
+  /** EPUB : chemin de la section, cité à la place de la page. */
+  section: string | null;
   category: Category;
   corpus: Corpus;
   provisional: boolean;
@@ -22,10 +24,13 @@ export interface ReferencedPassage extends RetrievedPassage {
 /** Un document cité ; plusieurs pages d'un même document partagent son numéro. */
 export interface Source {
   n: number;
+  docId: string;
   title: string;
   url: string;
   /** Pages citées, dans l'ordre (vide pour une page web). */
   pages: number[];
+  /** EPUB : sections citées (chemins complets), dans l'ordre du livre. */
+  sections: string[];
   category: Category;
   corpus: Corpus;
   provisional: boolean;

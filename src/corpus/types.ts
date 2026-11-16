@@ -37,15 +37,18 @@ export interface SourceItem {
   /** Ajouts manuels Telegram : file_id pour renvoyer le PDF. */
   telegramFileId?: string;
   addedBy?: string;
-  /** PDF déjà extrait par l'appelant (ajout manuel), page par page. */
-  inlinePages?: { page: number; text: string }[];
+  /** Document déjà extrait par l'appelant (ajout manuel) : pages PDF ou sections d'EPUB. */
+  inlinePages?: { page: number; text: string; section?: string }[];
   /** Classement imposé (sources ajoutées hors WordPress, comme l'édition 2022). */
   forced?: { category: Category; corpus: Corpus };
 }
 
-/** Texte d'un document, une entrée par page PDF (une seule pour HTML/texte). */
+/**
+ * Texte d'un document, une entrée par page PDF (une seule pour HTML/texte), ou par section
+ * pour un EPUB : `page` est alors le rang de la section, et `section` son titre, seul cité.
+ */
 export interface ExtractedDocument {
-  pages: { page: number | null; text: string }[];
+  pages: { page: number | null; text: string; section?: string }[];
 }
 
 export interface Classification {
@@ -53,7 +56,7 @@ export interface Classification {
   corpus: Corpus;
   included: boolean;
   reason: string;
-  /** Le programme général est une référence provisoire. */
+  /** Ancienne règle (programme du site marqué provisoire) : faux pour le livre 2026. */
   provisional: boolean;
 }
 
@@ -62,6 +65,8 @@ export interface PassageMetadata {
   title: string;
   url: string;
   page: number | null;
+  /** EPUB : chemin de la section (« Partie … › Chapitre … › Section »), cité à la place de la page. */
+  section: string | null;
   category: Category;
   corpus: Corpus;
   origin: Origin;

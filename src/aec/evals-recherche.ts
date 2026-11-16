@@ -7,6 +7,7 @@
  */
 import type { EvalQuestion } from "./evals.js";
 import { correspondA } from "./sources-attendues.js";
+import { sectionTitle } from "../corpus/epub.js";
 import type { RetrievedPassage } from "./types.js";
 
 export type Recherche = (requete: string) => Promise<RetrievedPassage[]>;
@@ -76,17 +77,17 @@ export async function evaluerQuestion(q: EvalQuestion, recherche: Recherche): Pr
     };
   }
   const attendues = q.attendu === "repondu" ? (q.sources ?? []) : [];
-  const pertinent = (p: RetrievedPassage) => attendues.some((a) => correspondA(p.title, [p.page], a));
+  const pertinent = (p: RetrievedPassage) => attendues.some((a) => correspondA(p.title, [p.page], a, [p.section]));
   const idx = found.findIndex(pertinent);
   return {
     ...base,
     rang: attendues.length && idx >= 0 ? idx + 1 : null,
     couverture: attendues.length
-      ? attendues.filter((a) => found.some((p) => correspondA(p.title, [p.page], a))).length / attendues.length
+      ? attendues.filter((a) => found.some((p) => correspondA(p.title, [p.page], a, [p.section]))).length / attendues.length
       : null,
     scorePertinent: idx >= 0 ? found[idx]!.score : null,
     scoreMax: found.length ? Math.max(...found.map((p) => p.score)) : null,
-    top: found.slice(0, 5).map((p, i) => ({ rang: i + 1, titre: p.title, page: p.page, score: p.score, pertinent: pertinent(p) })),
+    top: found.slice(0, 5).map((p, i) => ({ rang: i + 1, titre: p.section ? `${p.title} › ${sectionTitle(p.section)}` : p.title, page: p.page, score: p.score, pertinent: pertinent(p) })),
   };
 }
 

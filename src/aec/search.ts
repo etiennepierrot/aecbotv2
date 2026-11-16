@@ -86,6 +86,7 @@ function toPassage(id: string, score: number, m: Record<string, unknown>): Retri
     title: String(m.title),
     url: String(m.url),
     page: typeof m.page === "number" ? m.page : null,
+    section: typeof m.section === "string" ? m.section : null,
     category: m.category as Category,
     corpus: m.corpus as Corpus,
     provisional: m.provisional === true,

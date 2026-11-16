@@ -7,8 +7,8 @@ const answer: Answer = {
   statut: "repondu",
   texte: "Retraite à 60 ans [1]. Le livret <Emploi> & co le confirme [2].",
   sources: [
-    { n: 1, title: "PROGRAMME SITE 2025", url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf", pages: [33], category: "programme", corpus: "aec2027", provisional: true },
-    { n: 2, title: "Livret_UP_21_EMPLOI_web-ok", url: "https://melenchon2027.fr/x.pdf?a=1&b=\"2\"", pages: [23], category: "livret", corpus: "aec2027", provisional: false },
+    { n: 1, docId: "d1", sections: [], title: "PROGRAMME SITE 2025", url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf", pages: [33], category: "programme", corpus: "aec2027", provisional: true },
+    { n: 2, docId: "d2", sections: [], title: "Livret_UP_21_EMPLOI_web-ok", url: "https://melenchon2027.fr/x.pdf?a=1&b=\"2\"", pages: [23], category: "livret", corpus: "aec2027", provisional: false },
   ],
   avertissements: ["Programme provisoire : une édition plus récente peut exister."],
   controle: { passagesRecuperes: 3, citationsValides: 2, citationsRejetees: 0, phrasesRetirees: 0, phrasesSansSource: 0 },
@@ -90,7 +90,7 @@ describe("sources et commandes d'équipe", () => {
   it("affiche un document de l'équipe sans lien public", () => {
     const team = {
       ...answer,
-      sources: [{ n: 1, title: "Note interne", url: "", pages: [2], category: "ajout_manuel" as const, corpus: "aec2027" as const, provisional: false }],
+      sources: [{ n: 1, docId: "d1", sections: [], title: "Note interne", url: "", pages: [2], category: "ajout_manuel" as const, corpus: "aec2027" as const, provisional: false }],
     };
     expect(formatAnswer(team)).toContain("[1] Note interne, page 2 (document de l'équipe)");
   });
@@ -110,5 +110,27 @@ describe("suites", () => {
     expect(msg.startsWith("🔎 <b>Et le SMIC ?</b>\n\nRetraite à 60 ans [1].")).toBe(true);
     expect(msg).toContain("page 23\n\n<b>Pour aller plus loin</b>\n1. Comment la financer ?\n2. Et les &lt;femmes&gt; ?\n");
     expect(msg.endsWith("<i>Initiative non officielle, non endossée par LFI.</i>")).toBe(true);
+  });
+});
+
+describe("formatAnswer : livre EPUB", () => {
+  const livre: Answer = {
+    ...answer,
+    texte: "Retraite à 60 ans [1].",
+    avertissements: [],
+    sources: [{
+      n: 1, docId: "manual:livre-aec", title: "L'Avenir en commun (livre, édition 2026)", url: "", pages: [38, 40],
+      sections: ["Partie 3 : Mettre en sécurité sociale › Chapitre 1 : À chacun selon ses besoins › Éradiquer la pauvreté",
+        "Partie 3 : Mettre en sécurité sociale › Chapitre 1 : À chacun selon ses besoins › Garantir une retraite digne"],
+      category: "programme", corpus: "aec2027", provisional: false,
+    }],
+  };
+
+  it("cite les titres de section, sans page ni lien", () => {
+    expect(formatAnswer(livre)).toContain(
+      "[1] L'Avenir en commun (livre, édition 2026), « Éradiquer la pauvreté », « Garantir une retraite digne »\n",
+    );
+    expect(formatAnswer(livre)).not.toMatch(/page|href/);
+    expect(answerForMemory(livre)).toContain("[1] L'Avenir en commun (livre, édition 2026), « Éradiquer la pauvreté »");
   });
 });

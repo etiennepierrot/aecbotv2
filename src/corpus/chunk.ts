@@ -13,7 +13,8 @@ const OVERLAP = 150;
 
 /**
  * Un découpage par page PDF : chaque passage garde le numéro de la page
- * d'où il vient, ce qui permet de citer « page N ».
+ * d'où il vient, ce qui permet de citer « page N ». Pour un EPUB, la « page » est
+ * une section, citée par son titre.
  */
 export async function chunkDocument(
   item: SourceItem,
@@ -21,7 +22,7 @@ export async function chunkDocument(
   cls: Classification,
 ): Promise<Passage[]> {
   const passages: Passage[] = [];
-  for (const { page, text } of extracted.pages) {
+  for (const { page, text, section } of extracted.pages) {
     if (text.trim().length < 20) continue;
     const doc = item.kind === "html" ? MDocument.fromMarkdown(text) : MDocument.fromText(text);
     const chunks = await doc.chunk({ strategy: "recursive", maxSize: MAX_SIZE, overlap: OVERLAP });
@@ -36,6 +37,7 @@ export async function chunkDocument(
           title: item.title,
           url: item.url,
           page,
+          section: section ?? null,
           category: cls.category,
           corpus: cls.corpus,
           origin: item.origin,

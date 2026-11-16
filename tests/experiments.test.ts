@@ -21,7 +21,7 @@ const answer = (statut: Answer["statut"], citationsRejetees = 0): RepondreResult
     statut,
     texte: statut === "repondu" ? "Retraite à 60 ans [1]." : "INTROUVABLE",
     sources: statut === "repondu"
-      ? [{ n: 1, title: "PROGRAMME SITE 2025", url: "u", pages: [33], category: "programme", corpus: "aec2027", provisional: true }]
+      ? [{ n: 1, docId: "d1", sections: [], title: "PROGRAMME SITE 2025", url: "u", pages: [33], category: "programme", corpus: "aec2027", provisional: true }]
       : [],
     avertissements: [],
     controle: { passagesRecuperes: 1, citationsValides: statut === "repondu" ? 1 : 0, citationsRejetees, phrasesRetirees: 0, phrasesSansSource: 0 },

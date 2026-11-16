@@ -6,12 +6,12 @@ import { fakeModel } from "./helpers/fake-model.js";
 const reponse: Answer = {
   statut: "repondu",
   texte: "Le programme prévoit la retraite à 60 ans [1]. Il prévoit aussi la semaine de 4 jours [1].",
-  sources: [{ n: 1, title: "PROGRAMME SITE 2025", url: "u", pages: [33], category: "programme", corpus: "aec2027", provisional: true }],
+  sources: [{ n: 1, docId: "d", sections: [], title: "PROGRAMME SITE 2025", url: "u", pages: [33], category: "programme", corpus: "aec2027", provisional: true }],
   avertissements: [],
   controle: { passagesRecuperes: 1, citationsValides: 2, citationsRejetees: 0, phrasesRetirees: 0, phrasesSansSource: 0 },
 };
 const passages = [{
-  ref: "P1", id: "x", score: 1, docId: "d", title: "PROGRAMME SITE 2025", url: "u", page: 33,
+  ref: "P1", id: "x", score: 1, docId: "d", title: "PROGRAMME SITE 2025", url: "u", page: 33, section: null,
   category: "programme" as const, corpus: "aec2027" as const, provisional: true,
   text: "Rétablir la retraite à 60 ans après quarante années de cotisation",
 }];

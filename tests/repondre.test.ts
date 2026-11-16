@@ -11,7 +11,7 @@ const PASSAGES: Record<string, RetrievedPassage[]> = {
   retraite: [
     {
       id: "wp:media:15699#p33#0", score: 0.91, docId: "wp:media:15699", title: "PROGRAMME SITE 2025",
-      url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf", page: 33,
+      url: "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf", page: 33, section: null,
       category: "programme", corpus: "aec2027", provisional: true,
       text: "Rétablir la retraite à 60 ans après quarante années de cotisation",
     },
@@ -45,7 +45,7 @@ describe("repondre", () => {
     const model = fakeModel((prompt, call) => {
       if (call === 1) return { tool: "recherche", input: { requete: "retraite âge légal" } };
       const seen = lastToolOutput(prompt) ?? "";
-      expect(seen).toContain("[P1] PROGRAMME SITE 2025 — page 33 (programme général, édition provisoire)");
+      expect(seen).toContain("[P1] PROGRAMME SITE 2025 — page 33 (programme général)");
       expect(seen).not.toContain("https://"); // le modèle ne voit pas les URL
       return { text: "Le programme prévoit de rétablir la retraite à 60 ans [P1]. Il supprime aussi la CSG [P4]." };
     });

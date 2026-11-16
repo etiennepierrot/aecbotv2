@@ -5,10 +5,9 @@
     "attendu": "repondu",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          33,
-          37
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Garantir une retraite digne"
         ]
       },
       {
@@ -24,12 +23,13 @@
     "id": "smic",
     "question": "De combien le programme veut-il augmenter le SMIC ?",
     "attendu": "repondu",
-    "note": "Programme général : 1 600 € net (p. 37). Livret Outre-mer : 1 400 € net (p. 11). L'agent doit présenter les deux et signaler l'écart.",
+    "note": "Livre du programme : 1 700 € net (« Augmenter les salaires », « Créer un état d’urgence sociale »). Livret Outre-mer : 1 400 € net (p. 11). L'agent doit présenter les deux et signaler l'écart.",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          37
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Augmenter les salaires",
+          "Créer un état d’urgence sociale"
         ]
       },
       {
@@ -46,10 +46,9 @@
     "attendu": "repondu",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          8,
-          46
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "La bifurcation écologique pour une société de l’harmonie"
         ]
       },
       {
@@ -63,10 +62,9 @@
     "attendu": "repondu",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          9,
-          11
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Réunir une Assemblée constituante"
         ]
       },
       {
@@ -81,11 +79,9 @@
     "note": "Le programme ne parle pas de démission : l'agent doit le dire sans l'affirmer comme une absence, puis décrire le processus constituant (référendum art. 11, Constituante, référendum après deux ans).",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          9,
-          10,
-          11
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Réunir une Assemblée constituante"
         ]
       },
       {
@@ -99,9 +95,9 @@
     "attendu": "repondu",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          49
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Organiser le 100 % d’énergies renouvelables"
         ]
       },
       {
@@ -115,9 +111,9 @@
     "attendu": "repondu",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          59
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Assumer l’indépendance de la France dans le monde"
         ]
       },
       {
@@ -160,9 +156,9 @@
     "attendu": "repondu",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          12
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Une République de la souveraineté populaire permanente"
         ]
       },
       {
@@ -186,9 +182,9 @@
         ]
       },
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          54
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Rompre avec la maltraitance animale"
         ]
       }
     ]
@@ -223,9 +219,9 @@
     "attendu": "repondu",
     "sources": [
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          13
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Une République laïque"
         ]
       },
       {
@@ -251,9 +247,9 @@
         ]
       },
       {
-        "document": "PROGRAMME SITE 2025",
-        "pages": [
-          37
+        "document": "Avenir en commun (livre",
+        "sections": [
+          "Créer un état d’urgence sociale"
         ]
       }
     ]
@@ -293,12 +289,16 @@
   },
   {
     "id": "edition-2022",
-    "question": "Que disait l'édition 2022 du programme sur la retraite ?",
+    "question": "Que disait le livret Emploi de 2022 sur la retraite ?",
     "attendu": "repondu",
-    "note": "Version abrégée 2022 indexée : l'agent filtre sur aec2022 et dit que c'est une version pas à jour.",
+    "note": "Livret de la campagne 2022 (Union populaire), toujours valable mais pas à jour : l'agent filtre sur aec2022 et le dit. La version abrégée du programme 2022 n'est plus indexée.",
     "sources": [
       {
-        "document": "L'Avenir en commun 2022"
+        "document": "EMPLOI",
+        "pages": [
+          18,
+          23
+        ]
       }
     ]
   },

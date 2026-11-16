@@ -5,13 +5,14 @@
  *   pnpm docs:prod ajouter --titre "Tribune" --url https://exemple.fr/tribune
  *   pnpm docs:prod ajouter --titre "Mémo" --texte-fichier memo.txt
  *   pnpm docs:prod supprimer 3f2a9c1b
+ *   pnpm docs:prod livre L_Avenir_en_commun.epub     (le livre du programme : remplace la version précédente)
  * (`pnpm docs …` fait la même chose sur la base locale de .env)
  */
 import { readFile } from "node:fs/promises";
 import { userInfo } from "node:os";
 import { parseArgs } from "node:util";
 import { mastra } from "../src/mastra/index.js";
-import { ajouterDocument, listerDocuments, shortId, supprimerDocument } from "../src/corpus/manual.js";
+import { ajouterDocument, ajouterLivre, listerDocuments, shortId, supprimerDocument } from "../src/corpus/manual.js";
 
 const { values, positionals } = parseArgs({
   options: {
@@ -46,12 +47,17 @@ try {
         : `${r.status === "écarté" ? "Non ajouté" : "Échec"} : ${r.detail}`,
     );
     if (r.status !== "indexé") process.exitCode = 2;
+  } else if (cmd === "livre") {
+    if (!arg) throw new Error("Donne le chemin de l'EPUB du livre");
+    const r = await ajouterLivre(mastra, new Uint8Array(await readFile(arg)), who);
+    console.log(r.status === "indexé" ? `Livre indexé : ${r.passages} passages (${r.title})` : `${r.status} : ${r.detail}`);
+    if (r.status !== "indexé") process.exitCode = 2;
   } else if (cmd === "supprimer") {
     if (!arg) throw new Error("Donne l'identifiant affiché par « liste »");
     const d = await supprimerDocument(arg, who);
     console.log(`Retiré du corpus : ${d.title}`);
   } else {
-    console.log("Usage : pnpm docs:prod liste | ajouter --titre … (--fichier f.pdf | --url … | --texte … | --texte-fichier f.txt) | supprimer <id>");
+    console.log("Usage : pnpm docs:prod liste | ajouter --titre … (--fichier f.pdf|f.epub | --url … | --texte … | --texte-fichier f.txt) | livre f.epub | supprimer <id>");
     process.exitCode = 1;
   }
 } catch (e) {
