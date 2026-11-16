@@ -58,6 +58,22 @@ const apiRoutes = cfg.TELEGRAM_BOT_TOKEN
     ]
   : [statusRoute];
 
+/**
+ * Même base que le stockage principal, sous un autre nom d'application. Mastra conseille une
+ * base séparée pour les traces quand les deux chaînes de connexion sont identiques ; au volume
+ * du bot (quelques traces par question), ce n'est pas utile. Le nom distinct rend aussi ces
+ * connexions reconnaissables dans Neon (pg_stat_activity).
+ */
+export function observabilityConnectionString(databaseUrl: string): string {
+  try {
+    const url = new URL(databaseUrl);
+    url.searchParams.set("application_name", "aecbot-observability");
+    return url.toString();
+  } catch {
+    return databaseUrl;
+  }
+}
+
 export const mastra = new Mastra({
   agents: { aec: aecAgent },
   scorers,
@@ -67,7 +83,7 @@ export const mastra = new Mastra({
   storage: new PostgresStoreVNext({
     id: "aec-storage",
     connectionString: cfg.DATABASE_URL,
-    observability: { connectionString: cfg.DATABASE_URL },
+    observability: { connectionString: observabilityConnectionString(cfg.DATABASE_URL) },
     // Traces et votes contiennent les questions : même durée que la mémoire du bot.
     // Appliqué chaque nuit par le workflow purge (storage.prune()).
     retention: {
