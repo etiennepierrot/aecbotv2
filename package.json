@@ -31,6 +31,8 @@
     "feedback:prod": "tsx --import ./scripts/prod-env.ts scripts/feedback.ts",
     "docs": "tsx --env-file-if-exists=.env scripts/docs.ts",
     "docs:prod": "tsx --import ./scripts/prod-env.ts scripts/docs.ts",
+    "rapport": "tsx --env-file-if-exists=.env scripts/rapport.ts",
+    "rapport:prod": "tsx --import ./scripts/prod-env.ts scripts/rapport.ts",
     "avis": "tsx --env-file-if-exists=.env scripts/avis.ts",
     "avis:prod": "tsx --import ./scripts/prod-env.ts scripts/avis.ts",
     "suites:calibrer": "tsx --env-file-if-exists=.env scripts/suites-calibrer.ts",

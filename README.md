@@ -332,6 +332,33 @@ caractères au plus) sont gardées, et **seulement si elles citent un passage qu
 
 Après le déploiement, `pnpm webhook:prod <URL>` met à jour le menu des commandes (ajoute `/avis`).
 
+### Rapport journalier (`RAPPORT_CRON`)
+
+Chaque matin (`RAPPORT_CRON`, heure de Paris, par exemple `12 8 * * *`), le workflow `rapport` envoie en
+message privé à chaque membre de `TEAM_TELEGRAM_IDS` le bilan des dernières 24 h :
+
+- questions, personnes distinctes, suites choisies ; répondues et introuvables (taux) ;
+- réponses partielles contrôlées et écartées, citations inventées rejetées ;
+- 👍 / 👎 / commentaires, avis `/avis`, pannes, refus pour limite horaire ;
+- temps de réponse (médiane, max) et jetons (total et par question) ;
+- **à revoir** : le texte des questions restées introuvables (trous du corpus), des réponses
+  critiquées (👎, commentaires, avec la réponse donnée), et des réponses où le modèle avait cité un
+  passage qu'il n'avait pas reçu. Dix au plus par rubrique.
+
+```bash
+pnpm rapport:prod                 # le même rapport dans le terminal (24 h)
+pnpm rapport:prod --jours 7 --tout
+pnpm rapport:prod --envoyer       # l'envoie tout de suite à l'équipe, pour essayer
+```
+
+Données : chaque réponse garde dans `aec_conversations.meta` son statut, ses contrôles, ses jetons et
+sa durée (ni texte ni identifiant de plus) ; les pannes et refus sont comptés dans `aec_incidents`,
+sans pseudonyme. Les deux suivent `MEMORY_DAYS`. Les pseudonymes sont tronqués dans le rapport, jamais
+de nom ni d'identifiant Telegram. Un rapport reçu sur Telegram y reste, au-delà de `MEMORY_DAYS` :
+c'est le prix de lire les questions à revoir sans ouvrir la base. Un membre qui n'a jamais écrit au bot
+ne peut pas le recevoir. Les échanges d'avant ce changement n'ont pas de `meta` : leur statut est déduit
+de la réponse gardée en mémoire.
+
 ### Brancher le bot en production
 
 1. Renseigner `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` et
@@ -389,7 +416,7 @@ et sans attendre les tests.
    Puis, dans le tableau de bord Mastra → Environments → production → Variables, renseigner :
    `DATABASE_URL`, `OPENROUTER_API_KEY` (ou `MISTRAL_API_KEY`), `TELEGRAM_BOT_TOKEN`,
    `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` (une nouvelle clé, propre à la production),
-   `ADMIN_API_TOKEN`, `INGEST_CRON=0 3 * * *`, `PURGE_CRON=30 3 * * *`, `EDITIONS`,
+   `ADMIN_API_TOKEN`, `INGEST_CRON=0 3 * * *`, `PURGE_CRON=30 3 * * *`, `RAPPORT_CRON=12 8 * * *`, `EDITIONS`,
    `TEAM_TELEGRAM_IDS`. Pour voir traces et votes dans Mastra Cloud : `MASTRA_PLATFORM_ACCESS_TOKEN`
    (`pnpm exec mastra auth tokens create observability`) et `MASTRA_PROJECT_ID` (dans `.mastra-project.json`).
    Activer l'option **Persistent Server** : sans elle le serveur peut s'endormir, et les scans

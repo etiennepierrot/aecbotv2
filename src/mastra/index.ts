@@ -13,6 +13,7 @@ import { aecAgent } from "./agents/aec.js";
 import { scorers } from "./scorers/index.js";
 import { ingestDocumentWorkflow, ingestWorkflow } from "./workflows/ingest.js";
 import { purgeWorkflow } from "./workflows/purge.js";
+import { rapportWorkflow } from "./workflows/rapport.js";
 
 const cfg = config();
 const logger = new PinoLogger({ name: "aecbot", level: "info" });
@@ -77,7 +78,7 @@ export function observabilityConnectionString(databaseUrl: string): string {
 export const mastra = new Mastra({
   agents: { aec: aecAgent },
   scorers,
-  workflows: { ingest: ingestWorkflow, ingestDocument: ingestDocumentWorkflow, purge: purgeWorkflow },
+  workflows: { ingest: ingestWorkflow, ingestDocument: ingestDocumentWorkflow, purge: purgeWorkflow, rapport: rapportWorkflow },
   vectors: { aec: pgVector() },
   // « VNext » : la variante dont l'observabilité gère le feedback (votes 👍/👎).
   storage: new PostgresStoreVNext({

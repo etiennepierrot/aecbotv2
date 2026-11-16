@@ -15,6 +15,29 @@ export interface HistoryMessage {
  * Données du bot, toutes indexées par pseudonyme (jamais par identifiant Telegram) :
  * compteur de questions par heure et mémoire de conversation pour les questions de suite.
  */
+/** Comment une réponse s'est passée : ni question, ni réponse, ni identifiant. */
+export interface ReponseMeta {
+  statut: "repondu" | "introuvable";
+  origine: "question" | "suite";
+  sources: number;
+  citationsRejetees: number;
+  phrasesRetirees: number;
+  /** Réponse partielle contrôlée : « non » = devenue introuvable. */
+  objet?: "oui" | "non" | "erreur";
+  inputTokens: number;
+  outputTokens: number;
+  ms: number;
+}
+
+export interface EchangeRapport {
+  pseudo: string;
+  question: string;
+  answer: string;
+  traceId?: string;
+  meta?: ReponseMeta;
+  createdAt: Date;
+}
+
 export class BotStore {
   private ready?: Promise<void>;
 
@@ -43,6 +66,16 @@ export class BotStore {
         -- Questions d'approfondissement proposées sous la réponse (boutons 1, 2, 3).
         ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS suites jsonb;
         CREATE INDEX IF NOT EXISTS aec_conversations_trace ON aec_conversations (trace_id) WHERE trace_id IS NOT NULL;
+        -- Comment la réponse s'est passée (statut, contrôles, jetons, durée) : sert au rapport journalier.
+        ALTER TABLE aec_conversations ADD COLUMN IF NOT EXISTS meta jsonb;
+        CREATE INDEX IF NOT EXISTS aec_conversations_created ON aec_conversations (created_at);
+        -- Pannes et refus (limite horaire), comptés sans pseudonyme ni contenu.
+        CREATE TABLE IF NOT EXISTS aec_incidents (
+          id         bigserial PRIMARY KEY,
+          kind       text NOT NULL CHECK (kind IN ('erreur', 'limite')),
+          created_at timestamptz NOT NULL DEFAULT now()
+        );
+        CREATE INDEX IF NOT EXISTS aec_incidents_created ON aec_incidents (created_at);
         -- Après un 👎, la question « qu'est-ce qui n'allait pas ? » en attente de réponse.
         CREATE TABLE IF NOT EXISTS aec_feedback_prompts (
           pseudo            text NOT NULL,
@@ -110,13 +143,63 @@ export class BotStore {
 
   async append(
     pseudo: string, question: string, answer: string, traceId?: string, spanId?: string, suites: string[] = [],
+    meta?: ReponseMeta,
   ): Promise<void> {
     await this.init();
     await this.pool.query(
-      `INSERT INTO aec_conversations (pseudo, role, content, trace_id, span_id, suites)
-       VALUES ($1, 'user', $2, NULL, NULL, NULL), ($1, 'assistant', $3, $4, $5, $6)`,
-      [pseudo, question, answer, traceId ?? null, spanId ?? null, suites.length ? JSON.stringify(suites) : null],
+      `INSERT INTO aec_conversations (pseudo, role, content, trace_id, span_id, suites, meta)
+       VALUES ($1, 'user', $2, NULL, NULL, NULL, NULL), ($1, 'assistant', $3, $4, $5, $6, $7)`,
+      [
+        pseudo, question, answer, traceId ?? null, spanId ?? null,
+        suites.length ? JSON.stringify(suites) : null, meta ? JSON.stringify(meta) : null,
+      ],
     );
+  }
+
+  /** Une panne ou un refus, compté sans pseudonyme ni contenu (rapport journalier). */
+  async recordIncident(kind: "erreur" | "limite"): Promise<void> {
+    await this.init();
+    await this.pool.query(`INSERT INTO aec_incidents (kind) VALUES ($1)`, [kind]);
+  }
+
+  /** Les échanges d'une période, dans l'ordre, avec la manière dont chaque réponse s'est passée. */
+  async echangesEntre(depuis: Date, jusqua: Date): Promise<EchangeRapport[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT a.pseudo, q.content AS question, a.content AS answer, a.trace_id, a.meta, a.created_at
+         FROM aec_conversations a
+         JOIN aec_conversations q ON q.id = a.id - 1 AND q.pseudo = a.pseudo AND q.role = 'user'
+        WHERE a.role = 'assistant' AND a.created_at >= $1 AND a.created_at < $2
+        ORDER BY a.id`,
+      [depuis, jusqua],
+    );
+    return rows.map((r) => ({
+      pseudo: r.pseudo as string,
+      question: r.question as string,
+      answer: r.answer as string,
+      traceId: (r.trace_id as string | null) ?? undefined,
+      meta: (r.meta as ReponseMeta | null) ?? undefined,
+      createdAt: new Date(r.created_at),
+    }));
+  }
+
+  async incidentsEntre(depuis: Date, jusqua: Date): Promise<{ erreur: number; limite: number }> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT kind, count(*)::int AS n FROM aec_incidents WHERE created_at >= $1 AND created_at < $2 GROUP BY kind`,
+      [depuis, jusqua],
+    );
+    const n = (k: string) => (rows.find((r) => r.kind === k)?.n as number | undefined) ?? 0;
+    return { erreur: n("erreur"), limite: n("limite") };
+  }
+
+  async avisEntre(depuis: Date, jusqua: Date): Promise<number> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT count(*)::int AS n FROM aec_avis WHERE created_at >= $1 AND created_at < $2`,
+      [depuis, jusqua],
+    );
+    return rows[0].n as number;
   }
 
   /** Les suites proposées sous la réponse de cette trace, si elle a été donnée à cette personne. */
@@ -305,6 +388,7 @@ export class BotStore {
     await this.pool.query(`DELETE FROM aec_feedback_prompts WHERE created_at < now() - interval '1 day'`);
     const a = await this.pool.query(`DELETE FROM aec_avis WHERE created_at < now() - make_interval(days => $1)`, [days]);
     await this.pool.query(`DELETE FROM aec_avis_prompts WHERE created_at < now() - interval '1 day'`);
+    await this.pool.query(`DELETE FROM aec_incidents WHERE created_at < now() - make_interval(days => $1)`, [days]);
     return { messages: m.rowCount ?? 0, compteurs: c.rowCount ?? 0, avis: a.rowCount ?? 0 };
   }
 }
