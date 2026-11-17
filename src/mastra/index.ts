@@ -13,6 +13,7 @@ import { aecAgent } from "./agents/aec.js";
 import { scorers } from "./scorers/index.js";
 import { ingestDocumentWorkflow, ingestWorkflow } from "./workflows/ingest.js";
 import { purgeWorkflow } from "./workflows/purge.js";
+import { consolidationWorkflow } from "./workflows/consolidation.js";
 import { captureRoutes } from "./routes/capture.js";
 
 const cfg = config();
@@ -82,7 +83,7 @@ export function observabilityConnectionString(databaseUrl: string): string {
 export const mastra = new Mastra({
   agents: { aec: aecAgent },
   scorers,
-  workflows: { ingest: ingestWorkflow, ingestDocument: ingestDocumentWorkflow, purge: purgeWorkflow },
+  workflows: { ingest: ingestWorkflow, ingestDocument: ingestDocumentWorkflow, purge: purgeWorkflow, consolidation: consolidationWorkflow },
   vectors: { aec: pgVector() },
   // « VNext » : la variante dont l'observabilité gère le feedback (votes 👍/👎).
   storage: new PostgresStoreVNext({

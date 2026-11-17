@@ -12,7 +12,8 @@ Sont faites les **étapes 1 à 3 de la feuille de route** : scan + index, agent 
 | 3 | Bot Telegram (webhook, limite, mise en forme, mémoire 30 jours, /oublier) | ✅ |
 | 4 | `/ajouter`, `/docs`, `/supprimer` pour l'équipe, et `pnpm docs` en ligne de commande | ✅ |
 | Argu 1 | Argumentaire : tables, `POST /capture`, `/jeton`, catégorie `argumentaire` exclue du mode programme | ✅ |
-| Argu 2–6 | Consolidation, interface `/admin`, `/capter`, extension, collectes automatiques | à venir |
+| Argu 2 | Workflow `consolidation` (brouillons), `pnpm argu`, grille `pnpm evals:consolidation` | ✅ (jeu d'évals à annoter) |
+| Argu 3–6 | Interface `/admin`, `/capter`, extension, collectes automatiques | à venir |
 
 ## Démarrer en local
 
@@ -410,6 +411,46 @@ curl -X POST https://<serveur>/capture -H "Authorization: Bearer aec_…" -H 'co
   -d '{"source_type":"x","url":"https://x.com/compte/status/123","texte":"Texte complet du post"}'
 ```
 
+## Argumentaire : consolidation
+
+Chaque capture reçue par `POST /capture` lance le workflow `consolidation`
+(`src/mastra/workflows/consolidation.ts`, logique dans `src/argu/consolidation.ts`). Il ne produit
+que des **brouillons** : rien n'entre dans l'index sans validation humaine.
+
+1. **Préparer** : plafond `CONSOLIDATION_MAX_PER_DAY` (au-delà, la capture reste « reçue »),
+   nettoyage du texte, refus d'un lien seul.
+2. **Analyser** : deux appels au modèle (`CONSOLIDATION_MODEL`, par défaut le modèle du juge), sans
+   outil, sortie structurée, jetons plafonnés, le texte capturé présenté comme une donnée :
+   - extraction des affirmations (reformulation, citation, types, position, thème, registre) ;
+     **une citation introuvable mot pour mot dans la capture écarte l'affirmation** ;
+   - profil de l'émetteur (classe sociale, orientation) : un trait sans extrait de la capture qui
+     le fonde, ou fondé sur le seul nom, devient `indetermine` ; une correction de l'équipe n'est
+     jamais écrasée par une relance.
+3. **Rapprocher** : les passages du programme proches de chaque affirmation (jamais l'argumentaire).
+4. **Évaluer** : appui factuel et difficulté de réponse (modèle), portée (code : type d'émetteur ou
+   audience capturée), publics et familles visés par l'argument (hypothèses).
+5. **Regrouper et enregistrer** : les trois objections les plus proches au-dessus de
+   `REGROUPEMENT_MIN_SCORE` (aucune fusion automatique), fréquence, règle `fake_news` (retiré sans
+   source de vérification : celle de la capture, ou un `debunk` validé proche au-dessus de
+   `VERIFICATION_MIN_SCORE`), brouillons écrits, journal `aec_admin_log`, message Telegram à
+   l'équipe (source et nombre de brouillons, jamais le profil de l'émetteur).
+
+Une panne passe la capture en erreur, relançable. En attendant l'interface `/admin` :
+
+```bash
+pnpm argu:prod lister                  # brouillons à relire
+pnpm argu:prod voir <capture>          # capture, profil de l'émetteur (hypothèse), affirmations
+pnpm argu:prod valider <affirmation>   # ou rejeter ; préfixe d'identifiant accepté
+pnpm argu:prod relancer --attente      # captures en attente (plafond, panne)
+pnpm argu capturer --source x --url https://x.com/… --texte "…"   # essai en local, sans extension
+```
+
+**Évals** : `pnpm evals:consolidation [--passes 3] [--model …]` passe `evals/consolidation.json`
+(captures annotées) et affiche la grille : rappel de l'extraction, F1 des types, accord sur la
+position, zéro `fake_news` sans preuve, accord et stabilité du profil de l'émetteur, écart de la
+force entre passes, jetons et coût. Le fichier livré n'est qu'un **gabarit de trois exemples
+fictifs** : il faut l'annoter avec une trentaine de captures réelles avant de choisir un modèle.
+
 ## Tests
 
 ```bash
@@ -496,6 +537,10 @@ src/
 │  └─ deps.ts                assemblage (remplaçable en test)
 ├─ argu/                     argumentaire : captures, jetons, tables
 │  ├─ capture.ts             enregistrerCapture() : validation, dédoublonnage
+│  ├─ consolidation.ts       phases du workflow consolidation
+│  ├─ analyse.ts             les trois appels au modèle (extraction, émetteur, évaluation)
+│  ├─ citations.ts, regles.ts, force.ts   vérifications et calculs faits par le code
+│  ├─ evals.ts               grille de la consolidation
 │  ├─ jetons.ts              jetons de l'extension (empreinte seule)
 │  └─ store.ts               tables aec_captures, aec_affirmations…
 ├─ telegram/                 le bot
@@ -510,7 +555,7 @@ src/
    ├─ routes/capture.ts      POST /capture, GET /capture/config
    ├─ tools/recherche.ts     outil de recherche
    ├─ scorers/index.ts       citations, statut, source attendue, fidélité
-   └─ workflows/             ingest, purge
+   └─ workflows/             ingest, purge, consolidation
 scripts/                     ingest, ask, evals, bot, webhook, corpus, docs, feedback
 .github/workflows/           ci.yml (tests + déploiement), evals.yml (à la demande)
 evals/                       questions types, prix
