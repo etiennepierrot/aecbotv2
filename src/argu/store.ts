@@ -41,6 +41,10 @@ export class ArguStore {
           statut              text NOT NULL DEFAULT 'recue' CHECK (statut IN ('recue', 'traitee', 'erreur')),
           cree_le             timestamptz NOT NULL DEFAULT now()
         );
+        -- Profil déduit de l'émetteur (classe sociale, orientation politique), particuliers compris.
+        -- Donnée sensible au sens du RGPD : visible de l'équipe seulement, jamais indexée ni montrée
+        -- aux militants, effacée avec la capture (donc avec la suppression par auteur).
+        ALTER TABLE aec_captures ADD COLUMN IF NOT EXISTS emetteur_profil jsonb;
         CREATE INDEX IF NOT EXISTS aec_captures_auteur ON aec_captures (auteur_identifiant);
         CREATE INDEX IF NOT EXISTS aec_captures_par ON aec_captures (capture_par, canal, cree_le DESC);
 
@@ -119,7 +123,32 @@ export class ArguStore {
           ('categorie', 'critique',  'Critique',    'Une attaque publique d''un opposant contre le programme', 2),
           ('categorie', 'objection', 'Objection',   'Ce qu''un électeur répond à un militant', 3),
           ('categorie', 'debunk',    'Vérification','Un démenti sourcé d''une affirmation fausse', 4),
-          ('categorie', 'fake_news', 'Fausse information', 'Une affirmation démentie par une source de vérification', 5)
+          ('categorie', 'fake_news', 'Fausse information', 'Une affirmation démentie par une source de vérification', 5),
+
+          -- Classe sociale de l'émetteur, calquée sur les catégories socioprofessionnelles de l'Insee.
+          -- « indetermine » n'est pas une entrée : c'est la valeur par défaut, toujours permise.
+          ('classe_sociale', 'ouvrier',                  'Ouvrier',                  'Ouvrier, y compris agricole, qualifié ou non', 1),
+          ('classe_sociale', 'employe',                  'Employé',                  'Employé du public ou du privé : commerce, services, administration, soin', 2),
+          ('classe_sociale', 'profession_intermediaire', 'Profession intermédiaire', 'Technicien, agent de maîtrise, enseignant du primaire, infirmier, travailleur social', 3),
+          ('classe_sociale', 'cadre',                    'Cadre',                    'Cadre et profession intellectuelle supérieure : ingénieur, profession libérale, enseignant du secondaire et du supérieur', 4),
+          ('classe_sociale', 'artisan_commercant',       'Artisan, commerçant',      'Indépendant à son compte, avec peu ou pas de salariés', 5),
+          ('classe_sociale', 'chef_entreprise',          'Chef d''entreprise',       'Dirigeant d''une entreprise de dix salariés ou plus', 6),
+          ('classe_sociale', 'agriculteur',              'Agriculteur exploitant',   'Exploitant agricole à son compte', 7),
+          ('classe_sociale', 'retraite',                 'Retraité',                 'Ancien actif à la retraite, quelle que soit sa profession passée', 8),
+          ('classe_sociale', 'etudiant',                 'Étudiant, lycéen',         'En formation initiale', 9),
+          ('classe_sociale', 'sans_emploi',              'Sans emploi',              'Chômeur ou personne sans activité professionnelle', 10),
+
+          -- Famille politique de l'émetteur, de la gauche vers la droite, puis hors de cet axe.
+          ('famille', 'extreme_gauche',       'Extrême gauche',       NULL, 1),
+          ('famille', 'gauche_radicale',      'Gauche radicale',      NULL, 2),
+          ('famille', 'ecologistes',          'Écologistes',          'Écologie politique', 3),
+          ('famille', 'sociaux_liberaux',     'Sociaux-libéraux',     NULL, 4),
+          ('famille', 'centre',               'Centre',               'Centre et centre-droit libéral', 5),
+          ('famille', 'droite_liberale',      'Droite libérale',      NULL, 6),
+          ('famille', 'droite_conservatrice', 'Droite conservatrice', 'Droite traditionnelle, conservatrice sur les questions de société', 7),
+          ('famille', 'extreme_droite',       'Extrême droite',       NULL, 8),
+          ('famille', 'souverainistes',       'Souverainistes',       'Priorité à la souveraineté nationale, de gauche comme de droite', 9),
+          ('famille', 'libertarien',          'Libertarien',          NULL, 10)
         ON CONFLICT (type, code) DO NOTHING;
       `)
       .then(() => undefined);
@@ -153,11 +182,22 @@ export class ArguStore {
     const { rows } = await this.pool.query(
       `SELECT id, source_type AS "sourceType", url, texte, auteur_nom AS "auteurNom",
               auteur_identifiant AS "auteurIdentifiant", publie_le AS "publieLe", extras, note,
-              capture_par AS "capturePar", canal, statut, cree_le AS "creeLe"
+              capture_par AS "capturePar", canal, statut, cree_le AS "creeLe",
+              emetteur_profil AS "emetteurProfil"
          FROM aec_captures WHERE id = $1`,
       [id],
     );
     return rows[0];
+  }
+
+  /** Enregistre (ou remplace, après correction par l'équipe) le profil de l'émetteur d'une capture. */
+  async enregistrerProfilEmetteur(captureId: string, profil: ProfilEmetteur): Promise<boolean> {
+    await this.init();
+    const { rowCount } = await this.pool.query(`UPDATE aec_captures SET emetteur_profil = $2 WHERE id = $1`, [
+      captureId,
+      JSON.stringify(profil),
+    ]);
+    return (rowCount ?? 0) > 0;
   }
 
   /** Captures faites par ce membre sur ce canal dans les dernières `heures` (quota par jeton). */
@@ -260,6 +300,28 @@ export interface CaptureRow {
   canal: Canal;
   statut: "recue" | "traitee" | "erreur";
   creeLe: Date;
+  emetteurProfil: ProfilEmetteur | null;
+}
+
+/**
+ * Un trait de l'émetteur. `indice` est l'extrait de la capture (texte ou champs auteur) qui fonde
+ * la déduction : sans indice retrouvé mot pour mot, le trait vaut « indetermine ». La déduction
+ * reste une hypothèse ; ce qui est déclaré prime, et la correction de l'équipe fait foi.
+ */
+export interface TraitEmetteur {
+  /** Code d'un référentiel (`classe_sociale` ou `famille`), ou « indetermine ». */
+  code: string;
+  justification: string;
+  indice: string | null;
+  origine: "declare" | "deduit" | "corrige";
+}
+
+export interface ProfilEmetteur {
+  classe_sociale: TraitEmetteur;
+  orientation: TraitEmetteur;
+  /** Modèle qui a fait la déduction, ou pseudonyme du relecteur qui l'a corrigée. */
+  modele: string;
+  evalue_le: string;
 }
 
 export interface Referentiel {

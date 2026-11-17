@@ -361,8 +361,17 @@ viendront la consolidation, l'interface de validation et les canaux de capture.
 
 - **Tables** (`src/argu/store.ts`, créées au premier usage) : `aec_captures` (contenu brut, gardé
   sans limite : ni `purge` ni `MEMORY_DAYS` ne s'y appliquent), `aec_affirmations`,
-  `aec_objections`, `aec_referentiels` (catégories `argument`, `critique`, `objection`, `debunk`,
-  `fake_news` livrées au départ) et `aec_jetons`.
+  `aec_objections`, `aec_referentiels` et `aec_jetons`. Référentiels livrés au départ, modifiables
+  ensuite (une entrée renommée ou désactivée n'est jamais écrasée) :
+  - catégories : `argument`, `critique`, `objection`, `debunk`, `fake_news` ;
+  - classes sociales (sur le modèle des catégories de l'Insee) : ouvrier, employé, profession
+    intermédiaire, cadre, artisan ou commerçant, chef d'entreprise, agriculteur, retraité, étudiant,
+    sans emploi ;
+  - familles politiques : extrême gauche, gauche radicale, écologistes, sociaux-libéraux, centre,
+    droite libérale, droite conservatrice, extrême droite, puis, hors de l'axe gauche-droite,
+    souverainistes et libertariens.
+
+  `indetermine` n'est pas une entrée : c'est la valeur par défaut d'un trait de l'émetteur.
 - **`/jeton`** (équipe seulement, en privé) : donne un jeton personnel pour l'extension, montré une
   seule fois ; seule son empreinte SHA-256 est stockée, avec le pseudonyme. Un nouveau `/jeton`
   invalide le précédent ; `/jeton revoquer` l'invalide sans le remplacer.
@@ -371,6 +380,19 @@ viendront la consolidation, l'interface de validation et les canaux de capture.
   (même URL normalisée, même texte aux espaces près), 401, 413 (texte de plus de 50 000
   caractères), 422 (avec le champ en cause), 429 (plus de `CAPTURE_MAX_PER_TOKEN` captures en 24 h).
   `GET /capture/config` renvoie les sélecteurs DOM de X et YouTube (`src/argu/selecteurs.ts`).
+- **Émetteur et argument** : la consolidation (étape 2) analysera à la fois l'argument (à quels
+  publics il parle) et son émetteur (classe sociale, orientation politique), **particuliers
+  compris**. Le profil de l'émetteur est rangé dans `aec_captures.emetteur_profil`, avec pour
+  chaque trait sa justification, l'extrait de la capture qui la fonde et son origine
+  (`declare`, `deduit`, `corrige`). Garde-fous prévus : sans extrait retrouvé mot pour mot dans la
+  capture, le trait vaut `indetermine` (jamais de déduction sur le seul nom) ; une appartenance
+  déclarée prime ; la correction de l'équipe fait foi ; le profil n'est jamais indexé, jamais montré
+  aux militants ni journalisé, et il est effacé avec les captures de l'auteur.
+
+  > ⚠️ **Risque juridique.** Une orientation politique attribuée à une personne identifiable est
+  > une donnée sensible au sens du RGPD (article 9), et les captures sont gardées sans limite. Ces
+  > mesures réduisent le risque sans valoir analyse juridique : **un avis juridique est recommandé
+  > avant la mise en service de la déduction pour les particuliers.**
 - **Mode programme protégé** : la catégorie `argumentaire` est exclue par défaut de
   `searchPassages`, et l'outil `recherche` de l'agent `aec` l'exclut explicitement. Un test
   d'intégration vérifie qu'une fiche indexée ne remonte jamais.
