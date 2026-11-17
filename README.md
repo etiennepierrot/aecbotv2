@@ -8,7 +8,7 @@ Sont faites les **étapes 1 à 3 de la feuille de route** : scan + index, agent 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Workflow `ingest` branché sur le WordPress, pgvector rempli | ✅ |
-| 2 | Agent `aec`, outil de recherche filtré, réponse vérifiée, scorers, 21 questions types | ✅ |
+| 2 | Agent `aec`, outil de recherche filtré, réponse vérifiée, scorers, 40 questions types | ✅ |
 | 3 | Bot Telegram (webhook, limite, mise en forme, mémoire 30 jours, /oublier) | ✅ |
 | 4 | `/ajouter`, `/docs`, `/supprimer` pour l'équipe, et `pnpm docs` en ligne de commande | ✅ |
 
@@ -23,7 +23,7 @@ pnpm db:up                    # Postgres 17 + pgvector
 pnpm ingest --limit 3         # essai sur 3 documents
 pnpm ingest                   # scan complet
 pnpm ask "Que dit le programme sur la retraite ?"
-pnpm evals                    # les 21 questions types, grille de décision (base et clés de .env)
+pnpm evals                    # les 40 questions types, grille de décision (base et clés de .env)
 pnpm evals:prod               # idem contre l'index de production (.env.production)
 pnpm evals:recherche          # la recherche seule, sans LLM : recall@k et MRR
 pnpm bot                      # le bot en local (long polling), avec TELEGRAM_BOT_TOKEN
@@ -164,6 +164,15 @@ question ─▶ agent aec ──▶ outil recherche (pgvector, édition 2027 par
 `evals/questions.json` : 17 questions dont la réponse est dans le corpus (sources et pages
 attendues relevées dans le corpus actuel ; pour le livre, les titres de section attendus), dont 1 sur un livret 2022 et 1 à laquelle les textes
 ne répondent qu'en partie (démission et Constituante), 3 hors corpus et 1 tentative de détournement.
+
+S'y ajoutent 19 questions `objection-*` : les critiques adressées au programme et au candidat,
+telles qu'un militant les entend. 15 portent sur le programme (chiffrage, dette, fiscalité,
+police, retraite, nucléaire, Ukraine, OTAN, Israël, antisémitisme) et attendent une réponse
+sourcée. Leurs sources viennent surtout de la publication d'octobre 2026 sur les comptes publics
+et des plans et livrets. Pour le livre, les titres de section ne sont donnés que là où ils sont
+déjà connus, sinon le document seul. 4 visent la personne ou la campagne (antisémitisme de
+Mélenchon, Jeune Garde, second tour, primaire) : le programme n'y répond pas, l'agent doit
+répondre « introuvable » sans improviser.
 
 ```bash
 pnpm evals --model mistral/mistral-small-latest --model openai/gpt-5-mini
@@ -365,7 +374,7 @@ la base de `.env`.
    `mastra deploy --env production --region eu --workers in-process --yes`, puis attend que
    `GET /status` renvoie le commit déployé (si la variable `PROD_URL` est définie).
 
-`.github/workflows/evals.yml` se lance à la main (onglet Actions) : les 21 questions types
+`.github/workflows/evals.yml` se lance à la main (onglet Actions) : les 40 questions types
 contre l'index de production, résultat dans le résumé du job et en artefact.
 
 Les secrets de l'application restent côté Mastra ; GitHub ne connaît que de quoi déployer.
