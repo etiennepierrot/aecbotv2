@@ -139,12 +139,16 @@ export class ArguStore {
           ('classe_sociale', 'sans_emploi',              'Sans emploi',              'Chômeur ou personne sans activité professionnelle', 10),
 
           -- Famille politique de l'émetteur, de la gauche vers la droite, puis hors de cet axe.
-          ('famille', 'extreme_gauche',    'Extrême gauche',    NULL, 1),
-          ('famille', 'gauche_radicale',   'Gauche radicale',   NULL, 2),
-          ('famille', 'sociaux_liberaux',  'Sociaux-libéraux',  NULL, 3),
-          ('famille', 'droite_liberale',   'Droite libérale',   NULL, 4),
-          ('famille', 'extreme_droite',    'Extrême droite',    NULL, 5),
-          ('famille', 'libertarien',       'Libertarien',       NULL, 6)
+          ('famille', 'extreme_gauche',       'Extrême gauche',       NULL, 1),
+          ('famille', 'gauche_radicale',      'Gauche radicale',      NULL, 2),
+          ('famille', 'ecologistes',          'Écologistes',          'Écologie politique', 3),
+          ('famille', 'sociaux_liberaux',     'Sociaux-libéraux',     NULL, 4),
+          ('famille', 'centre',               'Centre',               'Centre et centre-droit libéral', 5),
+          ('famille', 'droite_liberale',      'Droite libérale',      NULL, 6),
+          ('famille', 'droite_conservatrice', 'Droite conservatrice', 'Droite traditionnelle, conservatrice sur les questions de société', 7),
+          ('famille', 'extreme_droite',       'Extrême droite',       NULL, 8),
+          ('famille', 'souverainistes',       'Souverainistes',       'Priorité à la souveraineté nationale, de gauche comme de droite', 9),
+          ('famille', 'libertarien',          'Libertarien',          NULL, 10)
         ON CONFLICT (type, code) DO NOTHING;
       `)
       .then(() => undefined);

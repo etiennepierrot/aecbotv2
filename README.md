@@ -358,8 +358,9 @@ viendront la consolidation, l'interface de validation et les canaux de capture.
   - classes sociales (sur le modèle des catégories de l'Insee) : ouvrier, employé, profession
     intermédiaire, cadre, artisan ou commerçant, chef d'entreprise, agriculteur, retraité, étudiant,
     sans emploi ;
-  - familles politiques : extrême gauche, gauche radicale, sociaux-libéraux, droite libérale,
-    extrême droite, libertarien.
+  - familles politiques : extrême gauche, gauche radicale, écologistes, sociaux-libéraux, centre,
+    droite libérale, droite conservatrice, extrême droite, puis, hors de l'axe gauche-droite,
+    souverainistes et libertariens.
 
   `indetermine` n'est pas une entrée : c'est la valeur par défaut d'un trait de l'émetteur.
 - **`/jeton`** (équipe seulement, en privé) : donne un jeton personnel pour l'extension, montré une

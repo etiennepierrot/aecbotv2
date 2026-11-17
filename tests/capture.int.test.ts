@@ -139,7 +139,8 @@ describe.skipIf(!DB)("route /capture", () => {
       "chef_entreprise", "agriculteur", "retraite", "etudiant", "sans_emploi",
     ]);
     expect((await store.referentiel("famille")).map((r) => r.libelle)).toEqual([
-      "Extrême gauche", "Gauche radicale", "Sociaux-libéraux", "Droite libérale", "Extrême droite", "Libertarien",
+      "Extrême gauche", "Gauche radicale", "Écologistes", "Sociaux-libéraux", "Centre", "Droite libérale",
+      "Droite conservatrice", "Extrême droite", "Souverainistes", "Libertarien",
     ]);
     // Une entrée renommée ou désactivée par l'équipe n'est pas écrasée au redémarrage.
     await pool.query("UPDATE aec_referentiels SET libelle = 'Ouvrière, ouvrier', actif = false WHERE code = 'ouvrier'");
