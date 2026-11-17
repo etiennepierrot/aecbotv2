@@ -148,7 +148,47 @@ export class ArguStore {
           ('famille', 'droite_conservatrice', 'Droite conservatrice', 'Droite traditionnelle, conservatrice sur les questions de société', 7),
           ('famille', 'extreme_droite',       'Extrême droite',       NULL, 8),
           ('famille', 'souverainistes',       'Souverainistes',       'Priorité à la souveraineté nationale, de gauche comme de droite', 9),
-          ('famille', 'libertarien',          'Libertarien',          NULL, 10)
+          ('famille', 'libertarien',          'Libertarien',          NULL, 10),
+
+          -- Publics : à qui parle l'argument (profils de terrain), quel que soit son émetteur.
+          ('public', 'quartiers_populaires', 'Quartiers populaires',          'Habitants des grands ensembles urbains', 1),
+          ('public', 'rural_periurbain',     'Rural et périurbain',           'Dépendance à la voiture, éloignement des services publics', 2),
+          ('public', 'jeunes',               'Jeunes',                        'Étudiants, lycéens, primo-votants, précarité d''entrée dans la vie active', 3),
+          ('public', 'retraites',            'Retraités',                     'Niveau des pensions, santé, dépendance', 4),
+          ('public', 'salaries_modestes',    'Salariés modestes',             'Smic, temps partiel, emplois pénibles', 5),
+          ('public', 'classes_moyennes',     'Classes moyennes salariées',    'Fiscalité, logement, école', 6),
+          ('public', 'fonctionnaires',       'Fonctionnaires et agents publics', 'Salaires, conditions de travail, sens du service public', 7),
+          ('public', 'independants',         'Indépendants et petits patrons', 'Charges, trésorerie, concurrence des grands groupes', 8),
+          ('public', 'agriculteurs',         'Agriculteurs',                  'Revenus, normes, libre-échange', 9),
+          ('public', 'abstentionnistes',     'Abstentionnistes et déçus',     'Défiance envers les institutions et les partis', 10),
+
+          -- Thèmes, alignés sur les grands chapitres du programme pour le rapprochement avec ses passages.
+          ('theme', 'salaires_pouvoir_achat', 'Salaires et pouvoir d''achat', NULL, 1),
+          ('theme', 'retraites',              'Retraites',                    NULL, 2),
+          ('theme', 'fiscalite',              'Fiscalité et partage des richesses', NULL, 3),
+          ('theme', 'dette_finances',         'Dette et finances publiques',  NULL, 4),
+          ('theme', 'services_publics',       'Services publics',             'Santé, école, transports', 5),
+          ('theme', 'logement',               'Logement',                     NULL, 6),
+          ('theme', 'ecologie_planification', 'Écologie et planification',    NULL, 7),
+          ('theme', 'energie',                'Énergie',                      NULL, 8),
+          ('theme', 'institutions',           'Institutions et 6e République', NULL, 9),
+          ('theme', 'securite_justice',       'Sécurité et justice',          NULL, 10),
+          ('theme', 'immigration',            'Immigration',                  NULL, 11),
+          ('theme', 'europe_international',   'Europe et international',      NULL, 12),
+          ('theme', 'travail_emploi',         'Travail et emploi',            NULL, 13),
+          ('theme', 'agriculture_alimentation', 'Agriculture et alimentation', NULL, 14),
+
+          -- Registres : la façon dont l'argument cherche à convaincre.
+          ('registre', 'cout_faisabilite',     'Coût et faisabilité',          '« C''est infinançable », « qui va payer »', 1),
+          ('registre', 'pouvoir_achat',        'Pouvoir d''achat et vie quotidienne', 'Prix, factures, plein d''essence', 2),
+          ('registre', 'peur_menace',          'Peur et menace',               'Fuite des capitaux, chaos, effondrement', 3),
+          ('registre', 'valeurs_morale',       'Valeurs et morale',            'Mérite, travail, justice, assistanat', 4),
+          ('registre', 'identite',             'Identité et appartenance',     'Nation, culture, « eux et nous »', 5),
+          ('registre', 'securite_ordre',       'Sécurité et ordre',            NULL, 6),
+          ('registre', 'expertise_chiffres',   'Expertise et chiffres',        'Appel à des études, des économistes, des institutions', 7),
+          ('registre', 'attaque_personnelle',  'Attaque personnelle',          'Vise une personne, pas la mesure', 8),
+          ('registre', 'defiance',             'Défiance générale',            '« Tous les mêmes », « promesses jamais tenues »', 9),
+          ('registre', 'comparaison_etrangere','Comparaison étrangère',        'Venezuela, Grèce, ou au contraire pays nordiques', 10)
         ON CONFLICT (type, code) DO NOTHING;
       `)
       .then(() => undefined);

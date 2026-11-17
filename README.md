@@ -369,7 +369,15 @@ viendront la consolidation, l'interface de validation et les canaux de capture.
     sans emploi ;
   - familles politiques : extrême gauche, gauche radicale, écologistes, sociaux-libéraux, centre,
     droite libérale, droite conservatrice, extrême droite, puis, hors de l'axe gauche-droite,
-    souverainistes et libertariens.
+    souverainistes et libertariens ;
+  - publics (à qui parle l'argument) : quartiers populaires, rural et périurbain, jeunes,
+    retraités, salariés modestes, classes moyennes salariées, fonctionnaires, indépendants et petits
+    patrons, agriculteurs, abstentionnistes et déçus ;
+  - thèmes, alignés sur les chapitres du programme (salaires, retraites, fiscalité, dette, services
+    publics, logement, écologie, énergie, institutions, sécurité, immigration, Europe, travail,
+    agriculture) ;
+  - registres : coût et faisabilité, pouvoir d'achat, peur, valeurs, identité, sécurité, expertise
+    et chiffres, attaque personnelle, défiance générale, comparaison étrangère.
 
   `indetermine` n'est pas une entrée : c'est la valeur par défaut d'un trait de l'émetteur.
 - **`/jeton`** (équipe seulement, en privé) : donne un jeton personnel pour l'extension, montré une
