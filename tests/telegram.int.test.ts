@@ -7,7 +7,7 @@ import { Pool } from "pg";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { RepondreResult } from "../src/aec/repondre.js";
 import { INTROUVABLE_TEXTE } from "../src/aec/types.js";
-import { ADMIN_MESSAGES, createBot, MAX_AVIS_PAR_JOUR, MESSAGES } from "../src/telegram/bot.js";
+import { ADMIN_MESSAGES, createBot, JETON_MESSAGES, MAX_AVIS_PAR_JOUR, MESSAGES } from "../src/telegram/bot.js";
 import { openChatId, pseudonymize, sealChatId } from "../src/telegram/privacy.js";
 import { telegramWebhookHandler } from "../src/telegram/runtime.js";
 import { BotStore } from "../src/telegram/store.js";
@@ -385,10 +385,21 @@ describe.skipIf(!DB)("bot Telegram", () => {
         return new Uint8Array([1, 2, 3]);
       },
     };
+    const argu = {
+      creerJeton: async (pseudo: string) => {
+        calls.push({ op: "creerJeton", args: pseudo });
+        return "aec_jetonSecret";
+      },
+      revoquerJetons: async (pseudo: string) => {
+        calls.push({ op: "revoquerJetons", args: pseudo });
+        return 1;
+      },
+    };
     const makeAdminBot = () => {
       const bot = createBot("123:TEST", {
         repondre: async () => nextAnswer(), store, pseudonymSecret: SECRET, ratePerHour: 100, memoryDays: 30,
-        team: new Set([TEAM_ID]), admin,
+        team: new Set([TEAM_ID]), admin, argu,
+        logger: { info: (msg, meta) => logs.push({ msg, meta }), error: (msg, meta) => logs.push({ msg, meta }) },
       }, botInfo);
       bot.api.config.use(async (_prev, method, payload) => {
         sent.push({ method, payload });
@@ -407,11 +418,23 @@ describe.skipIf(!DB)("bot Telegram", () => {
 
     it("refuse les commandes d'équipe à un militant", async () => {
       const bot = makeAdminBot();
-      for (const cmd of ["/ajouter https://x.fr/a.pdf Titre", "/docs", "/supprimer 3f2a9c1b"]) {
+      for (const cmd of ["/ajouter https://x.fr/a.pdf Titre", "/docs", "/supprimer 3f2a9c1b", "/jeton", "/jeton revoquer"]) {
         await bot.handleUpdate(from(USER_ID, cmd) as never);
         expect(replies().at(-1)).toBe(ADMIN_MESSAGES.reserve);
       }
       expect(calls).toEqual([]);
+    });
+
+    it("/jeton : un jeton pour l'extension, rattaché au pseudonyme, jamais journalisé ; /jeton revoquer", async () => {
+      const bot = makeAdminBot();
+      await bot.handleUpdate(from(TEAM_ID, "/jeton") as never);
+      expect(calls).toEqual([{ op: "creerJeton", args: pseudonymize(TEAM_ID, SECRET) }]);
+      expect(replies().at(-1)).toBe(JETON_MESSAGES.nouveau("aec_jetonSecret"));
+      expect(replies().at(-1)).toContain("<code>aec_jetonSecret</code>");
+      expect(JSON.stringify(logs)).not.toContain("aec_jeton");
+      await bot.handleUpdate(from(TEAM_ID, "/jeton révoquer") as never);
+      expect(calls.at(-1)).toEqual({ op: "revoquerJetons", args: pseudonymize(TEAM_ID, SECRET) });
+      expect(replies().at(-1)).toBe(JETON_MESSAGES.revoque(1));
     });
 
     it("/ajouter : un lien, un texte, et l'aide si la commande est incomplète", async () => {

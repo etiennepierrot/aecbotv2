@@ -37,6 +37,18 @@ const Env = z.object({
   SUITES_MIN_SCORE: z.coerce.number().min(0).max(1).default(0.8),
   /** Protège les routes /api/* (Studio, agents, workflows) une fois déployé. */
   ADMIN_API_TOKEN: z.string().optional(),
+
+  // --- Argumentaire : captures et consolidation -------------------------------------------
+  /** Modèle d'extraction et d'évaluation des affirmations (vide : le modèle de réponse par défaut). */
+  CONSOLIDATION_MODEL: z.string().optional(),
+  /** Modèle de vision qui transcrit les captures d'écran. */
+  CONSOLIDATION_VISION_MODEL: z.string().optional(),
+  /** Captures consolidées au plus par jour, toutes sources confondues : garde-fou des collectes automatiques. */
+  CONSOLIDATION_MAX_PER_DAY: z.coerce.number().int().positive().default(50),
+  /** Captures acceptées par jeton d'extension sur 24 heures glissantes. */
+  CAPTURE_MAX_PER_TOKEN: z.coerce.number().int().positive().default(100),
+  /** Adresse publique du serveur, pour les liens envoyés sur Telegram (interface /admin). */
+  ADMIN_BASE_URL: z.string().url().optional(),
 });
 
 export type AppConfig = z.infer<typeof Env>;

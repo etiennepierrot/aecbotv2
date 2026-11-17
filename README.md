@@ -11,6 +11,8 @@ Sont faites les **étapes 1 à 3 de la feuille de route** : scan + index, agent 
 | 2 | Agent `aec`, outil de recherche filtré, réponse vérifiée, scorers, 21 questions types | ✅ |
 | 3 | Bot Telegram (webhook, limite, mise en forme, mémoire 30 jours, /oublier) | ✅ |
 | 4 | `/ajouter`, `/docs`, `/supprimer` pour l'équipe, et `pnpm docs` en ligne de commande | ✅ |
+| Argu 1 | Argumentaire : tables, `POST /capture`, `/jeton`, catégorie `argumentaire` exclue du mode programme | ✅ |
+| Argu 2–6 | Consolidation, interface `/admin`, `/capter`, extension, collectes automatiques | à venir |
 
 ## Démarrer en local
 
@@ -343,6 +345,32 @@ Après le déploiement, `pnpm webhook:prod <URL>` met à jour le menu des comman
 n'importe qui pourrait appeler l'agent à vos frais ou lancer un ajout manuel. `/telegram` reste
 public, protégé par le secret du webhook.
 
+## Argumentaire : captures
+
+Première étape de la spec « collecte et consolidation d'argumentaires » : le socle sur lequel
+viendront la consolidation, l'interface de validation et les canaux de capture.
+
+- **Tables** (`src/argu/store.ts`, créées au premier usage) : `aec_captures` (contenu brut, gardé
+  sans limite : ni `purge` ni `MEMORY_DAYS` ne s'y appliquent), `aec_affirmations`,
+  `aec_objections`, `aec_referentiels` (catégories `argument`, `critique`, `objection`, `debunk`,
+  `fake_news` livrées au départ) et `aec_jetons`.
+- **`/jeton`** (équipe seulement, en privé) : donne un jeton personnel pour l'extension, montré une
+  seule fois ; seule son empreinte SHA-256 est stockée, avec le pseudonyme. Un nouveau `/jeton`
+  invalide le précédent ; `/jeton revoquer` l'invalide sans le remplacer.
+- **`POST /capture`** : route publique comme `/telegram`, protégée par ce jeton
+  (`Authorization: Bearer …`). 201 à la première réception, 200 avec le même `id` pour un doublon
+  (même URL normalisée, même texte aux espaces près), 401, 413 (texte de plus de 50 000
+  caractères), 422 (avec le champ en cause), 429 (plus de `CAPTURE_MAX_PER_TOKEN` captures en 24 h).
+  `GET /capture/config` renvoie les sélecteurs DOM de X et YouTube (`src/argu/selecteurs.ts`).
+- **Mode programme protégé** : la catégorie `argumentaire` est exclue par défaut de
+  `searchPassages`, et l'outil `recherche` de l'agent `aec` l'exclut explicitement. Un test
+  d'intégration vérifie qu'une fiche indexée ne remonte jamais.
+
+```bash
+curl -X POST https://<serveur>/capture -H "Authorization: Bearer aec_…" -H 'content-type: application/json' \
+  -d '{"source_type":"x","url":"https://x.com/compte/status/123","texte":"Texte complet du post"}'
+```
+
 ## Tests
 
 ```bash
@@ -427,6 +455,10 @@ src/
 │  ├─ embed.ts               embeddings (Mistral ou OpenRouter)
 │  ├─ store.ts               registre aec_documents + index pgvector
 │  └─ deps.ts                assemblage (remplaçable en test)
+├─ argu/                     argumentaire : captures, jetons, tables
+│  ├─ capture.ts             enregistrerCapture() : validation, dédoublonnage
+│  ├─ jetons.ts              jetons de l'extension (empreinte seule)
+│  └─ store.ts               tables aec_captures, aec_affirmations…
 ├─ telegram/                 le bot
 │  ├─ bot.ts                 commandes, questions, limite
 │  ├─ format.ts              message HTML, titres lisibles
@@ -436,6 +468,7 @@ src/
 └─ mastra/
    ├─ index.ts               instance Mastra
    ├─ agents/aec.ts          instructions, modèle
+   ├─ routes/capture.ts      POST /capture, GET /capture/config
    ├─ tools/recherche.ts     outil de recherche
    ├─ scorers/index.ts       citations, statut, source attendue, fidélité
    └─ workflows/             ingest, purge

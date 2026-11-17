@@ -11,8 +11,16 @@ export const CATEGORIES = [
   "ajout_manuel",
   "archive",
   "autre",
+  /** Fiches d'argumentaire validées par l'équipe : jamais montrées à l'agent `aec` (mode programme). */
+  "argumentaire",
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
+
+/**
+ * Catégories du mode programme : tout sauf l'argumentaire. C'est le filtre par défaut de la
+ * recherche ; le futur mode `argu` passera explicitement `["argumentaire"]`.
+ */
+export const CATEGORIES_PROGRAMME: Category[] = CATEGORIES.filter((c) => c !== "argumentaire");
 
 /**
  * Édition du programme. Tant que le programme 2027 n'est pas publié, l'édition 2022

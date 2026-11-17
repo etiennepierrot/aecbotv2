@@ -3,6 +3,7 @@ import { z } from "zod";
 import { COLLECTOR_KEY, PassageCollector } from "../../aec/collector.js";
 import { searchPassages } from "../../aec/search.js";
 import type { ReferencedPassage } from "../../aec/types.js";
+import { CATEGORIES_PROGRAMME } from "../../corpus/types.js";
 
 const CATEGORY_LABELS: Record<string, string> = {
   programme: "programme général",
@@ -44,7 +45,9 @@ export const rechercheTool = createTool({
       (context?.requestContext?.get(COLLECTOR_KEY as never) as PassageCollector | undefined) ?? new PassageCollector();
     let found;
     try {
-      found = await searchPassages({ requete, edition });
+      // Explicite, en plus du défaut de searchPassages : les fiches d'argumentaire ne doivent jamais
+      // nourrir une réponse du mode programme.
+      found = await searchPassages({ requete, edition, categories: CATEGORIES_PROGRAMME });
     } catch (e) {
       // Noté pour repondre(), qui en fera une erreur : sans ça, la panne passerait pour « introuvable ».
       // On ne relance pas l'exception : le modèle réessaierait jusqu'à maxSteps pour rien.

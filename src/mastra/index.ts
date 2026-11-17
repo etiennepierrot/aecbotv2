@@ -13,6 +13,7 @@ import { aecAgent } from "./agents/aec.js";
 import { scorers } from "./scorers/index.js";
 import { ingestDocumentWorkflow, ingestWorkflow } from "./workflows/ingest.js";
 import { purgeWorkflow } from "./workflows/purge.js";
+import { captureRoutes } from "./routes/capture.js";
 
 const cfg = config();
 const logger = new PinoLogger({ name: "aecbot", level: "info" });
@@ -41,9 +42,13 @@ const statusRoute = registerApiRoute("/status", {
   },
 });
 
+// Captures de l'argumentaire : actives même sans bot (l'extension n'en dépend pas).
+const routesCapture = captureRoutes({ error: (msg, meta) => logger.error(msg, meta) });
+
 const apiRoutes = cfg.TELEGRAM_BOT_TOKEN
   ? [
       statusRoute,
+      ...routesCapture,
       registerApiRoute("/telegram", {
         method: "POST",
         createHandler: async ({ mastra }) => {
@@ -56,7 +61,7 @@ const apiRoutes = cfg.TELEGRAM_BOT_TOKEN
         },
       }),
     ]
-  : [statusRoute];
+  : [statusRoute, ...routesCapture];
 
 /**
  * Même base que le stockage principal, sous un autre nom d'application. Mastra conseille une
@@ -114,11 +119,11 @@ export const mastra = new Mastra({
   server: {
     apiRoutes,
     // En production, /api/* (Studio, agents, workflows) exige ce jeton ; /telegram reste public,
-    // protégé par le secret du webhook.
+    // protégé par le secret du webhook, et /capture par le jeton personnel de chaque membre.
     ...(cfg.ADMIN_API_TOKEN
       ? { auth: new SimpleAuth({
             tokens: { [cfg.ADMIN_API_TOKEN]: { id: "equipe", name: "Équipe AECBot" } },
-            public: ["/telegram", "/status"],
+            public: ["/telegram", "/status", "/capture", "/capture/config"],
           }), }
       : {}),
   },

@@ -18,6 +18,8 @@ export interface BotDeps {
   /** Identifiants Telegram de l'équipe : seuls eux peuvent /ajouter, /docs, /supprimer. */
   team?: Set<number>;
   admin?: AdminOps;
+  /** Jetons de l'extension de capture (src/argu/jetons.ts en production). */
+  argu?: ArguOps;
   logger?: { info: (msg: string, meta?: object) => void; error: (msg: string, meta?: object) => void };
 }
 
@@ -75,6 +77,24 @@ export interface AdminOps {
   telecharger(fileId: string): Promise<Uint8Array>;
 }
 
+/** Jetons personnels de l'extension de capture, rattachés au pseudonyme du membre. */
+export interface ArguOps {
+  creerJeton(pseudo: string): Promise<string>;
+  revoquerJetons(pseudo: string): Promise<number>;
+}
+
+export const JETON_MESSAGES = {
+  nouveau: (jeton: string) =>
+    [
+      "🔑 <b>Ton jeton pour l'extension de capture</b>",
+      `<code>${escapeHtml(jeton)}</code>`,
+      "Colle-le une fois dans les réglages de l'extension. Il n'est pas conservé en clair : je ne pourrai pas te le redonner.",
+      "Ton jeton précédent, s'il y en avait un, ne marche plus. <code>/jeton revoquer</code> l'invalide si tu le perds.",
+      "<i>Tu peux supprimer ce message une fois le jeton copié.</i>",
+    ].join("\n\n"),
+  revoque: (n: number) => (n ? "Jeton révoqué : l'extension ne peut plus envoyer de captures en ton nom." : "Tu n'avais aucun jeton actif."),
+};
+
 export const ADMIN_MESSAGES = {
   reserve: "Cette commande est réservée à l'équipe.",
   aide: [
@@ -84,6 +104,8 @@ export const ADMIN_MESSAGES = {
     "• un texte : <code>/ajouter Titre du document</code>, puis le texte sur les lignes suivantes, dans le même message",
     "",
     "/docs liste les documents ajoutés ; <code>/supprimer identifiant</code> en retire un.",
+    "",
+    "<b>Extension de capture</b> : /jeton te donne ton jeton personnel ; <code>/jeton revoquer</code> l'invalide.",
     "",
     "<b>Avis des militants</b> : chaque avis t'arrive ici. Réponds au message (ou <code>/repondre numéro texte</code>) pour répondre à la personne.",
     "Le document est utilisable tout de suite, sans relecture : vérifie-le avant de l'ajouter.",
@@ -255,6 +277,25 @@ export function createBot(token: string, deps: BotDeps, botInfo?: UserFromGetMe)
       await ctx.reply("Réponse non envoyée : la personne a peut-être bloqué le bot.");
     }
   };
+
+  // --- Jetons de l'extension de capture (équipe seulement) -------------------------------
+  bot.command("jeton", async (ctx) => {
+    const pseudo = pseudoOf(ctx, deps);
+    if (!pseudo || !deps.team?.has(ctx.from!.id) || !deps.argu) return void (await ctx.reply(ADMIN_MESSAGES.reserve));
+    try {
+      if (/^r[ée]voquer$/i.test(String(ctx.match ?? "").trim())) {
+        const n = await deps.argu.revoquerJetons(pseudo);
+        log?.info("jeton révoqué", { pseudo, n });
+        return void (await ctx.reply(JETON_MESSAGES.revoque(n)));
+      }
+      const jeton = await deps.argu.creerJeton(pseudo);
+      // Jamais le jeton dans le journal : seulement qu'un jeton a été créé, et pour qui.
+      log?.info("jeton créé", { pseudo });
+      await ctx.reply(JETON_MESSAGES.nouveau(jeton), { parse_mode: "HTML" });
+    } catch (e) {
+      await adminError(ctx, e);
+    }
+  });
 
   // « /repondre 12 texte » : pour répondre sans passer par la notification.
   bot.command("repondre", async (ctx) => {
