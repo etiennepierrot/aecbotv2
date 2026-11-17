@@ -230,6 +230,44 @@ describe.skipIf(!DB)("workflow ingest (Postgres réel)", () => {
     expect((await searchPassages({ requete: rows[0].text, categories: ["livret"] })).every((h) => h.category === "livret")).toBe(true);
   });
 
+  it("recherche : une fiche d'argumentaire ne remonte jamais dans le mode programme", async () => {
+    const deps = await import("../src/corpus/deps.js");
+    const { textSearchFrom } = await import("../src/corpus/fulltext.js");
+    deps.setRetrievalDeps({ embedder, vector: deps.pgVector(), textSearch: textSearchFrom(deps.pgVector()) });
+    const { searchPassages } = await import("../src/aec/search.js");
+    const { rechercheTool } = await import("../src/mastra/tools/recherche.js");
+    // Le texte exact de la requête : avec l'embedder simulé, c'est le passage le plus proche possible.
+    const texte = "Objection : la retraite a 60 ans coute trop cher. Reponse courte de l'equipe.";
+    const [vecteur] = await embedder.embed([texte]);
+    await deps.pgVector().upsert({
+      indexName: PASSAGES_INDEX,
+      vectors: [vecteur!],
+      ids: ["argu:obj:test#0#0"],
+      metadata: [{
+        docId: "argu:obj:test", title: "Objection test", url: "", page: null, section: null, category: "argumentaire",
+        corpus: "aec2027", origin: "manuel", modified: "", provisional: false, text: texte,
+      }],
+    });
+    try {
+      const parDefaut = await searchPassages({ requete: texte, elargir: false });
+      expect(parDefaut.length).toBeGreaterThan(0);
+      expect(parDefaut.some((h) => h.category === "argumentaire")).toBe(false);
+
+      const outil = (await rechercheTool.execute!({ requete: texte, edition: "toutes" }, {} as never)) as {
+        passages: { category: string }[];
+      };
+      expect(outil.passages.length).toBeGreaterThan(0);
+      expect(outil.passages.some((p) => p.category === "argumentaire")).toBe(false);
+
+      // Le futur mode argu la trouve en la demandant explicitement.
+      const argu = await searchPassages({ requete: texte, categories: ["argumentaire"], elargir: false });
+      expect(argu[0]).toMatchObject({ docId: "argu:obj:test", category: "argumentaire" });
+    } finally {
+      await deps.pgVector().deleteVectors({ indexName: PASSAGES_INDEX, filter: { docId: { $eq: "argu:obj:test" } } as never });
+      deps.setRetrievalDeps({ embedder, vector: deps.pgVector() });
+    }
+  });
+
   it("recherche hybride : un mot exact de la question remonte son passage, même loin par le sens", async () => {
     const deps = await import("../src/corpus/deps.js");
     const { textSearchFrom } = await import("../src/corpus/fulltext.js");

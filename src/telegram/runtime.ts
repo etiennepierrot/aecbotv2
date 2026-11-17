@@ -9,6 +9,8 @@ import { mastraFeedbackSink } from "./feedback.js";
 import { cloudExporter } from "../mastra/cloud-exporter.js";
 import { ajouterDocument, listerDocuments, MAX_PDF_BYTES, supprimerDocument } from "../corpus/manual.js";
 import { BotStore } from "./store.js";
+import { arguStore } from "../argu/deps.js";
+import { creerJeton } from "../argu/jetons.js";
 
 let store: BotStore | undefined;
 export function botStore(): BotStore {
@@ -33,6 +35,10 @@ export function botFromEnv(logger?: Parameters<typeof createBot>[1]["logger"], m
     memoryDays: cfg.MEMORY_DAYS,
     feedback: mastra ? mastraFeedbackSink(mastra, cloudExporter) : undefined,
     team: cfg.TEAM_TELEGRAM_IDS,
+    argu: {
+      creerJeton: (pseudo) => creerJeton(arguStore(), pseudo),
+      revoquerJetons: (pseudo) => arguStore().revoquerJetons(pseudo),
+    },
     admin: mastra
       ? {
           ajouter: (a) => ajouterDocument(mastra, a),

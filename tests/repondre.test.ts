@@ -2,6 +2,7 @@
  * L'agent de bout en bout avec un modèle simulé et une recherche simulée :
  * on vérifie le câblage outil → collecteur → vérification, sans réseau ni base.
  */
+import { CATEGORIES_PROGRAMME } from "../src/corpus/types.js";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { RetrievedPassage } from "../src/aec/types.js";
 import type { EvalQuestion } from "../src/aec/evals.js";
@@ -64,7 +65,13 @@ describe("repondre", () => {
     // Chaque appel du modèle est plafonné : une question détournée ne peut pas coûter des milliers de jetons.
     expect(model.calls.map((c) => c.maxOutputTokens)).toEqual([1000, 1000]);
     // Par défaut : une requête par édition de EDITIONS (2027 puis 2022), chacune avec son quota.
-    expect(queries.slice(-2).map((q) => q.filter)).toEqual([{ corpus: { $eq: "aec2027" } }, { corpus: { $eq: "aec2022" } }]);
+    // Le mode programme exclut toujours les fiches d'argumentaire.
+    const programme = { category: { $in: CATEGORIES_PROGRAMME } };
+    expect(queries.slice(-2).map((q) => q.filter)).toEqual([
+      { corpus: { $eq: "aec2027" }, ...programme },
+      { corpus: { $eq: "aec2022" }, ...programme },
+    ]);
+    expect(CATEGORIES_PROGRAMME).not.toContain("argumentaire");
   });
 
   describe("réponse partielle : contrôle de l'objet de la question", () => {
@@ -166,7 +173,7 @@ describe("repondre", () => {
     });
     const res = await repondre("Que disait l'édition 2022 sur la retraite ?", { model });
     expect(res.reponse.statut).toBe("introuvable");
-    expect(queries.at(-1)?.filter).toEqual({ corpus: { $eq: "aec2022" } });
+    expect(queries.at(-1)?.filter).toEqual({ corpus: { $eq: "aec2022" }, category: { $in: CATEGORIES_PROGRAMME } });
   });
 
   it("transmet l'historique pour les questions de suite", async () => {

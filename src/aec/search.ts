@@ -1,12 +1,13 @@
 import { config, PASSAGES_INDEX } from "../config.js";
 import { retrievalDeps } from "../corpus/deps.js";
-import type { Category, Corpus } from "../corpus/types.js";
+import { CATEGORIES_PROGRAMME, type Category, type Corpus } from "../corpus/types.js";
 import type { RetrievedPassage } from "./types.js";
 
 export interface SearchParams {
   requete: string;
   /** Une édition précise, ou toutes celles de EDITIONS (par défaut). */
   edition?: Corpus | "toutes";
+  /** Par défaut, toutes les catégories du programme : l'argumentaire n'en fait jamais partie. */
   categories?: Category[];
   /** Nombre de passages tirés de l'index, avant regroupement par page. */
   topK?: number;
@@ -39,7 +40,7 @@ const MAX_PAR_MOTS = 3;
 export async function searchPassages({
   requete,
   edition = "toutes",
-  categories,
+  categories = CATEGORIES_PROGRAMME,
   topK = 10,
   elargir = true,
 }: SearchParams): Promise<RetrievedPassage[]> {
@@ -58,7 +59,7 @@ export async function searchPassages({
     editions.map(async (ed, i) => {
       const quota = quotas[i]!;
       const filter: Record<string, unknown> = { corpus: { $eq: ed } };
-      if (categories?.length) filter.category = { $in: categories };
+      if (categories.length) filter.category = { $in: categories };
       const [parSens, parMots] = await Promise.all([
         vector.query({ indexName: PASSAGES_INDEX, queryVector, topK: quota, filter: filter as never }),
         textSearch ? textSearch({ requete, queryVector, corpus: ed, categories, topK: quota }) : Promise.resolve([]),

@@ -9,7 +9,8 @@ const purger = createStep({
   id: "purger",
   description:
     "Efface les conversations plus anciennes que MEMORY_DAYS, les compteurs expirés, et (rétention " +
-    "du stockage Mastra) les traces, votes et exécutions de workflows du même âge.",
+    "du stockage Mastra) les traces, votes et exécutions de workflows du même âge. Les captures de " +
+    "l'argumentaire n'en font pas partie : elles sont gardées sans limite (suppression explicite seulement).",
   inputSchema: z.object({}),
   outputSchema: out,
   execute: async ({ mastra }) => {
