@@ -1,0 +1,116 @@
+[
+  {
+    "id": "argu-chiffrage",
+    "question": "Un collègue me dit que le programme de Mélenchon est infinançable. Que lui répondre ?",
+    "attendu": "repondu",
+    "fiche": "Le programme n'est pas chiffré, il va creuser la dette"
+  },
+  {
+    "id": "argu-coupes",
+    "question": "Ma voisine pense qu'il suffirait de faire des économies sur l'État. Comment lui répondre ?",
+    "attendu": "repondu",
+    "fiche": "Il faut couper dans les dépenses publiques pour réduire le déficit"
+  },
+  {
+    "id": "argu-dette",
+    "question": "On m'a dit que ne pas rembourser la dette, c'est la faillite assurée. Que dire ?",
+    "attendu": "repondu",
+    "fiche": "LFI veut annuler la dette, c'est impossible avec l'Europe"
+  },
+  {
+    "id": "argu-classes-moyennes",
+    "question": "Un prof me dit qu'avec LFI il paiera beaucoup plus d'impôts. Que répondre ?",
+    "attendu": "repondu",
+    "fiche": "Avec 14 tranches d'impôt, les classes moyennes vont payer"
+  },
+  {
+    "id": "argu-heritage",
+    "question": "Un retraité a peur qu'on prenne la maison qu'il veut laisser à ses enfants. Que lui dire ?",
+    "attendu": "repondu",
+    "fiche": "LFI veut confisquer les héritages"
+  },
+  {
+    "id": "argu-exil-fiscal",
+    "question": "Comment répondre à quelqu'un qui dit que les riches vont tous partir en Suisse ?",
+    "attendu": "repondu",
+    "fiche": "Si on taxe les riches, ils partiront à l'étranger"
+  },
+  {
+    "id": "argu-entreprises",
+    "question": "Un artisan me dit que Mélenchon va couler les petites boîtes. Quoi répondre ?",
+    "attendu": "repondu",
+    "fiche": "Le programme est contre les entreprises"
+  },
+  {
+    "id": "argu-epargne",
+    "question": "On me dit que Mélenchon va piquer l'argent des livrets A. C'est vrai ?",
+    "attendu": "repondu",
+    "fiche": "Mélenchon veut contrôler l'épargne des Français"
+  },
+  {
+    "id": "argu-police",
+    "question": "Une électrice me dit que LFI est anti-flics. Que lui répondre ?",
+    "attendu": "repondu",
+    "fiche": "LFI veut supprimer la police et désarmer les polices municipales"
+  },
+  {
+    "id": "argu-retraite",
+    "question": "Comment répondre à « la retraite à 60 ans, on n'a pas les moyens » ?",
+    "attendu": "repondu",
+    "fiche": "La retraite à 60 ans est impossible à financer"
+  },
+  {
+    "id": "argu-nucleaire",
+    "question": "Quelqu'un me dit qu'avec LFI on va s'éclairer à la bougie. Que répondre ?",
+    "attendu": "repondu",
+    "fiche": "Sortir du nucléaire, c'est le black-out et des factures qui explosent"
+  },
+  {
+    "id": "argu-poutine",
+    "question": "On me traite de pro-Poutine parce que je soutiens Mélenchon. Que répondre ?",
+    "attendu": "repondu",
+    "fiche": "Mélenchon est complaisant avec Poutine"
+  },
+  {
+    "id": "argu-otan",
+    "question": "Comment répondre à quelqu'un qui dit que sans l'OTAN la France serait sans défense ?",
+    "attendu": "repondu",
+    "fiche": "Sortir de l'OTAN affaiblirait la défense de la France"
+  },
+  {
+    "id": "argu-israel",
+    "question": "Un électeur dit que LFI veut la guerre contre Israël. Que lui répondre ?",
+    "attendu": "repondu",
+    "fiche": "LFI veut faire la guerre à Israël"
+  },
+  {
+    "id": "argu-antisemitisme",
+    "question": "On me dit que Mélenchon est antisémite. Que répondre ?",
+    "attendu": "repondu",
+    "fiche": "Mélenchon est antisémite"
+  },
+  {
+    "id": "argu-jeune-garde",
+    "question": "Après la mort de Quentin à Lyon, on accuse LFI de couvrir la violence. Que dire ?",
+    "attendu": "repondu",
+    "fiche": "LFI est complice de la violence de la Jeune Garde"
+  },
+  {
+    "id": "argu-second-tour",
+    "question": "On me dit que voter Mélenchon, c'est faire élire Le Pen. Que répondre ?",
+    "attendu": "repondu",
+    "fiche": "Mélenchon ne peut pas gagner au second tour"
+  },
+  {
+    "id": "argu-primaire",
+    "question": "Un ami de gauche reproche à Mélenchon d'avoir refusé la primaire. Que lui dire ?",
+    "attendu": "repondu",
+    "fiche": "Mélenchon divise la gauche en refusant la primaire"
+  },
+  {
+    "id": "argu-sans-fiche",
+    "question": "On me dit que Mélenchon veut sortir de l'euro. Que répondre ?",
+    "attendu": "introuvable",
+    "note": "Aucune fiche sur ce sujet : le mode argu ne doit pas improviser une réponse, il dit qu'aucune fiche validée ne traite cette objection (et peut renvoyer au mode programme)."
+  }
+]
