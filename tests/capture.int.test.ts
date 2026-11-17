@@ -111,14 +111,20 @@ describe.skipIf(!DB)("route /capture", () => {
     expect(await r.json()).toEqual(JSON.parse(JSON.stringify(SELECTEURS)));
   });
 
-  it("supprime une capture ou toutes celles d'un auteur, avec leurs affirmations", async () => {
+  it("supprime une capture ou toutes celles d'un auteur, avec leurs affirmations et le profil de l'émetteur", async () => {
     const ids: string[] = [];
     for (const n of [1, 2]) ids.push(((await (await post(capture(n))).json()) as { id: string }).id);
     const autre = ((await (await post({ ...capture(3), auteur: { identifiant: "@autre" } })).json()) as { id: string }).id;
     await pool.query(`INSERT INTO aec_affirmations (capture_id, texte, citation) VALUES ($1, 'coût', 'trop cher')`, [ids[0]]);
+    const trait = { code: "indetermine", justification: "rien dans la capture", indice: null, origine: "deduit" as const };
+    const profil = { classe_sociale: trait, orientation: trait, modele: "test", evalue_le: "2026-11-17T10:00:00Z" };
+    expect(await store.enregistrerProfilEmetteur(ids[1]!, profil)).toBe(true);
+    expect((await store.capture(ids[1]!))?.emetteurProfil).toEqual(profil);
 
     expect(await store.supprimerAuteur("@compte")).toBe(2);
     expect((await pool.query("SELECT count(*)::int AS n FROM aec_affirmations")).rows[0].n).toBe(0);
+    // Le profil de l'émetteur disparaît avec ses captures : rien ne reste rattaché à l'auteur.
+    expect((await pool.query("SELECT count(*)::int AS n FROM aec_captures WHERE emetteur_profil IS NOT NULL")).rows[0].n).toBe(0);
     expect(await store.capture(autre)).toMatchObject({ id: autre, auteurIdentifiant: "@autre" });
     expect(await store.supprimerCapture(autre)).toBe(true);
     expect(await store.capture(autre)).toBeUndefined();

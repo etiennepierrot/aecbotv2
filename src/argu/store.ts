@@ -41,6 +41,10 @@ export class ArguStore {
           statut              text NOT NULL DEFAULT 'recue' CHECK (statut IN ('recue', 'traitee', 'erreur')),
           cree_le             timestamptz NOT NULL DEFAULT now()
         );
+        -- Profil déduit de l'émetteur (classe sociale, orientation politique), particuliers compris.
+        -- Donnée sensible au sens du RGPD : visible de l'équipe seulement, jamais indexée ni montrée
+        -- aux militants, effacée avec la capture (donc avec la suppression par auteur).
+        ALTER TABLE aec_captures ADD COLUMN IF NOT EXISTS emetteur_profil jsonb;
         CREATE INDEX IF NOT EXISTS aec_captures_auteur ON aec_captures (auteur_identifiant);
         CREATE INDEX IF NOT EXISTS aec_captures_par ON aec_captures (capture_par, canal, cree_le DESC);
 
@@ -153,11 +157,22 @@ export class ArguStore {
     const { rows } = await this.pool.query(
       `SELECT id, source_type AS "sourceType", url, texte, auteur_nom AS "auteurNom",
               auteur_identifiant AS "auteurIdentifiant", publie_le AS "publieLe", extras, note,
-              capture_par AS "capturePar", canal, statut, cree_le AS "creeLe"
+              capture_par AS "capturePar", canal, statut, cree_le AS "creeLe",
+              emetteur_profil AS "emetteurProfil"
          FROM aec_captures WHERE id = $1`,
       [id],
     );
     return rows[0];
+  }
+
+  /** Enregistre (ou remplace, après correction par l'équipe) le profil de l'émetteur d'une capture. */
+  async enregistrerProfilEmetteur(captureId: string, profil: ProfilEmetteur): Promise<boolean> {
+    await this.init();
+    const { rowCount } = await this.pool.query(`UPDATE aec_captures SET emetteur_profil = $2 WHERE id = $1`, [
+      captureId,
+      JSON.stringify(profil),
+    ]);
+    return (rowCount ?? 0) > 0;
   }
 
   /** Captures faites par ce membre sur ce canal dans les dernières `heures` (quota par jeton). */
@@ -260,6 +275,28 @@ export interface CaptureRow {
   canal: Canal;
   statut: "recue" | "traitee" | "erreur";
   creeLe: Date;
+  emetteurProfil: ProfilEmetteur | null;
+}
+
+/**
+ * Un trait de l'émetteur. `indice` est l'extrait de la capture (texte ou champs auteur) qui fonde
+ * la déduction : sans indice retrouvé mot pour mot, le trait vaut « indetermine ». La déduction
+ * reste une hypothèse ; ce qui est déclaré prime, et la correction de l'équipe fait foi.
+ */
+export interface TraitEmetteur {
+  /** Code d'un référentiel (`classe_sociale` ou `famille`), ou « indetermine ». */
+  code: string;
+  justification: string;
+  indice: string | null;
+  origine: "declare" | "deduit" | "corrige";
+}
+
+export interface ProfilEmetteur {
+  classe_sociale: TraitEmetteur;
+  orientation: TraitEmetteur;
+  /** Modèle qui a fait la déduction, ou pseudonyme du relecteur qui l'a corrigée. */
+  modele: string;
+  evalue_le: string;
 }
 
 export interface Referentiel {
