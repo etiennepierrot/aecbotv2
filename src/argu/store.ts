@@ -123,7 +123,28 @@ export class ArguStore {
           ('categorie', 'critique',  'Critique',    'Une attaque publique d''un opposant contre le programme', 2),
           ('categorie', 'objection', 'Objection',   'Ce qu''un électeur répond à un militant', 3),
           ('categorie', 'debunk',    'Vérification','Un démenti sourcé d''une affirmation fausse', 4),
-          ('categorie', 'fake_news', 'Fausse information', 'Une affirmation démentie par une source de vérification', 5)
+          ('categorie', 'fake_news', 'Fausse information', 'Une affirmation démentie par une source de vérification', 5),
+
+          -- Classe sociale de l'émetteur, calquée sur les catégories socioprofessionnelles de l'Insee.
+          -- « indetermine » n'est pas une entrée : c'est la valeur par défaut, toujours permise.
+          ('classe_sociale', 'ouvrier',                  'Ouvrier',                  'Ouvrier, y compris agricole, qualifié ou non', 1),
+          ('classe_sociale', 'employe',                  'Employé',                  'Employé du public ou du privé : commerce, services, administration, soin', 2),
+          ('classe_sociale', 'profession_intermediaire', 'Profession intermédiaire', 'Technicien, agent de maîtrise, enseignant du primaire, infirmier, travailleur social', 3),
+          ('classe_sociale', 'cadre',                    'Cadre',                    'Cadre et profession intellectuelle supérieure : ingénieur, profession libérale, enseignant du secondaire et du supérieur', 4),
+          ('classe_sociale', 'artisan_commercant',       'Artisan, commerçant',      'Indépendant à son compte, avec peu ou pas de salariés', 5),
+          ('classe_sociale', 'chef_entreprise',          'Chef d''entreprise',       'Dirigeant d''une entreprise de dix salariés ou plus', 6),
+          ('classe_sociale', 'agriculteur',              'Agriculteur exploitant',   'Exploitant agricole à son compte', 7),
+          ('classe_sociale', 'retraite',                 'Retraité',                 'Ancien actif à la retraite, quelle que soit sa profession passée', 8),
+          ('classe_sociale', 'etudiant',                 'Étudiant, lycéen',         'En formation initiale', 9),
+          ('classe_sociale', 'sans_emploi',              'Sans emploi',              'Chômeur ou personne sans activité professionnelle', 10),
+
+          -- Famille politique de l'émetteur, de la gauche vers la droite, puis hors de cet axe.
+          ('famille', 'extreme_gauche',    'Extrême gauche',    NULL, 1),
+          ('famille', 'gauche_radicale',   'Gauche radicale',   NULL, 2),
+          ('famille', 'sociaux_liberaux',  'Sociaux-libéraux',  NULL, 3),
+          ('famille', 'droite_liberale',   'Droite libérale',   NULL, 4),
+          ('famille', 'extreme_droite',    'Extrême droite',    NULL, 5),
+          ('famille', 'libertarien',       'Libertarien',       NULL, 6)
         ON CONFLICT (type, code) DO NOTHING;
       `)
       .then(() => undefined);

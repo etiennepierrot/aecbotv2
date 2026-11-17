@@ -130,9 +130,23 @@ describe.skipIf(!DB)("route /capture", () => {
     expect(await store.capture(autre)).toBeUndefined();
   });
 
-  it("référentiel des catégories livré au départ", async () => {
+  it("référentiels livrés au départ : catégories, classes sociales, familles politiques", async () => {
     expect((await store.referentiel("categorie")).map((r) => r.code)).toEqual([
       "argument", "critique", "objection", "debunk", "fake_news",
     ]);
+    expect((await store.referentiel("classe_sociale")).map((r) => r.code)).toEqual([
+      "ouvrier", "employe", "profession_intermediaire", "cadre", "artisan_commercant",
+      "chef_entreprise", "agriculteur", "retraite", "etudiant", "sans_emploi",
+    ]);
+    expect((await store.referentiel("famille")).map((r) => r.libelle)).toEqual([
+      "Extrême gauche", "Gauche radicale", "Sociaux-libéraux", "Droite libérale", "Extrême droite", "Libertarien",
+    ]);
+    // Une entrée renommée ou désactivée par l'équipe n'est pas écrasée au redémarrage.
+    await pool.query("UPDATE aec_referentiels SET libelle = 'Ouvrière, ouvrier', actif = false WHERE code = 'ouvrier'");
+    await new ArguStore(pool).init();
+    expect((await store.referentiel("classe_sociale", { actifsSeulement: false }))[0]).toMatchObject({
+      code: "ouvrier", libelle: "Ouvrière, ouvrier", actif: false,
+    });
+    await pool.query("UPDATE aec_referentiels SET libelle = 'Ouvrier', actif = true WHERE code = 'ouvrier'");
   });
 });

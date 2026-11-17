@@ -352,8 +352,16 @@ viendront la consolidation, l'interface de validation et les canaux de capture.
 
 - **Tables** (`src/argu/store.ts`, créées au premier usage) : `aec_captures` (contenu brut, gardé
   sans limite : ni `purge` ni `MEMORY_DAYS` ne s'y appliquent), `aec_affirmations`,
-  `aec_objections`, `aec_referentiels` (catégories `argument`, `critique`, `objection`, `debunk`,
-  `fake_news` livrées au départ) et `aec_jetons`.
+  `aec_objections`, `aec_referentiels` et `aec_jetons`. Référentiels livrés au départ, modifiables
+  ensuite (une entrée renommée ou désactivée n'est jamais écrasée) :
+  - catégories : `argument`, `critique`, `objection`, `debunk`, `fake_news` ;
+  - classes sociales (sur le modèle des catégories de l'Insee) : ouvrier, employé, profession
+    intermédiaire, cadre, artisan ou commerçant, chef d'entreprise, agriculteur, retraité, étudiant,
+    sans emploi ;
+  - familles politiques : extrême gauche, gauche radicale, sociaux-libéraux, droite libérale,
+    extrême droite, libertarien.
+
+  `indetermine` n'est pas une entrée : c'est la valeur par défaut d'un trait de l'émetteur.
 - **`/jeton`** (équipe seulement, en privé) : donne un jeton personnel pour l'extension, montré une
   seule fois ; seule son empreinte SHA-256 est stockée, avec le pseudonyme. Un nouveau `/jeton`
   invalide le précédent ; `/jeton revoquer` l'invalide sans le remplacer.
