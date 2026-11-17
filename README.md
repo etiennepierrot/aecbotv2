@@ -473,6 +473,27 @@ et sans attendre les tests.
    production dans `.env`. Ne plus lancer `pnpm bot` avec le token de production ensuite (il
    supprime le webhook) : créer un second bot via @BotFather pour les essais en local.
 
+### En cas de panne de Mastra : avis de maintenance
+
+Quand le serveur Mastra ne répond plus, Telegram envoie les messages dans le vide et les
+utilisateurs n'ont aucune réponse. `maintenance/` est un Cloudflare Worker de secours qui répond
+à chaque message privé (et à chaque bouton 👍/👎) par un avis de panne. Il répond au webhook par
+un appel de méthode dans le corps HTTP : il n'a pas besoin du token du bot, seulement du secret
+du webhook pour refuser les requêtes qui ne viennent pas de Telegram.
+
+Bascule depuis l'onglet Actions (ou l'appli GitHub sur téléphone) → **Maintenance du bot** :
+- `activer` : déploie le Worker, vérifie qu'il répond, branche le webhook dessus et met
+  « ⚠️ Service momentanément indisponible » dans la description courte du bot ;
+- `desactiver` : vérifie que `PROD_URL/status` répond, rebranche le webhook sur Mastra et vide la
+  description. Les messages reçus pendant la panne ont eu l'avis, ils ne sont pas rejoués.
+
+Mise en place, une fois : un compte Cloudflare (gratuit), un jeton d'API créé avec le modèle
+« Edit Cloudflare Workers », puis dans l'environnement GitHub `production` les secrets
+`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `TELEGRAM_BOT_TOKEN` et
+`TELEGRAM_WEBHOOK_SECRET` (les mêmes valeurs que côté Mastra). C'est la seule exception à
+« les secrets de l'application restent côté Mastra » : sans eux, impossible de basculer quand
+Mastra est en panne.
+
 ## Arborescence
 
 ```
@@ -512,7 +533,9 @@ src/
    ├─ scorers/index.ts       citations, statut, source attendue, fidélité
    └─ workflows/             ingest, purge
 scripts/                     ingest, ask, evals, bot, webhook, corpus, docs, feedback
-.github/workflows/           ci.yml (tests + déploiement), evals.yml (à la demande)
+.github/workflows/           ci.yml (tests + déploiement), evals.yml (à la demande),
+                             maintenance.yml (bascule vers l'avis de panne)
+maintenance/                 Cloudflare Worker de secours (avis de panne)
 evals/                       questions types, prix
 tests/
 ```

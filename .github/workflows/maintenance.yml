@@ -1,0 +1,86 @@
+# Bascule le bot Telegram vers le Worker de secours (avis de panne) ou le rebranche sur Mastra.
+# Se lance à la main, y compris depuis l'appli GitHub sur téléphone : Actions → Maintenance du bot.
+name: Maintenance du bot
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "activer = avis de panne via Cloudflare ; desactiver = retour sur Mastra"
+        type: choice
+        options: [activer, desactiver]
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maintenance-bot
+  cancel-in-progress: false
+
+jobs:
+  basculer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_WEBHOOK_SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROD_URL: ${{ vars.PROD_URL }}
+      WRANGLER: npx --yes wrangler@4.151.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérifier les secrets
+        run: |
+          requis="TELEGRAM_BOT_TOKEN TELEGRAM_WEBHOOK_SECRET"
+          if [ "${{ inputs.mode }}" = activer ]; then requis="$requis CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID"; else requis="$requis PROD_URL"; fi
+          for v in $requis; do
+            if [ -z "${!v}" ]; then echo "::error::$v manquant dans l'environnement GitHub « production »"; exit 1; fi
+          done
+
+      - name: Déployer le Worker de secours
+        if: inputs.mode == 'activer'
+        working-directory: maintenance
+        run: |
+          $WRANGLER deploy | tee deploy.log
+          url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          if [ -z "$url" ]; then echo "::error::URL du Worker introuvable dans la sortie de wrangler"; exit 1; fi
+          printf '%s' "$TELEGRAM_WEBHOOK_SECRET" | $WRANGLER secret put TELEGRAM_WEBHOOK_SECRET
+          echo "CIBLE=$url" >> "$GITHUB_ENV"
+
+      - name: Vérifier que le Worker répond
+        if: inputs.mode == 'activer'
+        run: |
+          # Sans le secret, le Worker doit refuser (401) ; avec, il doit renvoyer l'avis de panne.
+          for i in $(seq 1 12); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$CIBLE" -d '{}' || true)
+            if [ "$code" = 401 ]; then break; fi
+            echo "essai $i : HTTP $code"; sleep 5
+          done
+          if [ "$code" != 401 ]; then echo "::error::Le Worker ne répond pas comme prévu (HTTP $code)"; exit 1; fi
+          body='{"message":{"chat":{"id":1,"type":"private"}}}'
+          curl -fsS -X POST "$CIBLE" -H "X-Telegram-Bot-Api-Secret-Token: $TELEGRAM_WEBHOOK_SECRET" -d "$body" | grep -q '"sendMessage"'
+
+      - name: Vérifier que Mastra répond avant d'y revenir
+        if: inputs.mode == 'desactiver'
+        run: |
+          curl -fsS "$PROD_URL/status" || { echo "::error::$PROD_URL/status ne répond pas : le bot resterait muet. Bascule annulée."; exit 1; }
+          echo "CIBLE=$PROD_URL/telegram" >> "$GITHUB_ENV"
+
+      - name: Brancher le webhook Telegram
+        run: |
+          api="https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN"
+          payload=$(jq -n --arg url "$CIBLE" --arg s "$TELEGRAM_WEBHOOK_SECRET" \
+            '{url: $url, secret_token: $s, allowed_updates: ["message", "callback_query"], drop_pending_updates: false}')
+          curl -fsS -X POST "$api/setWebhook" -H 'Content-Type: application/json' -d "$payload" | grep -q '"ok":true'
+          if [ "${{ inputs.mode }}" = activer ]; then
+            court="⚠️ Service momentanément indisponible. Nous travaillons à le rétablir."
+          else
+            court=""
+          fi
+          curl -fsS -X POST "$api/setMyShortDescription" --data-urlencode "short_description=$court" | grep -q '"ok":true'
+          curl -fsS "$api/getWebhookInfo" | jq '.result | {url, pending_update_count, last_error_message}'
+          echo "Webhook branché sur $CIBLE"
