@@ -142,6 +142,11 @@ describe.skipIf(!DB)("route /capture", () => {
       "Extrême gauche", "Gauche radicale", "Écologistes", "Sociaux-libéraux", "Centre", "Droite libérale",
       "Droite conservatrice", "Extrême droite", "Souverainistes", "Libertarien",
     ]);
+    expect((await store.referentiel("public")).length).toBe(10);
+    expect((await store.referentiel("theme")).length).toBe(14);
+    expect((await store.referentiel("registre")).map((r) => r.code)).toContain("cout_faisabilite");
+    // Les apostrophes doublées du SQL reviennent simples.
+    expect((await store.referentiel("theme"))[0]!.libelle).toBe("Salaires et pouvoir d'achat");
     // Une entrée renommée ou désactivée par l'équipe n'est pas écrasée au redémarrage.
     await pool.query("UPDATE aec_referentiels SET libelle = 'Ouvrière, ouvrier', actif = false WHERE code = 'ouvrier'");
     await new ArguStore(pool).init();
