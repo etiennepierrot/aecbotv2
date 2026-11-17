@@ -167,14 +167,16 @@ question ─▶ agent aec ──▶ outil recherche (pgvector, édition 2027 par
 attendues relevées dans le corpus actuel ; pour le livre, les titres de section attendus), dont 1 sur un livret 2022 et 1 à laquelle les textes
 ne répondent qu'en partie (démission et Constituante), 3 hors corpus et 1 tentative de détournement.
 
-S'y ajoutent 19 questions `objection-*` : les critiques adressées au programme et au candidat,
-telles qu'un militant les entend. 15 portent sur le programme (chiffrage, dette, fiscalité,
-police, retraite, nucléaire, Ukraine, OTAN, Israël, antisémitisme) et attendent une réponse
-sourcée. Leurs sources viennent surtout de la publication d'octobre 2026 sur les comptes publics
-et des plans et livrets. Pour le livre, les titres de section ne sont donnés que là où ils sont
-déjà connus, sinon le document seul. 4 visent la personne ou la campagne (antisémitisme de
-Mélenchon, Jeune Garde, second tour, primaire) : le programme n'y répond pas, l'agent doit
-répondre « introuvable » sans improviser.
+S'y ajoutent 19 questions tirées des critiques adressées au programme et au candidat. Une règle
+les départage : **une question de programme s'en tient au programme**, une question d'argumentaire
+(« que répondre à… ») attend une réponse tirée des fiches d'objections validées par l'équipe
+(voir « Argumentaire : fiches d'objections »). Ici, 15 sont posées comme des questions de programme
+(chiffrage, dette, fiscalité, police, retraite, nucléaire, Ukraine, défense, Israël,
+antisémitisme). Leurs sources viennent surtout de la publication d'octobre 2026 sur les comptes
+publics et des plans et livrets ; pour le livre, les titres de section ne sont donnés que là où ils
+sont déjà connus. 4 questions `hors-programme-*` visent la personne ou la campagne (antisémitisme
+de Mélenchon, Jeune Garde, second tour, primaire) : en mode programme, l'agent doit répondre
+« introuvable » sans improviser.
 
 ```bash
 pnpm evals --model mistral/mistral-small-latest --model openai/gpt-5-mini
@@ -410,6 +412,28 @@ curl -X POST https://<serveur>/capture -H "Authorization: Bearer aec_…" -H 'co
   -d '{"source_type":"x","url":"https://x.com/compte/status/123","texte":"Texte complet du post"}'
 ```
 
+## Argumentaire : fiches d'objections
+
+Les questions d'argumentaire (« on me dit que… », « que répondre à… ») ne se répondent pas avec le
+programme seul : la réponse vient d'une **fiche d'objection consolidée et validée par l'équipe**
+(`aec_objections`, statut `validee`). Le mode programme ne les voit jamais ; le futur mode argu ne
+répondra qu'à partir d'elles.
+
+- **`argu/fiches-brouillon.json`** : 18 fiches rédigées à partir d'une revue de presse de
+  novembre 2026 et du corpus (intitulé, reformulations, thème, réponse courte et détaillée, points
+  d'appui). Les points d'appui « programme » citent un extrait recopié mot pour mot, avec document
+  et page ; ceux de l'ancienne édition 2025 portent une note : les retrouver dans le livre 2026
+  avant validation. Les points « presse » donnent titre et lien. **Rien n'y est validé.**
+- **`pnpm argu:fiches:prod`** les importe en brouillon (`--fichier` pour un autre fichier,
+  `--verifier` pour valider sans écrire). Une objection qui porte déjà le même intitulé (casse
+  ignorée) n'est jamais modifiée, quel que soit son statut ; un thème absent du référentiel fait
+  refuser tout le lot.
+- **`evals/argumentaire.json`** : une question par fiche, formulée autrement que l'intitulé
+  (`fiche` = l'intitulé attendu), plus une objection sans fiche qui doit rester « introuvable ».
+  Ce jeu servira au mode argu ; il n'est pas encore branché sur `pnpm evals`.
+
+> Le dépôt est public : ces brouillons, comme les fiches qui en sortiront, y sont lisibles par tous.
+
 ## Tests
 
 ```bash
@@ -494,7 +518,7 @@ src/
 │  ├─ embed.ts               embeddings (Mistral ou OpenRouter)
 │  ├─ store.ts               registre aec_documents + index pgvector
 │  └─ deps.ts                assemblage (remplaçable en test)
-├─ argu/                     argumentaire : captures, jetons, tables
+├─ argu/                     argumentaire : captures, jetons, tables, import des fiches
 │  ├─ capture.ts             enregistrerCapture() : validation, dédoublonnage
 │  ├─ jetons.ts              jetons de l'extension (empreinte seule)
 │  └─ store.ts               tables aec_captures, aec_affirmations…

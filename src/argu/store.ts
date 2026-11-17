@@ -265,6 +265,21 @@ export class ArguStore {
     return rowCount ?? 0;
   }
 
+  /**
+   * Ajoute une objection en brouillon, sauf si une objection porte déjà cet intitulé (casse ignorée) :
+   * le travail de l'équipe n'est jamais écrasé. Renvoie true si elle a été ajoutée.
+   */
+  async insererObjectionBrouillon(o: NouvelleObjection): Promise<boolean> {
+    await this.init();
+    const { rowCount } = await this.pool.query(
+      `INSERT INTO aec_objections (intitule, reformulations, theme, reponse_courte, reponse_detaillee, points_appui, statut)
+       SELECT $1, $2, $3, $4, $5, $6, 'brouillon'
+        WHERE NOT EXISTS (SELECT 1 FROM aec_objections WHERE lower(intitule) = lower($1))`,
+      [o.intitule, o.reformulations, o.theme, o.reponse_courte, o.reponse_detaillee, JSON.stringify(o.points_appui)],
+    );
+    return (rowCount ?? 0) > 0;
+  }
+
   async referentiel(type: string, { actifsSeulement = true } = {}): Promise<Referentiel[]> {
     await this.init();
     const { rows } = await this.pool.query(
@@ -362,6 +377,15 @@ export interface ProfilEmetteur {
   /** Modèle qui a fait la déduction, ou pseudonyme du relecteur qui l'a corrigée. */
   modele: string;
   evalue_le: string;
+}
+
+export interface NouvelleObjection {
+  intitule: string;
+  reformulations: string[];
+  theme: string | null;
+  reponse_courte: string;
+  reponse_detaillee: string;
+  points_appui: unknown[];
 }
 
 export interface Referentiel {

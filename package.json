@@ -36,7 +36,9 @@
     "suites:calibrer": "tsx --env-file-if-exists=.env scripts/suites-calibrer.ts",
     "suites:calibrer:prod": "tsx --import ./scripts/prod-env.ts scripts/suites-calibrer.ts",
     "suites:donnees": "tsx --env-file-if-exists=.env scripts/suites-donnees.ts",
-    "suites:donnees:prod": "tsx --import ./scripts/prod-env.ts scripts/suites-donnees.ts"
+    "suites:donnees:prod": "tsx --import ./scripts/prod-env.ts scripts/suites-donnees.ts",
+    "argu:fiches": "tsx --env-file-if-exists=.env scripts/argu-fiches.ts",
+    "argu:fiches:prod": "tsx --import ./scripts/prod-env.ts scripts/argu-fiches.ts"
   },
   "dependencies": {
     "@mastra/core": "1.80.0",

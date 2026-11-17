@@ -1,0 +1,615 @@
+{
+  "_note": "Fiches d'objections en BROUILLON, rédigées à partir d'une revue de presse (novembre 2026) et du corpus du programme. Rien ici n'est validé par l'équipe : à relire, corriger et valider avant publication. Les extraits « programme » sont recopiés mot pour mot ; ceux de l'ancienne édition 2025 sont à retrouver dans le livre 2026.",
+  "fiches": [
+    {
+      "intitule": "Le programme n'est pas chiffré, il va creuser la dette",
+      "reformulations": [
+        "C'est infinançable",
+        "Qui va payer tout ça ?",
+        "Ils n'ont même pas chiffré leur programme",
+        "Avec Mélenchon, la dette va exploser"
+      ],
+      "theme": "dette_finances",
+      "reponse_courte": "Le budget de la première année est chiffré au milliard près : 106,4 milliards de recettes nouvelles, payées par les plus riches et les grandes entreprises, pour 81,7 milliards de dépenses. Le déficit baisse donc de 24,7 milliards dès 2027.",
+      "reponse_detaillee": "La France insoumise a publié en octobre 2026 son budget pour 2027 : 106,4 milliards d'euros de recettes supplémentaires, uniquement en faisant contribuer les plus riches et les grandes entreprises, et 81,7 milliards de dépenses d'urgence (salaires des fonctionnaires, pensions, école, hôpital, planification écologique). Résultat : 24,7 milliards de réduction du déficit la première année, et une trajectoire qui stabilise la dette par rapport au PIB en un quinquennat.\n\nChaque recette est détaillée : suppression de la flat tax (9 milliards), ISF renforcé (10), niches fiscales (22), taxe Zucman sur les patrimoines de plus de 100 millions (15), droits de succession (20), superprofits (5), transactions financières (5), lutte contre la fraude (2).\n\nCe document couvre le budget 2027, pas tout le programme pluriannuel : il le dit lui-même. Mais ce sont les politiques actuelles qui ont creusé la dette : 1 314 milliards de plus sous Emmanuel Macron, et un déficit qui serait de 2,9 % au lieu de 5,1 % si les recettes étaient restées au niveau de 2017.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 14,
+          "extrait": "106,4 milliards d’euros de recettes"
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 6,
+          "extrait": "un ajustement de 25 milliards d’euros l’année prochaine, nous mettant sur une trajectoire crédible pour stabiliser notre dette par rapport au PIB en un quinquennat"
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 7,
+          "extrait": "Il ne constitue pas un chiffrage complet du programme L’Avenir en Commun qui s’étalera sur plusieurs années.",
+          "note": "À dire honnêtement si l'interlocuteur insiste : le chiffrage complet n'est pas encore publié."
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 5,
+          "extrait": "si les recettes étaient restées au niveau de 2017, le déficit serait de 2,9 % du PIB au lieu de 5,1 %."
+        },
+        {
+          "type": "presse",
+          "titre": "Le Média – Thomas Porcher : pourquoi le programme fait paniquer les éditorialistes",
+          "url": "https://www.lemediatv.fr/emissions/2026/melenchon-pourquoi-son-programme-fait-paniquer-les-editorialistes-oN6NP1jxTQmMduIP-27BQQ"
+        }
+      ]
+    },
+    {
+      "intitule": "Il faut couper dans les dépenses publiques pour réduire le déficit",
+      "reformulations": [
+        "L'État dépense trop",
+        "Il faut faire des économies, pas dépenser plus",
+        "On vit au-dessus de nos moyens"
+      ],
+      "theme": "dette_finances",
+      "reponse_courte": "Les coupes ont été essayées, et elles creusent le déficit : avec 30 milliards de coupes en 2026, le déficit est passé de 5,1 % à 5,4 % et la croissance a reculé. Même le FMI constate que l'austérité ne fait pas baisser la dette.",
+      "reponse_detaillee": "Le budget 2026 a coupé 30 milliards d'euros : la croissance a perdu un demi-point et le déficit est passé de 5,1 % à 5,4 % du PIB. Quand on coupe, le pouvoir d'achat et l'investissement baissent, l'activité ralentit, les recettes fiscales chutent.\n\nL'Espagne des années 2010 l'a vécu : cinq ans pour retrouver son niveau de PIB, une dette qui a doublé. Au Portugal, la saignée imposée par l'Union européenne a fait reculer le PIB de 6,6 points. Le FMI lui-même conclut qu'« en moyenne, la consolidation budgétaire ne réduit pas les ratios dette/PIB ».\n\nLe programme fait l'inverse : relancer l'activité par les salaires et l'investissement public, et aller chercher les recettes perdues sous Emmanuel Macron.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 17,
+          "extrait": "Déficit qui passe de 5,1 % à 5,4 % (+0,3 point)"
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 18,
+          "extrait": "« qu’en moyenne, la consolidation budgétaire ne réduit pas les ratios dette/PIB »"
+        }
+      ]
+    },
+    {
+      "intitule": "LFI veut annuler la dette, c'est impossible avec l'Europe",
+      "reformulations": [
+        "On ne peut pas ne pas rembourser",
+        "Les marchés vont nous sanctionner",
+        "Les traités européens l'interdisent"
+      ],
+      "theme": "dette_finances",
+      "reponse_courte": "La BCE détient déjà une grande partie de notre dette. Elle peut la geler ou l'annuler sans changer les traités : l'article 123 interdit seulement de prêter directement aux États. Et la charge de la dette, 2,9 % du PIB en 2027, reste loin des records des années 1990.",
+      "reponse_detaillee": "Il ne s'agit pas de faire défaut auprès des épargnants. Une partie de la dette française est détenue par la Banque de France pour le compte de la BCE. La proposition est que la BCE gèle ou annule la part de dette publique qu'elle possède, ou la transforme en dette perpétuelle à taux nul. Cela ne demande pas de réviser les traités : l'article 123 du TFUE interdit le prêt direct aux États, pas ce type d'opération.\n\nLa France n'est pas seule : la hausse des taux touche toute la zone euro, d'autres États ont intérêt à cette intervention.\n\nSur le poids de la dette : sa charge sera de 2,9 % du PIB en 2027, alors qu'elle était entre 3 et 4 % de 1996 à 2004.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 20,
+          "extrait": "Cela ne nécessite pas de révision des traités, car l’article 123 du traité de fonctionnement de l’Union européenne (TFUE) interdit le prêt direct aux États mais pas ce type d’opérations."
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 19,
+          "extrait": "La charge de la dette en 2027 sera de 2,9 % du PIB, ce qui est loin d’être un record (entre 1996 et 2004, elle était comprise entre 3 et 4 %)."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 26,
+          "extrait": "Exiger de l’Union européenne que la Banque centrale européenne (BCE) transforme la part de dette des États qu’elle possède en dettes perpétuelles à taux nul",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "Avec 14 tranches d'impôt, les classes moyennes vont payer",
+      "reformulations": [
+        "Ils vont matraquer les classes moyennes",
+        "Ça va encore être les mêmes qui paient",
+        "Un impôt confiscatoire"
+      ],
+      "theme": "fiscalite",
+      "reponse_courte": "Un barème à 14 tranches, c'est plus de progressivité : l'impôt baisse pour la majorité et augmente pour les plus hauts revenus. La France avait déjà 14 tranches dans les années 1980.",
+      "reponse_detaillee": "Aujourd'hui l'impôt sur le revenu n'a que 5 tranches : un cadre supérieur et un milliardaire sont presque traités pareil, et l'essentiel de l'effort repose sur la TVA et les taxes sur les carburants, qui pèsent le plus sur les ménages modestes. Le programme revient à 14 tranches, comme dans les années 1980, avec un principe simple : plus on gagne, plus on contribue.\n\nLe plan Justice fiscale l'écrit : rendre l'impôt juste permet de le répartir mieux et donc de le baisser pour la majorité des contribuables. Les recettes nouvelles viennent des plus hauts revenus, des niches fiscales des très riches et du capital.\n\nÀ éviter : annoncer des seuils précis de revenu si on ne les a pas sous les yeux.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Plan Justice fiscale",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Plan_UP_JUSTICE-FISCALE_web-3-1.pdf",
+          "page": 29,
+          "extrait": "Rendre l’impôt juste permet de mieux le répartir dans la population et donc de le baisser pour la majorité des contribuables."
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 14,
+          "extrait": "Nous réformerons l’impôt sur le revenu au cours du mandat pour le rendre plus progressif avec l’instauration de 14 tranches."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 26,
+          "extrait": "Rendre l’impôt sur le revenu plus progressif avec un barème à 14 tranches contre 5 aujourd’hui",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "LFI veut confisquer les héritages",
+      "reformulations": [
+        "Ils vont prendre la maison de mes parents",
+        "On ne pourra plus rien transmettre à ses enfants",
+        "Au-delà de 12 millions ils prennent tout"
+      ],
+      "theme": "fiscalite",
+      "reponse_courte": "L'héritage maximum est fixé à 12 millions d'euros, soit 100 fois le patrimoine médian : cela concerne moins de 0,01 % de la population. Pour la résidence principale, un abattement de 120 000 euros protège les familles.",
+      "reponse_detaillee": "Le programme fixe un héritage maximum de 12 millions d'euros. C'est 100 fois le patrimoine médian, l'équivalent de huit siècles de SMIC : moins de 0,01 % de la population est concernée. Au-dessus, la somme finance la jeunesse.\n\nPour les familles ordinaires, le programme protège : un abattement de 120 000 euros pour quiconque hérite du logement qui était déjà sa résidence principale. Ce qui change pour les très gros patrimoines, c'est que les droits de succession comptent l'ensemble des dons et héritages reçus au cours de la vie, ce qui ferme les montages d'optimisation.\n\nRecette attendue : 17 milliards par an selon le plan Justice fiscale, 20 milliards la première année selon le budget 2027.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Plan Justice fiscale",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Plan_UP_JUSTICE-FISCALE_web-3-1.pdf",
+          "page": 15,
+          "extrait": "Nous mettrons en place un héritage maximum fixé à 12 millions d’euros, ce qui correspond à 100 fois le patrimoine médian et concerne moins de 0,01% de la population."
+        },
+        {
+          "type": "programme",
+          "titre": "Plan Justice fiscale",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Plan_UP_JUSTICE-FISCALE_web-3-1.pdf",
+          "page": 15,
+          "extrait": "un abattement de 120 000 euros pour toute personne qui hérite d’un bien immobilier qui était déjà sa résidence principale depuis plus d’un an."
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 14,
+          "extrait": "une réforme des droits de succession (20 milliards d’euros la première année)",
+          "note": "Le plan Justice fiscale (p. 29) donne 17 milliards : préciser de quel document vient le chiffre."
+        }
+      ]
+    },
+    {
+      "intitule": "Si on taxe les riches, ils partiront à l'étranger",
+      "reformulations": [
+        "Les riches vont fuir",
+        "Fuite des capitaux",
+        "Exil fiscal massif"
+      ],
+      "theme": "fiscalite",
+      "reponse_courte": "Le programme instaure un impôt universel : un Français installé dans un paradis fiscal paiera la différence avec l'impôt français. L'exit tax est rétablie, et les multinationales seront taxées sur l'activité réellement réalisée en France.",
+      "reponse_detaillee": "L'impôt universel rattache l'impôt à la nationalité : un Français domicilié dans un pays à fiscalité privilégiée paiera à la France la différence entre ce qu'il paie là-bas et ce qu'il paierait ici. C'en est fini de la prime aux exilés fiscaux. L'exit tax, supprimée par Emmanuel Macron, est rétablie.\n\nPour les entreprises, une taxe universelle sur les multinationales les impose selon l'activité qu'elles réalisent réellement en France, quel que soit le pays où elles déclarent leurs profits.\n\nC'est aussi une question d'égalité : aujourd'hui les PME paient près de 24 % d'impôt sur les sociétés, les grands groupes 14,7 %, grâce aux niches et à l'optimisation.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Plan Justice fiscale",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Plan_UP_JUSTICE-FISCALE_web-3-1.pdf",
+          "page": 18,
+          "extrait": "Un·e Français·e domicilié·e dans un pays à fiscalité privilégiée, et qui payerait"
+        },
+        {
+          "type": "programme",
+          "titre": "Plan Justice fiscale",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Plan_UP_JUSTICE-FISCALE_web-3-1.pdf",
+          "page": 30,
+          "extrait": "En taxant les multinationales pratiquant l’évasion fiscale, l’impôt universel"
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 14,
+          "extrait": "une taxe universelle sur les multinationales (5 milliards la première année) qui permettra de les imposer selon l’activité réellement effectuée en France"
+        }
+      ]
+    },
+    {
+      "intitule": "Le programme est contre les entreprises",
+      "reformulations": [
+        "Mélenchon déteste les patrons",
+        "Ça va tuer les PME",
+        "Les entreprises vont fermer"
+      ],
+      "theme": "fiscalite",
+      "reponse_courte": "Le programme vise la finance et les grands groupes, pas les PME : aujourd'hui une PME paie près de 24 % d'impôt sur les sociétés, une grande entreprise 14,7 %. L'impôt sur les sociétés deviendra progressif pour rétablir l'égalité.",
+      "reponse_detaillee": "Les PME et TPE sont aujourd'hui les perdantes du système : taux implicite d'impôt sur les sociétés de près de 24 %, contre 14,7 % pour les grandes entreprises, qui profitent des niches, de l'optimisation et de la délocalisation de leurs profits. Le programme fait porter l'effort sur la finance pour préserver les activités productives.\n\nSurtout, la relance par les salaires et l'investissement public remplit les carnets de commandes : quand les classes populaires consomment, ce sont d'abord les commerces, les artisans et les PME qui en profitent.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 14,
+          "extrait": "Le taux implicite d’imposition à l’impôt sur les sociétés est de près de 24 % pour les PME contre 14,7 % pour les grandes entreprises."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 8,
+          "extrait": "La relance de l’activité par la consommation populaire et l’investissement public entraînera les entreprises par leurs carnets de commandes.",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "Mélenchon veut contrôler l'épargne des Français",
+      "reformulations": [
+        "Ils vont prendre mon livret A",
+        "Ils vont bloquer l'assurance-vie",
+        "Contrôle des capitaux"
+      ],
+      "theme": "dette_finances",
+      "reponse_courte": "Non : les mesures sur l'épargne sont « non contraignantes et rémunératrices pour tous les épargnants ». Le plafond du livret A monte à 30 000 euros et un « livret B » facultatif permet d'investir son épargne en France.",
+      "reponse_detaillee": "Le programme veut mieux orienter l'épargne vers l'investissement en France, sans rien imposer : relever le plafond du livret A à 30 000 euros, créer un « livret B » facultatif pour l'épargne de moyen et long terme, garanti investi dans l'intérêt national. Aujourd'hui l'assurance-vie est investie pour moitié hors de France.\n\nCes fonds alimenteront un pôle public bancaire (Caisse des dépôts, Bpifrance, Banque postale) capable d'investir 100 milliards par an dans le logement, les transports, l'énergie et l'industrie.\n\nLe contrôle des capitaux n'apparaît pas dans les textes consultés : ne pas l'affirmer ni le démentir sans source.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 16,
+          "extrait": "Avec ces différentes mesures non contraignantes et rémunératrices pour tous les épargnants"
+        },
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 16,
+          "extrait": "un relèvement du plafond de dépôt maximal sur le livret A à 30 000 euros"
+        }
+      ]
+    },
+    {
+      "intitule": "LFI veut supprimer la police et désarmer les polices municipales",
+      "reformulations": [
+        "Ils sont anti-flics",
+        "Avec eux, plus de sécurité",
+        "Ils veulent démanteler les BAC"
+      ],
+      "theme": "securite_justice",
+      "reponse_courte": "Le programme ne supprime pas la police, il la remet dans les quartiers : une police de proximité, des commissariats de proximité, les polices municipales intégrées à la police nationale. 60 % des Français préfèrent la police de proximité aux BAC.",
+      "reponse_detaillee": "La sûreté est un droit de l'homme, et le programme en fait la boussole de la police. Il rétablit la police de proximité comme pilier central : nouveaux centres de police de proximité, fin de la politique du chiffre, plus d'enquêteurs contre la délinquance financière, la traite et les mafias, police scientifique doublée, plus de moyens pour recevoir les plaintes.\n\nLes BAC (environ 7 000 agents) et les BRAV-M sont démantelées et leurs agents redéployés. Les 24 000 policiers municipaux sont intégrés à la police nationale, sous l'autorité fonctionnelle du maire. 60 % des Français sont favorables au remplacement des BAC par une police de proximité.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Livret Sécurité",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Livret_UP_28_SECURITE_web-ok.pdf",
+          "page": 12,
+          "extrait": "Démanteler les BAC : environ 7 000 agent·es"
+        },
+        {
+          "type": "programme",
+          "titre": "Livret Sécurité",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Livret_UP_28_SECURITE_web-ok.pdf",
+          "page": 12,
+          "extrait": "Intégrer les polices municipales à la police nationale : environ 24 000 policières et policiers municipaux"
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 31,
+          "extrait": "60 % des Français sont favorables au remplacement des brigades anticriminalité (BAC) par une police de proximité (Harris Interactive, juillet 2021)",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 32,
+          "extrait": "Augmenter les effectifs en charge de la délinquance financière, du trafic d’êtres humains et du démantèlement des réseaux mafieux",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "La retraite à 60 ans est impossible à financer",
+      "reformulations": [
+        "On vit plus longtemps, il faut travailler plus",
+        "Qui va payer les retraites ?",
+        "Le système va faire faillite"
+      ],
+      "theme": "retraites",
+      "reponse_courte": "Première étape dès 2027 : abroger la réforme Borne, pour 9 milliards. Le retour à 60 ans avec 40 annuités se fait sur le mandat, financé par une hausse de 0,25 point par an des cotisations et par des cotisations sur l'intéressement, la participation et les revenus financiers des entreprises.",
+      "reponse_detaillee": "Le calendrier est progressif : abrogation immédiate de la réforme Borne (9 milliards en 2027), puis retour à la retraite à 60 ans à taux plein avec 40 annuités, objectif sur un mandat.\n\nLe financement est prévu : hausse de 0,25 point par an pendant le quinquennat de la cotisation vieillesse, et cotisations sur ce qui y échappe aujourd'hui (intéressement, participation, épargne salariale, revenus financiers des entreprises). La hausse des salaires et de l'emploi augmente aussi les cotisations.\n\nUne majorité de Français y est favorable.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Comment nous allons remettre de l’ordre dans les comptes publics (octobre 2026)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+          "page": 11,
+          "extrait": "nous abrogerons la réforme Borne qui a porté la retraite à 64 ans, ce qui occasionnera une dépense de 9 milliards d’euros."
+        },
+        {
+          "type": "programme",
+          "titre": "Livret Vieillir",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Livret_UP_36_VIEILLIR_web-ok.pdf",
+          "page": 12,
+          "extrait": "L’augmentation de 0,25 point par an durant le quinquennat du taux de cotisation vieillesse"
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 33,
+          "extrait": "71 % des Français sont favorables au retour de la retraite à 60 ans",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "Sortir du nucléaire, c'est le black-out et des factures qui explosent",
+      "reformulations": [
+        "On va retourner à la bougie",
+        "Le nucléaire est une énergie propre",
+        "On va perdre notre indépendance énergétique"
+      ],
+      "theme": "energie",
+      "reponse_courte": "La sortie est planifiée, pas brutale : réacteurs fermés par paires, en s'appuyant sur les scénarios de RTE et de négaWatt, avec 100 % d'énergies renouvelables en 2050 et la reconversion des territoires.",
+      "reponse_detaillee": "Le programme planifie la sortie du nucléaire, sur la base de travaux de RTE et de l'association négaWatt qui en ont démontré la faisabilité : fermeture des réacteurs par paires, plans de reconversion des bassins d'emploi, compensation des recettes fiscales perdues par les collectivités. Le démantèlement lui-même crée des emplois qualifiés.\n\nL'objectif est 100 % d'énergies renouvelables en 2050, avec sobriété et efficacité énergétique, et un grand plan de rénovation des logements pour faire baisser les factures.\n\nÀ éviter : promettre une baisse des prix de l'électricité chiffrée, le programme n'en donne pas.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Plan Règle verte",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Plan_UP_REGLE-VERTE-1.pdf",
+          "page": 26,
+          "extrait": "La sortie du nucléaire doit être planifiée. Nous pourrons nous appuyer pour cela sur les travaux de l’association négaWatt et de Réseau de transport d’électricité (RTE) qui en ont démontré la faisabilité."
+        },
+        {
+          "type": "programme",
+          "titre": "Plan Règle verte",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Plan_UP_REGLE-VERTE-1.pdf",
+          "page": 26,
+          "extrait": "Ce plan devra prévoir la fermeture de réacteurs par paires"
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 49,
+          "extrait": "Planifier le passage à 100 % d’énergies renouvelables avec un double mot d’ordre : sobriété et efficacité énergétique",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "Mélenchon est complaisant avec Poutine",
+      "reformulations": [
+        "Il est pro-russe",
+        "Il refuse d'aider l'Ukraine",
+        "Il veut négocier avec Poutine"
+      ],
+      "theme": "europe_international",
+      "reponse_courte": "Le programme demande le retrait des troupes russes d'Ukraine. Mélenchon l'a dit à l'Assemblée : « Quelles que soient les causes de l'invasion de l'Ukraine, rien ne peut l'excuser », et Poutine en porte « la totale responsabilité ».",
+      "reponse_detaillee": "Le programme est clair : agir pour un cessez-le-feu, le retrait des troupes russes et des négociations pour une paix durable, puis bâtir un cadre de sécurité qui protège les pays d'Europe centrale et orientale.\n\nDès l'invasion, Jean-Luc Mélenchon a déclaré à l'Assemblée nationale : « Quelles que soient les causes de l'invasion de l'Ukraine, rien ne peut l'excuser. Ni la relativiser. » et : « Le gouvernement de monsieur Poutine en porte la totale responsabilité. »\n\nLa divergence porte sur les moyens : la priorité donnée à la diplomatie pour arrêter la guerre, face à une puissance nucléaire.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Livret Paix",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Livret_UP_03_PAIX_web-ok.pdf",
+          "page": 20,
+          "extrait": "Quelles que soient les causes de l’invasion de l’Ukraine, rien ne peut l’excuser. Ni la relativiser."
+        },
+        {
+          "type": "programme",
+          "titre": "Livret Paix",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2024/02/Livret_UP_03_PAIX_web-ok.pdf",
+          "page": 20,
+          "extrait": "Le gouvernement de monsieur Poutine en porte la totale responsabilité"
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 60,
+          "extrait": "En Ukraine, agir pour créer un cadre diplomatique permettant d’obtenir un cessez-le-feu, le retrait des troupes russes, et l’ouverture de négociations pour une paix durable",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "Sortir de l'OTAN affaiblirait la défense de la France",
+      "reformulations": [
+        "Sans l'OTAN on est seuls face à la Russie",
+        "C'est naïf de quitter l'Alliance",
+        "Il veut désarmer la France"
+      ],
+      "theme": "europe_international",
+      "reponse_courte": "Le programme renforce l'indépendance militaire : loi de programmation militaire, pôle public de l'armement, priorité au matériel français, drones et IA. La sortie de l'OTAN se fait par étapes, d'abord du commandement intégré, comme sous de Gaulle.",
+      "reponse_detaillee": "Il ne s'agit pas de désarmer mais de ne plus dépendre des États-Unis, dont le président remet en cause l'intégrité territoriale même de pays alliés. Le programme prévoit un livre blanc et une loi de programmation militaire pour restaurer l'indépendance et la souveraineté industrielle, un pôle public de l'armement, la priorité au matériel français, et l'investissement dans les technologies de rupture (drones, intelligence artificielle).\n\nLa sortie de l'OTAN est progressive : d'abord le commandement intégré, puis l'organisation elle-même par étapes. La France reste dotée de la dissuasion.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 59,
+          "extrait": "Se retirer immédiatement du commandement intégré de l’OTAN puis, par étapes, de l’organisation elle-même",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 59,
+          "extrait": "Rédiger un livre blanc et adopter une loi de programmation militaire visant à restaurer notre indépendance, notre souveraineté industrielle",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 59,
+          "extrait": "Prioriser l’acquisition de matériel militaire français dans l’armée",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "LFI veut faire la guerre à Israël",
+      "reformulations": [
+        "Mélenchon menace Israël",
+        "Ils soutiennent le Hamas"
+      ],
+      "theme": "europe_international",
+      "reponse_courte": "Le programme demande l'application du droit international : cessez-le-feu, sanctions contre le gouvernement Netanyahou, embargo sur les armes, reconnaissance de l'État de Palestine. Aucune action militaire n'est prévue.",
+      "reponse_detaillee": "Le programme appuie le droit et la justice internationale : application des mesures conservatoires de la Cour internationale de justice, jugement des criminels de guerre. Concrètement : un cessez-le-feu durable en Palestine et au Liban, la fin du blocus de Gaza et de l'annexion de la Cisjordanie et du Golan, des sanctions contre le gouvernement Netanyahou, l'arrêt des accords de coopération économique avec Israël, un embargo sur les armes et la reconnaissance de l'État de Palestine.\n\nCe sont des moyens diplomatiques et économiques, pas militaires.\n\nPour l'accusation de soutien au Hamas : rien dans le programme ne l'étaye. À traiter avec la fiche validée par l'équipe si elle existe.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 61,
+          "extrait": "Mettre en place des sanctions contre le gouvernement Netanyahou, interrompre les accords de coopération économique avec Israël et décréter un embargo sur les armes",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 61,
+          "extrait": "Reconnaître l’État de Palestine",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        }
+      ]
+    },
+    {
+      "intitule": "Mélenchon est antisémite",
+      "reformulations": [
+        "LFI est antisémite",
+        "Ses blagues sur Epstein et Glucksmann",
+        "LFI a un problème avec l'antisémitisme"
+      ],
+      "theme": null,
+      "reponse_courte": "Mélenchon a toujours rejeté ces accusations, et aucun élu insoumis n'a été condamné pour antisémitisme. Le programme prévoit un plan interministériel contre l'antisémitisme et l'islamophobie, et la protection renforcée des synagogues comme des mosquées.",
+      "reponse_detaillee": "Sur les faits : Jean-Luc Mélenchon a toujours nié toute intention antisémite et juge ces accusations intolérables ; les insoumis rappellent qu'aucun de leurs élus n'a été condamné par la justice pour des propos antisémites, et dénoncent une instrumentalisation de l'antisémitisme à des fins politiques. Un montage trompeur diffusé sur France Culture, qui lui prêtait des propos antisémites, a été dénoncé par les salariés de la station.\n\nSur le fond, le programme prévoit un plan interministériel pour analyser, prévenir et combattre l'antisémitisme et l'islamophobie, et le renforcement de la protection policière des lieux de culte, synagogues comme mosquées.\n\nPrudence : ne pas minimiser l'antisémitisme ni répondre par une attaque ; certaines formules ont été critiquées jusque dans la presse de gauche.",
+      "points_appui": [
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 40,
+          "extrait": "Mettre en place un plan interministériel pour analyser, prévenir et lutter contre l’islamophobie et l’antisémitisme en France",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        },
+        {
+          "type": "programme",
+          "titre": "Programme site 2025 (PDF, ancienne édition)",
+          "url": "https://melenchon2027.fr/wp-content/uploads/2025/02/A5-PROGRAMME-SITE.pdf",
+          "page": 40,
+          "extrait": "Assurer la sécurité des lieux cultuels et culturels de notre pays en renforçant si nécessaire toutes les mesures de protection policières dont ils bénéficient du fait des attaques et menaces contre des mosquées et des synagogues",
+          "note": "Ancienne édition, écartée par le bot : retrouver la même mesure dans le livre 2026 avant validation."
+        },
+        {
+          "type": "presse",
+          "titre": "La Libre (AFP) – « Epstine » : Mélenchon à nouveau accusé d'antisémitisme",
+          "url": "https://www.lalibre.be/dernieres-depeches/2026/02/27/epstine-melenchon-a-nouveau-accuse-dantisemitisme-2LRZERWQEJCCJOANMYVMPPTT7E/"
+        },
+        {
+          "type": "presse",
+          "titre": "Public Sénat – Mélenchon dénonce une « accusation ignoble »",
+          "url": "https://www.publicsenat.fr/actualites/politique/antisemitisme-melenchon-denonce-une-accusation-ignoble-des-macronistes-138062"
+        },
+        {
+          "type": "presse",
+          "titre": "Politis – Mélenchon ou la stratégie du pire (critique venue de la gauche)",
+          "url": "https://www.politis.fr/articles/2026/03/parti-pris-melenchon-ou-la-strategie-du-pire/"
+        }
+      ]
+    },
+    {
+      "intitule": "LFI est complice de la violence de la Jeune Garde",
+      "reformulations": [
+        "LFI a du sang sur les mains",
+        "Mort de Quentin à Lyon",
+        "LFI couvre l'ultragauche violente"
+      ],
+      "theme": "securite_justice",
+      "reponse_courte": "Une enquête judiciaire est en cours. Ni Jean-Luc Mélenchon ni la direction de LFI n'y sont mis en cause, et le service d'ordre de LFI n'est pas impliqué.",
+      "reponse_detaillee": "Brouillon à valider avec soin, idéalement avec un avis juridique : l'affaire est en cours d'instruction.\n\nCe que disent les sources : un collaborateur d'un député LFI a été mis en examen ; ni Jean-Luc Mélenchon, ni la direction de LFI, ni le groupe parlementaire ne sont visés par l'enquête, et LFI indique que son service d'ordre n'est pas impliqué. Les responsables insoumis dénoncent une instrumentalisation de ce drame à l'approche des élections.\n\nPoint difficile : Jean-Luc Mélenchon a assumé publiquement un rapprochement avec la Jeune Garde. Ne rien affirmer sur l'enquête au-delà des faits établis, et ne jamais minimiser la mort d'une personne.",
+      "points_appui": [
+        {
+          "type": "presse",
+          "titre": "Le Temps – Après la mort d'un jeune proche de l'extrême droite à Lyon, LFI sur le banc des accusés",
+          "url": "https://www.letemps.ch/monde/europe/apres-la-mort-d-un-jeune-proche-de-l-extreme-droite-a-lyon-le-parti-de-jean-luc-melenchon-est-sur-le-banc-des-accuses"
+        },
+        {
+          "type": "presse",
+          "titre": "Lyon Capitale – Mélenchon défend la Jeune Garde et charge la presse",
+          "url": "https://www.lyoncapitale.fr/actualite/municipales-a-lyon-melenchon-defend-la-jeune-garde-et-charge-la-presse"
+        },
+        {
+          "type": "presse",
+          "titre": "Thomas Guénolé – Le grand retour du Mélenchon-bashing (lecture favorable à LFI)",
+          "url": "https://thomasguenole.substack.com/p/le-grand-retour-du-melenchon-bashing"
+        }
+      ]
+    },
+    {
+      "intitule": "Mélenchon ne peut pas gagner au second tour",
+      "reformulations": [
+        "Voter Mélenchon, c'est faire gagner le RN",
+        "Il a un plafond de verre",
+        "Il est trop rejeté"
+      ],
+      "theme": null,
+      "reponse_courte": "L'élection se joue sur la participation : la moitié des électeurs des quartiers populaires ne vote pas. L'objectif est de faire passer la participation de 50 à 80 %. En 2022, il n'a manqué qu'environ 420 000 voix pour le second tour.",
+      "reponse_detaillee": "Les sondages à plusieurs mois du scrutin mesurent mal un électorat qui se mobilise tard. Le pari de la campagne est la participation : l'abstention est la plus forte dans les quartiers populaires, chez les jeunes et dans les Outre-mer, ceux qui ont le plus intérêt au programme. Manuel Bompard : « Notre plan, c'est de passer de 50 à 80 % de participation. »\n\nEn 2022, il a manqué environ 420 000 voix pour accéder au second tour. Sur le « plafond de verre », Manuel Bompard répond : « Un plafond de verre, c'est quand on fait cinq élections et qu'on est bloqué à 47 %. »\n\nÀ dire honnêtement si on insiste : les sondages actuels de second tour sont défavorables, c'est l'enjeu de la campagne.",
+      "points_appui": [
+        {
+          "type": "presse",
+          "titre": "Public Sénat – « Notre plan, c'est de passer de 50 à 80 % de participation »",
+          "url": "https://www.publicsenat.fr/actualites/politique/melenchon-a-la-recherche-des-electeurs-perdus-notre-plan-c-est-de-passer-de-50-a"
+        },
+        {
+          "type": "presse",
+          "titre": "Public Sénat – LFI s'ancre dans les quartiers populaires (plafond de verre)",
+          "url": "https://www.publicsenat.fr/actualites/politique/municipales-malgre-la-deception-de-toulouse-lfi-sancre-dans-les-quartiers-populaires"
+        },
+        {
+          "type": "presse",
+          "titre": "Fondation Jean-Jaurès – Les abstentionnistes ultramarins",
+          "url": "https://www.jean-jaures.org/publication/les-abstentionnistes-ultra-marins-lautre-armee-de-reserve-que-lfi-cherche-a-mobiliser/"
+        }
+      ]
+    },
+    {
+      "intitule": "Mélenchon divise la gauche en refusant la primaire",
+      "reformulations": [
+        "Il aurait dû faire l'union",
+        "Il préfère perdre seul",
+        "Pourquoi pas une candidature commune avec Glucksmann ou Ruffin ?"
+      ],
+      "theme": null,
+      "reponse_courte": "Une union n'a de sens que sur un programme commun clair. La primaire a désigné un candidat sur une ligne opposée à LFI ; le programme de rupture est porté par la candidature soutenue par environ 450 000 personnes.",
+      "reponse_detaillee": "Brouillon : à compléter par l'équipe avec la ligne officielle.\n\nSelon les insoumis, une alliance électorale sans programme commun mène à la trahison des électeurs. La primaire de 2026 a été remportée par Raphaël Glucksmann sur une ligne explicitement opposée à LFI, avec environ 70 000 voix sur 120 000 votants, quand la candidature de Jean-Luc Mélenchon revendique près de 450 000 soutiens.\n\nPoint sensible : la dureté de certains propos de Mélenchon envers ses anciens partenaires est elle-même critiquée.",
+      "points_appui": [
+        {
+          "type": "presse",
+          "titre": "Politis – Glucksmann, la gauche en moins",
+          "url": "https://www.politis.fr/articles/2026/10/parti-pris-glucksmann-la-gauche-en-moins/"
+        },
+        {
+          "type": "presse",
+          "titre": "Politis – Tribune : une victoire de Mélenchon, première condition des victoires sociales",
+          "url": "https://www.politis.fr/articles/2026/07/tribune-une-victoire-de-melenchon-est-la-premiere-condition-pour-obtenir-des-victoires-sociales-et-ecologiques/"
+        },
+        {
+          "type": "presse",
+          "titre": "Libre Journal – Laurent Joffrin, la charge de Mélenchon contre l'union (critique)",
+          "url": "https://librejournal.fr/article/vive-lunion-de-la-gauche/"
+        }
+      ]
+    }
+  ]
+}
