@@ -45,6 +45,19 @@ export class ArguStore {
         -- Donnée sensible au sens du RGPD : visible de l'équipe seulement, jamais indexée ni montrée
         -- aux militants, effacée avec la capture (donc avec la suppression par auteur).
         ALTER TABLE aec_captures ADD COLUMN IF NOT EXISTS emetteur_profil jsonb;
+        -- Consolidation : quand elle a eu lieu (plafond quotidien), et pourquoi elle a échoué.
+        ALTER TABLE aec_captures ADD COLUMN IF NOT EXISTS traitee_le timestamptz;
+        ALTER TABLE aec_captures ADD COLUMN IF NOT EXISTS erreur text;
+        -- Même journal que les ajouts au corpus (src/corpus/store.ts), créé ici aussi s'il manque.
+        CREATE TABLE IF NOT EXISTS aec_admin_log (
+          id       bigserial PRIMARY KEY,
+          at       timestamptz NOT NULL DEFAULT now(),
+          who      text NOT NULL,
+          action   text NOT NULL,
+          doc_id   text,
+          title    text,
+          detail   text
+        );
         CREATE INDEX IF NOT EXISTS aec_captures_auteur ON aec_captures (auteur_identifiant);
         CREATE INDEX IF NOT EXISTS aec_captures_par ON aec_captures (capture_par, canal, cree_le DESC);
 
@@ -223,7 +236,8 @@ export class ArguStore {
       `SELECT id, source_type AS "sourceType", url, texte, auteur_nom AS "auteurNom",
               auteur_identifiant AS "auteurIdentifiant", publie_le AS "publieLe", extras, note,
               capture_par AS "capturePar", canal, statut, cree_le AS "creeLe",
-              emetteur_profil AS "emetteurProfil"
+              emetteur_profil AS "emetteurProfil", auteur_type AS "auteurType",
+              auteur_affiliation AS "auteurAffiliation", erreur
          FROM aec_captures WHERE id = $1`,
       [id],
     );
@@ -238,6 +252,164 @@ export class ArguStore {
       JSON.stringify(profil),
     ]);
     return (rowCount ?? 0) > 0;
+  }
+
+  /** Met à jour une capture pendant sa consolidation. `traitee` date la fin du traitement. */
+  async majCapture(
+    id: string,
+    m: { texte?: string; statut?: CaptureRow["statut"]; erreur?: string | null; auteurType?: string; auteurAffiliation?: string | null; traitee?: boolean },
+  ): Promise<void> {
+    await this.init();
+    await this.pool.query(
+      `UPDATE aec_captures SET
+         texte = COALESCE($2, texte),
+         statut = COALESCE($3, statut),
+         erreur = CASE WHEN $4::boolean THEN $5 ELSE erreur END,
+         auteur_type = COALESCE($6, auteur_type),
+         auteur_affiliation = CASE WHEN $7::boolean THEN $8 ELSE auteur_affiliation END,
+         traitee_le = CASE WHEN $9::boolean THEN now() ELSE traitee_le END
+       WHERE id = $1`,
+      [
+        id, m.texte ?? null, m.statut ?? null, m.erreur !== undefined, m.erreur ?? null, m.auteurType ?? null,
+        m.auteurAffiliation !== undefined, m.auteurAffiliation ?? null, m.traitee === true,
+      ],
+    );
+  }
+
+  /** Captures consolidées depuis minuit, heure de Paris : le plafond CONSOLIDATION_MAX_PER_DAY. */
+  async consolideesAujourdhui(): Promise<number> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT count(*)::int AS n FROM aec_captures
+        WHERE traitee_le >= (date_trunc('day', now() AT TIME ZONE 'Europe/Paris') AT TIME ZONE 'Europe/Paris')`,
+    );
+    return rows[0].n as number;
+  }
+
+  /** Captures à consolider (plafond atteint, panne), les plus anciennes d'abord. */
+  async capturesEnAttente(limit = 50): Promise<string[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      // Reçues, ou en erreur après une panne (pas un refus définitif comme un lien seul, daté traitee_le).
+      `SELECT id FROM aec_captures
+        WHERE statut = 'recue' OR (statut = 'erreur' AND traitee_le IS NULL)
+        ORDER BY cree_le LIMIT $1`,
+      [limit],
+    );
+    return rows.map((r) => r.id as string);
+  }
+
+  /**
+   * Remplace les brouillons d'une capture par ceux d'une nouvelle consolidation (relance). Les
+   * affirmations déjà validées ou rejetées par l'équipe ne sont jamais touchées.
+   */
+  async remplacerBrouillons(captureId: string, affirmations: NouvelleAffirmation[]): Promise<string[]> {
+    await this.init();
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(`DELETE FROM aec_affirmations WHERE capture_id = $1 AND statut = 'brouillon'`, [captureId]);
+      const ids: string[] = [];
+      for (const a of affirmations) {
+        const { rows } = await client.query(
+          `INSERT INTO aec_affirmations
+             (capture_id, texte, citation, types, position, theme, registre, force, publics, familles,
+              passages_programme, verification_url, a_verifier, objection_proposee_id, propositions, embedding)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16::vector)
+           RETURNING id`,
+          [
+            captureId, a.texte, a.citation, a.types, a.position, a.theme, a.registre, JSON.stringify(a.force),
+            JSON.stringify(a.publics), JSON.stringify(a.familles), JSON.stringify(a.passagesProgramme),
+            a.verificationUrl, a.aVerifier, a.propositions[0]?.id ?? null, JSON.stringify(a.propositions),
+            a.embedding ? vecteur(a.embedding) : null,
+          ],
+        );
+        ids.push(rows[0].id as string);
+      }
+      await client.query("COMMIT");
+      return ids;
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  /** Les objections les plus proches (cosinus), au-dessus du seuil, avec le nombre d'affirmations rattachées. */
+  async objectionsProches(embedding: number[], k = 3, min = 0): Promise<PropositionObjection[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT o.id, o.intitule, 1 - (o.embedding <=> $1::vector) AS score,
+              (SELECT count(*)::int FROM aec_affirmations a WHERE a.objection_id = o.id) AS rattachees
+         FROM aec_objections o
+        WHERE o.embedding IS NOT NULL AND 1 - (o.embedding <=> $1::vector) >= $3
+        ORDER BY o.embedding <=> $1::vector
+        LIMIT $2`,
+      [vecteur(embedding), k, min],
+    );
+    return rows.map((r) => ({ id: r.id, intitule: r.intitule, score: Number(r.score), rattachees: r.rattachees }));
+  }
+
+  /**
+   * La source de vérification d'un `debunk` déjà validé, proche de l'affirmation : elle peut
+   * fonder l'étiquette `fake_news` (regles.ts). Sa propre URL, sinon celle de sa capture.
+   */
+  async verificationProche(embedding: number[], min: number): Promise<string | null> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT COALESCE(a.verification_url, c.url) AS url
+         FROM aec_affirmations a JOIN aec_captures c ON c.id = a.capture_id
+        WHERE a.statut = 'validee' AND 'debunk' = ANY(a.types) AND a.embedding IS NOT NULL
+          AND COALESCE(a.verification_url, c.url) IS NOT NULL
+          AND 1 - (a.embedding <=> $1::vector) >= $2
+        ORDER BY a.embedding <=> $1::vector
+        LIMIT 1`,
+      [vecteur(embedding), min],
+    );
+    return rows[0]?.url ?? null;
+  }
+
+  async affirmations(f: { statut?: "brouillon" | "validee" | "rejetee"; captureId?: string; limit?: number } = {}): Promise<AffirmationRow[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT a.id, a.capture_id AS "captureId", a.texte, a.citation, a.types, a.position, a.theme, a.registre,
+              a.force, a.publics, a.familles, a.passages_programme AS "passagesProgramme",
+              a.verification_url AS "verificationUrl", a.a_verifier AS "aVerifier", a.propositions,
+              a.statut, a.validee_par AS "valideePar", a.cree_le AS "creeLe"
+         FROM aec_affirmations a
+        WHERE ($1::text IS NULL OR a.statut = $1) AND ($2::uuid IS NULL OR a.capture_id = $2)
+        ORDER BY a.cree_le DESC, a.id
+        LIMIT $3`,
+      [f.statut ?? null, f.captureId ?? null, f.limit ?? 50],
+    );
+    return rows;
+  }
+
+  /** Valide ou rejette une affirmation (préfixe d'identifiant accepté, s'il est unique). */
+  async deciderAffirmation(idOuPrefixe: string, statut: "validee" | "rejetee", qui: string): Promise<AffirmationRow> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT id FROM aec_affirmations WHERE id::text LIKE $1 || '%' LIMIT 2`,
+      [idOuPrefixe.toLowerCase()],
+    );
+    if (rows.length === 0) throw new Error(`Aucune affirmation ${idOuPrefixe}`);
+    if (rows.length > 1) throw new Error(`Identifiant ambigu : ${idOuPrefixe}`);
+    const id = rows[0].id as string;
+    await this.pool.query(
+      `UPDATE aec_affirmations SET statut = $2, validee_par = $3, validee_le = now() WHERE id = $1`,
+      [id, statut, qui],
+    );
+    await this.journaliser(qui, statut === "validee" ? "valider_affirmation" : "rejeter_affirmation", id);
+    return (await this.affirmations({ limit: 1000 })).find((a) => a.id === id)!;
+  }
+
+  /** Une ligne dans aec_admin_log : qui a fait quoi, quand. */
+  async journaliser(qui: string, action: string, objet?: string, detail?: string): Promise<void> {
+    await this.init();
+    await this.pool.query(`INSERT INTO aec_admin_log (who, action, doc_id, detail) VALUES ($1, $2, $3, $4)`, [
+      qui, action, objet ?? null, detail ?? null,
+    ]);
   }
 
   /** Captures faites par ce membre sur ce canal dans les dernières `heures` (quota par jeton). */
@@ -312,6 +484,53 @@ export class ArguStore {
   }
 }
 
+const vecteur = (v: number[]) => `[${v.join(",")}]`;
+
+export interface PropositionObjection {
+  id: string;
+  intitule: string;
+  score: number;
+  rattachees: number;
+}
+
+export interface NouvelleAffirmation {
+  texte: string;
+  citation: string;
+  types: string[];
+  position: "pour" | "contre" | "neutre";
+  theme: string | null;
+  registre: string | null;
+  force: Record<string, unknown>;
+  publics: { code: string; justification: string }[];
+  familles: { code: string; justification: string }[];
+  passagesProgramme: unknown[];
+  verificationUrl: string | null;
+  aVerifier: boolean;
+  propositions: PropositionObjection[];
+  embedding: number[] | null;
+}
+
+export interface AffirmationRow {
+  id: string;
+  captureId: string;
+  texte: string;
+  citation: string;
+  types: string[];
+  position: "pour" | "contre" | "neutre" | null;
+  theme: string | null;
+  registre: string | null;
+  force: Record<string, { note: number; justification: string }>;
+  publics: { code: string; justification: string }[];
+  familles: { code: string; justification: string }[];
+  passagesProgramme: unknown[];
+  verificationUrl: string | null;
+  aVerifier: boolean;
+  propositions: PropositionObjection[];
+  statut: "brouillon" | "validee" | "rejetee";
+  valideePar: string | null;
+  creeLe: Date;
+}
+
 export interface NouvelleCapture {
   sourceType: SourceType;
   url?: string;
@@ -341,6 +560,9 @@ export interface CaptureRow {
   statut: "recue" | "traitee" | "erreur";
   creeLe: Date;
   emetteurProfil: ProfilEmetteur | null;
+  auteurType: string | null;
+  auteurAffiliation: string | null;
+  erreur: string | null;
 }
 
 /**

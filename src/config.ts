@@ -47,6 +47,10 @@ const Env = z.object({
   CONSOLIDATION_MAX_PER_DAY: z.coerce.number().int().positive().default(50),
   /** Captures acceptées par jeton d'extension sur 24 heures glissantes. */
   CAPTURE_MAX_PER_TOKEN: z.coerce.number().int().positive().default(100),
+  /** Similarité (cosinus) minimale pour proposer de rattacher une affirmation à une objection existante. */
+  REGROUPEMENT_MIN_SCORE: z.coerce.number().min(0).max(1).default(0.8),
+  /** Similarité minimale pour qu'un debunk déjà validé serve de source de vérification à un « fake_news ». */
+  VERIFICATION_MIN_SCORE: z.coerce.number().min(0).max(1).default(0.85),
   /** Adresse publique du serveur, pour les liens envoyés sur Telegram (interface /admin). */
   ADMIN_BASE_URL: z.string().url().optional(),
 });

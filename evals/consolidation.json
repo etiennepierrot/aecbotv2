@@ -1,0 +1,48 @@
+{
+  "_note": "GABARIT : trois exemples fictifs pour montrer le format. À remplacer par une trentaine de captures réelles annotées à la main avant de juger un modèle. Pour chaque capture : les affirmations attendues (citation mot pour mot, types, position) et, si possible, les codes attendus pour l'émetteur (« indetermine » compris).",
+  "captures": [
+    {
+      "id": "exemple-01",
+      "capture": {
+        "source_type": "x",
+        "url": "https://x.com/exemple/status/1",
+        "texte": "La retraite à 60 ans, c'est 80 milliards par an que personne ne sait financer. Et le SMIC à 1 600 euros va tuer les petites entreprises.",
+        "auteur": { "nom": "Compte exemple", "identifiant": "@exemple" }
+      },
+      "attendu": {
+        "affirmations": [
+          { "citation": "La retraite à 60 ans, c'est 80 milliards par an que personne ne sait financer", "types": ["critique"], "position": "contre" },
+          { "citation": "le SMIC à 1 600 euros va tuer les petites entreprises", "types": ["critique"], "position": "contre" }
+        ],
+        "emetteur": { "classe_sociale": "indetermine", "orientation": "indetermine" }
+      }
+    },
+    {
+      "id": "exemple-02",
+      "capture": {
+        "source_type": "telegram_texte",
+        "texte": "Entendu au marché : « Je suis artisan, si on augmente le SMIC je ne pourrai plus embaucher mon apprenti. »"
+      },
+      "attendu": {
+        "affirmations": [
+          { "citation": "si on augmente le SMIC je ne pourrai plus embaucher mon apprenti", "types": ["objection"], "position": "contre" }
+        ],
+        "emetteur": { "classe_sociale": "artisan_commercant", "orientation": "indetermine" }
+      }
+    },
+    {
+      "id": "exemple-03",
+      "capture": {
+        "source_type": "rss",
+        "url": "https://verification.exemple.fr/article-1",
+        "texte": "Non, le programme ne prévoit pas de supprimer les heures supplémentaires : l'affirmation virale est fausse, selon notre vérification.",
+        "extras": { "verification_url": "https://verification.exemple.fr/article-1" }
+      },
+      "attendu": {
+        "affirmations": [
+          { "citation": "le programme ne prévoit pas de supprimer les heures supplémentaires", "types": ["debunk"], "position": "pour" }
+        ]
+      }
+    }
+  ]
+}

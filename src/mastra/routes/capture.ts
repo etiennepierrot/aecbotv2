@@ -1,3 +1,4 @@
+import type { Mastra } from "@mastra/core";
 import { registerApiRoute } from "@mastra/core/server";
 import type { Context } from "hono";
 import { enregistrerCapture, type CaptureDeps } from "../../argu/capture.js";
@@ -55,11 +56,27 @@ export function captureConfigHandler(deps: () => Pick<CaptureRouteDeps, "store">
 
 type Logger = { error: (msg: string, meta?: object) => void };
 
+/** Lance le workflow consolidation sur une capture, sans l'attendre. */
+export function lanceur(mastra: Mastra) {
+  return async (captureId: string, relance = false) => {
+    const run = await mastra.getWorkflow("consolidation").createRun();
+    return run.start({ inputData: { captureId, relance } });
+  };
+}
+
 export function captureRoutes(logger?: Logger) {
-  // Le workflow consolidation (étape 2) sera lancé ici par lancerConsolidation.
-  const deps = (): CaptureRouteDeps => ({ store: arguStore(), maxParJeton: config().CAPTURE_MAX_PER_TOKEN, logger });
+  const deps = (mastra?: Mastra) => (): CaptureRouteDeps => ({
+    store: arguStore(),
+    maxParJeton: config().CAPTURE_MAX_PER_TOKEN,
+    logger,
+    lancerConsolidation: mastra ? lanceur(mastra) : undefined,
+  });
   return [
-    registerApiRoute("/capture", { method: "POST", requiresAuth: false, handler: captureHandler(deps) }),
-    registerApiRoute("/capture/config", { method: "GET", requiresAuth: false, handler: captureConfigHandler(deps) }),
+    registerApiRoute("/capture", {
+      method: "POST",
+      requiresAuth: false,
+      createHandler: async ({ mastra }) => captureHandler(deps(mastra)),
+    }),
+    registerApiRoute("/capture/config", { method: "GET", requiresAuth: false, handler: captureConfigHandler(deps()) }),
   ];
 }
