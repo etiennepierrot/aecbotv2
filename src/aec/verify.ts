@@ -19,7 +19,9 @@ export function verifyAnswer(raw: string, collector: PassageCollector): Answer {
     phrasesSansSource: 0,
   };
   const { texte: text, suites: brutes } = parseSuites(raw);
-  if (!text || /^\W*INTROUVABLE\b/i.test(text)) return introuvable(controle);
+  // En capitales, le mot suffit même collé à la suite : le modèle écrit parfois
+  // « INTROUVABLEJe ne trouve pas… », qui échappait à la fois à ce test et au contrôle de l'objet.
+  if (!text || /^\W*(?:INTROUVABLE|[Ii]ntrouvable\b)/.test(text)) return introuvable(controle);
 
   const sources: Source[] = [];
   const sourceKey = new Map<string, number>();
