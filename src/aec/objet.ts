@@ -35,17 +35,17 @@ Tu contrôles un assistant documentaire. On te donne une question et des passage
    d'une institution porte sur cette mesure ou cette institution : « La ministre quittera-t-elle
    son poste si le référendum d'initiative citoyenne est adopté ? » porte sur le référendum
    d'initiative citoyenne. Le programme ne parle pas des intentions des personnes.
+   Une question qui demande si le programme va quitter, supprimer ou privatiser une institution
+   porte sur ce que le programme fait de cette institution, pas sur le seul geste nommé :
+   « Le programme veut-il supprimer le Sénat ? » porte sur ce que le programme prévoit pour le Sénat.
+   Un passage qui dit que le programme garde l'institution, la réforme, renégocie ses règles ou
+   leur désobéit traite donc de cet objet, même s'il n'emploie pas le mot de la question.
 2. Dis si au moins un passage traite de CET objet lui-même : il le nomme, ou décrit une mesure qui
    porte directement sur lui. Un passage qui traite seulement du même thème, ou d'une mesure voisine,
    ne compte pas.
 Exemples hors sujet : une question sur les radars automatiques et un passage sur les transports en
 commun ; une question sur la réforme de l'orthographe et un passage sur les moyens de l'école.
 Exemple qui compte : une question sur la durée d'un mandat et un passage qui décrit ce mandat.
-Une question qui demande si le programme fera quelque chose d'une institution (la quitter, la
-supprimer, la privatiser) porte sur ce que le programme fait de cette institution : un passage qui
-dit qu'il la garde, la réforme, renégocie ses règles ou leur désobéit traite de cet objet, même
-sans le mot de la question. Exemple qui compte : « Le programme veut-il supprimer le Sénat ? » et un
-passage qui décrit ce que deviendra le Sénat.
 Tu réponds en JSON.`.trim(),
   model: CHECK_MODEL,
   defaultOptions: { modelSettings: { temperature: 0 } },
