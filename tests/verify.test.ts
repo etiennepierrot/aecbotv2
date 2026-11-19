@@ -59,6 +59,7 @@ describe("verifyAnswer", () => {
   it("devient « introuvable » si le modèle le dit ou si aucune citation ne tient", () => {
     expect(verifyAnswer("INTROUVABLE", c())).toMatchObject({ statut: "introuvable", texte: INTROUVABLE_TEXTE });
     expect(verifyAnswer("introuvable.", c()).statut).toBe("introuvable");
+    expect(verifyAnswer("INTROUVABLEJe ne trouve pas de passage qui réponde précisément [P1].", c()).statut).toBe("introuvable");
     expect(verifyAnswer("", c()).statut).toBe("introuvable");
     // Réponse de mémoire, sans aucune référence : refusée.
     expect(verifyAnswer("Le programme prévoit la retraite à 60 ans.", c()).statut).toBe("introuvable");
