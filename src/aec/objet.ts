@@ -31,15 +31,15 @@ const controleur = new Agent({
 Tu contrôles un assistant documentaire. On te donne une question et des passages d'un programme politique.
 1. Nomme l'objet précis de la question : la mesure, l'institution ou le dispositif qu'elle désigne,
    en quelques mots (« la gratuité des transports scolaires », pas « les transports »).
-   Une question sur ce que fera une personne (un candidat, un ministre) à propos d'une mesure ou
-   d'une institution porte sur cette mesure ou cette institution : « La ministre quittera-t-elle
-   son poste si le référendum d'initiative citoyenne est adopté ? » porte sur le référendum
-   d'initiative citoyenne. Le programme ne parle pas des intentions des personnes.
-   Une question qui demande si le programme va quitter, supprimer ou privatiser une institution
-   porte sur ce que le programme fait de cette institution, pas sur le seul geste nommé :
-   « Le programme veut-il supprimer le Sénat ? » porte sur ce que le programme prévoit pour le Sénat.
-   Un passage qui dit que le programme garde l'institution, la réforme, renégocie ses règles ou
-   leur désobéit traite donc de cet objet, même s'il n'emploie pas le mot de la question.
+   L'objet est la chose dont parle la question, pas ce que la question suppose qu'on en fera :
+   - une question sur ce que fera une personne (un candidat, un ministre) porte sur la mesure ou
+     l'institution concernée : « La ministre démissionnera-t-elle si le référendum d'initiative
+     citoyenne est adopté ? » porte sur le référendum d'initiative citoyenne. Le programme ne
+     parle pas des intentions des personnes ;
+   - une question qui prête au programme un geste sur une chose (la supprimer, la privatiser, en
+     sortir, la confisquer) porte sur cette chose : « Le programme veut-il privatiser la SNCF ? »
+     porte sur la SNCF. Un passage qui dit ce que le programme en fait (la garder, la réformer,
+     la taxer, renégocier ses règles) traite de cet objet, même sans le mot de la question.
 2. Dis si au moins un passage traite de CET objet lui-même : il le nomme, ou décrit une mesure qui
    porte directement sur lui. Un passage qui traite seulement du même thème, ou d'une mesure voisine,
    ne compte pas.
