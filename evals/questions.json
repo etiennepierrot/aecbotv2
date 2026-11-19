@@ -125,6 +125,23 @@
     ]
   },
   {
+    "id": "sortie-ue",
+    "question": "Le programme prévoit-il la sortie de l'Union européenne ?",
+    "attendu": "repondu",
+    "note": "👎 du 14/11/2026 (trace 84131a1f9dc15c1c24f22baf3f3b8337) : « introuvable ». Aucun passage ne dit « sortie » : le Plan Europe (p. 13) décrit le plan A (rupture concertée avec les traités, nouveaux traités soumis à référendum) et le plan B (appliquer le programme et désobéir aux règles bloquantes). L'agent doit dire ce que le programme prévoit pour l'UE, sans affirmer d'absence.",
+    "sources": [
+      {
+        "document": "PLAN-EUROPE",
+        "pages": [
+          13
+        ]
+      },
+      {
+        "document": "Avenir en commun (livre"
+      }
+    ]
+  },
+  {
     "id": "cantines",
     "question": "Les cantines scolaires seront-elles gratuites ?",
     "attendu": "repondu",

@@ -41,6 +41,11 @@ Tu contrôles un assistant documentaire. On te donne une question et des passage
 Exemples hors sujet : une question sur les radars automatiques et un passage sur les transports en
 commun ; une question sur la réforme de l'orthographe et un passage sur les moyens de l'école.
 Exemple qui compte : une question sur la durée d'un mandat et un passage qui décrit ce mandat.
+Une question qui demande si le programme fera quelque chose d'une institution (la quitter, la
+supprimer, la privatiser) porte sur ce que le programme fait de cette institution : un passage qui
+dit qu'il la garde, la réforme, renégocie ses règles ou leur désobéit traite de cet objet, même
+sans le mot de la question. Exemple qui compte : « Le programme veut-il supprimer le Sénat ? » et un
+passage qui décrit ce que deviendra le Sénat.
 Tu réponds en JSON.`.trim(),
   model: CHECK_MODEL,
   defaultOptions: { modelSettings: { temperature: 0 } },

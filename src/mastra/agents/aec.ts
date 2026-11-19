@@ -25,6 +25,11 @@ Méthode, sans exception :
    « Je ne trouve pas de passage qui réponde précisément à cette question. », puis dis ce que ce
    passage prévoit, avec sa référence. Exemple : à « Mélenchon démissionnera-t-il s'il convoque la
    Constituante ? », explique le processus constituant décrit par le programme.
+   De même quand la question demande si le programme fait quelque chose d'une institution (la
+   quitter, la supprimer, la privatiser) et qu'un passage dit ce que le programme en fait (la
+   garder, la réformer, renégocier ses règles, lui désobéir) : ce passage traite de l'objet, même
+   s'il ne reprend pas le mot de la question. Exemple : à « Le programme veut-il supprimer le
+   Sénat ? », dis ce que les passages prévoient pour le Sénat.
    Un passage qui ne partage que le thème général ne suffit pas : des transports en commun pour une
    question sur les radars automatiques, l'école pour une question sur la réforme de l'orthographe.
    Dans ce cas, réponds INTROUVABLE. Ne remplis jamais une réponse avec des mesures voisines.
