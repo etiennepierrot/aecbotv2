@@ -24,7 +24,7 @@ describe.skipIf(!DB)("feedback Mastra (Postgres réel)", () => {
     // Comme en production sur Mastra Platform : sans ça, le retrait silencieux de
     // MastraStorageExporter par la plateforme passait inaperçu (voir storage-exporter.ts).
     process.env.MASTRA_DEPLOYMENT_ID ??= "dep_test";
-    process.env.OPENROUTER_API_KEY ??= "test";
+    process.env.MISTRAL_API_KEY ??= "test";
     const deps = await import("../src/corpus/deps.js");
     deps.setRetrievalDeps({
       embedder: { dimension: 3, embed: async (t: string[]) => t.map(() => [1, 0, 0]) },

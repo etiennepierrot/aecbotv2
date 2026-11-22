@@ -1,6 +1,6 @@
 import { Agent } from "@mastra/core/agent";
 import { z } from "zod";
-import { defaultModels } from "../config.js";
+import { DEFAULT_MODELS } from "../config.js";
 import type { ReferencedPassage } from "./types.js";
 
 /** La phrase par laquelle l'agent annonce une réponse partielle (règle 4 de ses instructions). */
@@ -19,7 +19,7 @@ export interface VerdictObjet {
 export type ControleObjet = (question: string, passages: ReferencedPassage[]) => Promise<VerdictObjet>;
 
 /** Modèle du contrôle : AEC_CHECK_MODEL, sinon le juge des évals (le contrôle est rare, il doit être sûr). */
-export const CHECK_MODEL = process.env.AEC_CHECK_MODEL?.trim() || defaultModels().judge;
+export const CHECK_MODEL = process.env.AEC_CHECK_MODEL?.trim() || DEFAULT_MODELS.judge;
 
 const verdictSchema = z.object({ objet: z.string(), traite: z.boolean(), raison: z.string() });
 

@@ -1,6 +1,6 @@
 import { PgVector } from "@mastra/pg";
 import { config, EMBEDDING_DIMENSION, PASSAGES_INDEX } from "../config.js";
-import { embedderFromKeys, type Embedder } from "./embed.js";
+import { MistralEmbedder, type Embedder } from "./embed.js";
 import { textSearchFrom, type TextSearch } from "./fulltext.js";
 import { CompositeSource, EDITION_2022, StaticSource } from "./sources.js";
 import { CorpusStore } from "./store.js";
@@ -84,6 +84,5 @@ export function setRetrievalDeps(d: RetrievalDeps): void {
 }
 
 function embedderFromEnv(): Embedder {
-  const cfg = config();
-  return embedderFromKeys({ mistral: cfg.MISTRAL_API_KEY, openrouter: cfg.OPENROUTER_API_KEY });
+  return new MistralEmbedder(config().MISTRAL_API_KEY);
 }

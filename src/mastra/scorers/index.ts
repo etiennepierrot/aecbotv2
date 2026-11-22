@@ -1,7 +1,7 @@
 import { createScorer, notScorable } from "@mastra/core/evals";
 import { z } from "zod";
 import type { Answer, ReferencedPassage } from "../../aec/types.js";
-import { defaultModels } from "../../config.js";
+import { DEFAULT_MODELS } from "../../config.js";
 import { correspondA, type SourceAttendue } from "../../aec/sources-attendues.js";
 
 /** Ce que les scorers évaluent : une réponse vérifiée et les passages vus par l'agent. */
@@ -47,7 +47,7 @@ export const sourceAttendueScorer = createScorer<{ question: string }, ScoredRun
 });
 
 /** Le juge : un modèle plus fort que celui qui répond, idéalement. */
-export const DEFAULT_JUDGE_MODEL = process.env.AEC_JUDGE_MODEL?.trim() || defaultModels().judge;
+export const DEFAULT_JUDGE_MODEL = process.env.AEC_JUDGE_MODEL?.trim() || DEFAULT_MODELS.judge;
 
 /**
  * Fidélité aux sources (juge LLM) : chaque phrase de la réponse est-elle

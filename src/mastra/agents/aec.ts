@@ -1,9 +1,9 @@
 import { Agent } from "@mastra/core/agent";
-import { defaultModels } from "../../config.js";
+import { DEFAULT_MODELS } from "../../config.js";
 import { rechercheTool } from "../tools/recherche.js";
 
 /** Modèle de réponse par défaut ; comparer d'autres modèles avec `pnpm evals --model …`. */
-export const DEFAULT_MODEL = process.env.AEC_MODEL?.trim() || defaultModels().answer;
+export const DEFAULT_MODEL = process.env.AEC_MODEL?.trim() || DEFAULT_MODELS.answer;
 
 /** Plafond de sortie par appel du modèle : borne le coût d'une question, même détournée. */
 export const MAX_OUTPUT_TOKENS = 1000;
