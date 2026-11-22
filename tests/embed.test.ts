@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { assertModelKey, DEFAULT_MODELS } from "../src/config.js";
-import { mistralEmbedder, OpenAICompatibleEmbedder } from "../src/corpus/embed.js";
+import { MistralEmbedder } from "../src/corpus/embed.js";
 
 function fakeApi(dimension = 1024) {
   const calls: { url: string; body: any; auth: string | null }[] = [];
@@ -17,9 +17,7 @@ function fakeApi(dimension = 1024) {
 describe("embeddings", () => {
   it("bon point d'accès, bon modèle, ordre respecté, lots de 32", async () => {
     const api = fakeApi();
-    const e = new OpenAICompatibleEmbedder({
-      baseUrl: "https://api.mistral.ai/v1/", apiKey: "sk-m", model: "mistral-embed", fetchImpl: api.fetchImpl,
-    });
+    const e = new MistralEmbedder("sk-m", api.fetchImpl);
     const v = await e.embed(Array.from({ length: 40 }, (_, i) => `t${i}`));
     expect(api.calls.map((c) => [c.url, c.body.model, c.body.input.length, c.auth])).toEqual([
       ["https://api.mistral.ai/v1/embeddings", "mistral-embed", 32, "Bearer sk-m"],
@@ -30,14 +28,14 @@ describe("embeddings", () => {
 
   it("refuse des vecteurs de la mauvaise dimension (mauvais modèle)", async () => {
     const api = fakeApi(1536);
-    const e = new OpenAICompatibleEmbedder({ baseUrl: "https://x/v1", apiKey: "k", model: "m", fetchImpl: api.fetchImpl });
+    const e = new MistralEmbedder("k", api.fetchImpl);
     await expect(e.embed(["a"])).rejects.toThrow(/réponse inattendue/);
   });
 
   it("Mistral par défaut, et une clé obligatoire pour les embeddings", () => {
-    expect(() => mistralEmbedder(undefined)).toThrow(/MISTRAL_API_KEY manquante/);
-    expect(() => mistralEmbedder("  ")).toThrow(/MISTRAL_API_KEY manquante/);
-    expect(mistralEmbedder("k").dimension).toBe(1024);
+    expect(() => new MistralEmbedder(undefined)).toThrow(/MISTRAL_API_KEY manquante/);
+    expect(() => new MistralEmbedder("  ")).toThrow(/MISTRAL_API_KEY manquante/);
+    expect(new MistralEmbedder("k").dimension).toBe(1024);
     expect(DEFAULT_MODELS).toEqual({ answer: "mistral/mistral-small-latest", judge: "mistral/mistral-medium-latest" });
   });
 
