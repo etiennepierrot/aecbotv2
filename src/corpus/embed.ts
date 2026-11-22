@@ -14,9 +14,8 @@ export interface EmbedderConfig {
 }
 
 /**
- * Embeddings `mistral-embed` (1024 dimensions), via l'API Mistral ou via OpenRouter :
- * même modèle, mêmes vecteurs, donc le même index sert dans les deux cas. Les questions
- * des militants passent aussi par ici.
+ * Embeddings `mistral-embed` (1024 dimensions) par une API au format OpenAI, ici celle de
+ * Mistral. Les questions des militants passent aussi par ici.
  */
 export class OpenAICompatibleEmbedder implements Embedder {
   readonly dimension: number;
@@ -56,18 +55,10 @@ export class OpenAICompatibleEmbedder implements Embedder {
   }
 }
 
-/** Mistral en direct si MISTRAL_API_KEY est fourni, sinon OpenRouter (même modèle). */
-export function embedderFromKeys(keys: { mistral?: string; openrouter?: string }): Embedder {
-  if (keys.mistral) {
-    return new OpenAICompatibleEmbedder({
-      baseUrl: "https://api.mistral.ai/v1", apiKey: keys.mistral, model: "mistral-embed", label: "Mistral",
-    });
-  }
-  if (keys.openrouter) {
-    return new OpenAICompatibleEmbedder({
-      baseUrl: "https://openrouter.ai/api/v1", apiKey: keys.openrouter, model: "mistralai/mistral-embed-2312",
-      label: "OpenRouter",
-    });
-  }
-  throw new Error("Ni MISTRAL_API_KEY ni OPENROUTER_API_KEY : impossible de calculer les embeddings");
+/** `mistral-embed` par l'API Mistral. */
+export function mistralEmbedder(apiKey: string | undefined): Embedder {
+  if (!apiKey?.trim()) throw new Error("MISTRAL_API_KEY manquante : impossible de calculer les embeddings");
+  return new OpenAICompatibleEmbedder({
+    baseUrl: "https://api.mistral.ai/v1", apiKey, model: "mistral-embed", label: "Mistral",
+  });
 }

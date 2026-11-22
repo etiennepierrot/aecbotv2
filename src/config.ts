@@ -2,9 +2,8 @@ import { z } from "zod";
 
 const Env = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL manquant"),
+  /** Clé de l'API Mistral (la Plateforme) : modèles de réponse, juge et embeddings. */
   MISTRAL_API_KEY: z.string().optional(),
-  /** Alternative à MISTRAL_API_KEY : mêmes modèles Mistral, servis via OpenRouter. */
-  OPENROUTER_API_KEY: z.string().optional(),
   WP_BASE_URL: z.string().url().default("https://melenchon2027.fr"),
   INGEST_CRON: z.string().optional(),
   /**
@@ -55,25 +54,26 @@ export type AppConfig = z.infer<typeof Env>;
 
 let cached: AppConfig | undefined;
 
-/** Les modèles Mistral par défaut, en direct ou via OpenRouter selon la clé disponible. */
-export function defaultModels(env: NodeJS.ProcessEnv = process.env) {
-  const viaOpenRouter = !env.MISTRAL_API_KEY && !!env.OPENROUTER_API_KEY;
-  return viaOpenRouter
-    ? { answer: "openrouter/mistralai/mistral-small-2603", judge: "openrouter/mistralai/mistral-medium-3-5" }
-    : { answer: "mistral/mistral-small-latest", judge: "mistral/mistral-medium-latest" };
-}
+/**
+ * Modèles Mistral par défaut, servis par l'API Mistral. Les alias « -latest » suivent les nouvelles
+ * versions : en production, figer une version datée via AEC_MODEL, AEC_JUDGE_MODEL et AEC_CHECK_MODEL.
+ */
+export const DEFAULT_MODELS = {
+  answer: "mistral/mistral-small-latest",
+  judge: "mistral/mistral-medium-latest",
+} as const;
 
 /** Échoue tout de suite, avec un message clair, si la clé du fournisseur d'un modèle manque. */
 export function assertModelKey(model: string, env: NodeJS.ProcessEnv = process.env): void {
-  const needs: Record<string, string> = { mistral: "MISTRAL_API_KEY", openrouter: "OPENROUTER_API_KEY", openai: "OPENAI_API_KEY" };
+  const needs: Record<string, string> = { mistral: "MISTRAL_API_KEY", openai: "OPENAI_API_KEY" };
   const provider = model.split("/")[0] ?? "";
   const key = needs[provider];
   if (key && !env[key]?.trim()) {
     const origine =
       env.AEC_MODEL?.trim() === model || env.AEC_JUDGE_MODEL?.trim() === model
         ? "imposé par AEC_MODEL ou AEC_JUDGE_MODEL"
-        : "choisi par défaut car ni MISTRAL_API_KEY ni OPENROUTER_API_KEY ne sont renseignées";
-    const presentes = ["MISTRAL_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY"].filter((k) => env[k]?.trim());
+        : "modèle par défaut";
+    const presentes = ["MISTRAL_API_KEY", "OPENAI_API_KEY"].filter((k) => env[k]?.trim());
     throw new Error(
       `Le modèle « ${model} » (${origine}) demande ${key}, absente de l'environnement. ` +
         `Clés présentes : ${presentes.join(", ") || "aucune"}. ` +

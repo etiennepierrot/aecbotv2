@@ -20,7 +20,7 @@ Prérequis : Node ≥ 22.13, pnpm (`corepack enable`), Docker.
 
 ```bash
 pnpm install
-cp .env.example .env          # renseigner MISTRAL_API_KEY ou OPENROUTER_API_KEY
+cp .env.example .env          # renseigner MISTRAL_API_KEY
 pnpm db:up                    # Postgres 17 + pgvector
 pnpm ingest --limit 3         # essai sur 3 documents
 pnpm ingest                   # scan complet
@@ -37,19 +37,25 @@ Pour `pnpm bot`, remplir aussi `PSEUDONYM_SECRET` (32 caractères au moins, par 
 
 Dans Studio, le workflow `ingest` montre chaque étape et chaque document traité.
 
-## Clés de modèles : Mistral ou OpenRouter
+## Modèles : l'API Mistral
 
-Une seule clé suffit :
+Tous les modèles passent par l'API Mistral (traitement dans l'UE), avec une seule clé,
+`MISTRAL_API_KEY`. Les modèles se choisissent avec des chaînes `fournisseur/modèle` du routeur
+de Mastra (`src/config.ts`), qui lit la clé du fournisseur dans l'environnement :
 
-- `MISTRAL_API_KEY` : Mistral en direct, traitement dans l'UE. Préférée si les deux sont présentes.
-- `OPENROUTER_API_KEY` : les mêmes modèles Mistral via OpenRouter (`mistralai/mistral-embed-2312`
-  pour les embeddings, `openrouter/mistralai/mistral-small-2603` pour répondre,
-  `openrouter/mistralai/mistral-medium-3-5` pour le juge). Les vecteurs sont ceux de
-  `mistral-embed` dans les deux cas : on peut passer de l'un à l'autre sans réindexer.
+| Usage | Par défaut | Variable |
+|---|---|---|
+| Réponse (agent) | `mistral/mistral-small-latest` | `AEC_MODEL` |
+| Juge de fidélité (évals) | `mistral/mistral-medium-latest` | `AEC_JUDGE_MODEL` |
+| Contrôle de l'objet (réponses partielles, en production) | le juge | `AEC_CHECK_MODEL` |
+| Embeddings | `mistral-embed` (1024 dim.) | — |
 
-Via OpenRouter, les questions transitent par un intermédiaire de plus. OpenRouter ne garde pas
-les prompts par défaut ; le routage limité à l'Europe est réservé à ses offres Business et
-Enterprise. À trancher avant d'ouvrir le bot au-delà d'un groupe test.
+Les alias `-latest` suivent les nouvelles versions de Mistral : en production, mettre dans ces
+variables des versions datées (liste sur la console Mistral), et ne changer de version qu'après
+un passage des évals.
+
+Une clé pour la production et une autre pour les évals et le poste de développement permettent de
+lire le coût réel de la production dans le suivi de consommation de Mistral.
 
 ## Le programme : le livre 2026 (EPUB), seule version qui fait foi
 
@@ -119,7 +125,7 @@ detecter ─▶ foreach(document) ─▶ resumer
    PDF sans texte exploitable, doublons exacts (le plus récent est gardé). Les règles reproduisent
    les 75 décisions de l'ancien pipeline (`tests/classify.test.ts`).
 4. **Découper** : `MDocument`, un découpage par page pour garder `page` en métadonnée.
-5. **Indexer** : embeddings `mistral-embed` (1024 dim., Mistral ou OpenRouter) → upsert dans l'index
+5. **Indexer** : embeddings `mistral-embed` (1024 dim., API Mistral) → upsert dans l'index
    pgvector `aec_passages`, en remplaçant tous les anciens passages du document.
 
 Chaque passage porte : `docId`, `title`, `url`, `page`, `section` (livre EPUB), `category`, `corpus` (`aec2027`),
@@ -454,7 +460,7 @@ et sans attendre les tests.
    ```
    Ce premier déploiement crée le projet et `.mastra-project.json` : **commiter ce fichier**.
    Puis, dans le tableau de bord Mastra → Environments → production → Variables, renseigner :
-   `DATABASE_URL`, `OPENROUTER_API_KEY` (ou `MISTRAL_API_KEY`), `TELEGRAM_BOT_TOKEN`,
+   `DATABASE_URL`, `MISTRAL_API_KEY`, `TELEGRAM_BOT_TOKEN`,
    `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` (une nouvelle clé, propre à la production),
    `ADMIN_API_TOKEN`, `INGEST_CRON=0 3 * * *`, `PURGE_CRON=30 3 * * *`, `EDITIONS`,
    `TEAM_TELEGRAM_IDS`. Pour voir traces et votes dans Mastra Cloud : `MASTRA_PLATFORM_ACCESS_TOKEN`
@@ -466,7 +472,7 @@ et sans attendre les tests.
    fois), `MASTRA_ORG_ID` et `MASTRA_PROJECT_ID` (dans `.mastra-project.json` ou le tableau de bord),
    et la variable `PROD_URL` (l'URL du serveur, par exemple `https://<projet>.server.mastra.cloud`).
    Option : exiger une approbation manuelle avant chaque mise en production (« Required reviewers »).
-   Pour les évals : `EVALS_DATABASE_URL` (la base Neon) et `OPENROUTER_API_KEY`.
+   Pour les évals : `EVALS_DATABASE_URL` (la base Neon) et `MISTRAL_API_KEY`.
 5. **Premier remplissage de l'index** : depuis ton poste, avec `DATABASE_URL` de Neon :
    `pnpm ingest`. Ensuite le scan de nuit prend le relais.
 6. **Webhook Telegram**, une fois : `pnpm webhook <PROD_URL>` avec le token et le secret de
@@ -512,7 +518,7 @@ src/
 │  ├─ epub.ts                EPUB (livre du programme) → sections
 │  ├─ classify.ts            catégories, doublons, extraction vide
 │  ├─ chunk.ts               découpage par page
-│  ├─ embed.ts               embeddings (Mistral ou OpenRouter)
+│  ├─ embed.ts               embeddings (API Mistral)
 │  ├─ store.ts               registre aec_documents + index pgvector
 │  └─ deps.ts                assemblage (remplaçable en test)
 ├─ argu/                     argumentaire : captures, jetons, tables

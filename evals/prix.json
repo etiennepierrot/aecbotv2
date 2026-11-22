@@ -11,13 +11,5 @@
   "mistral/mistral-medium-latest": {
     "entree": null,
     "sortie": null
-  },
-  "openrouter/mistralai/mistral-small-2603": {
-    "entree": null,
-    "sortie": null
-  },
-  "openrouter/mistralai/mistral-medium-3-5": {
-    "entree": null,
-    "sortie": null
   }
 }

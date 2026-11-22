@@ -26,7 +26,6 @@ jobs:
       # Base de production (Neon) : les évals ne font que lire l'index des passages.
       DATABASE_URL: ${{ secrets.EVALS_DATABASE_URL }}
       MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
