@@ -171,6 +171,17 @@ export class BotStore {
     return new Map(rows.map((r) => [r.trace_id as string, { question: r.question as string, answer: r.answer as string }]));
   }
 
+  /** Questions posées ces `jours` derniers jours (pour le nuage de mots-clés, jamais renvoyées telles quelles). */
+  async questionsRecentes(jours: number): Promise<{ pseudo: string; content: string }[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT pseudo, content FROM aec_conversations
+        WHERE role = 'user' AND created_at > now() - make_interval(days => $1)`,
+      [jours],
+    );
+    return rows as { pseudo: string; content: string }[];
+  }
+
   async ownsTrace(pseudo: string, traceId: string): Promise<boolean> {
     return (await this.answerOf(pseudo, traceId)) !== undefined;
   }

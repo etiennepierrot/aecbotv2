@@ -343,6 +343,23 @@ caractères au plus) sont gardées, et **seulement si elles citent un passage qu
 
 Après le déploiement, `pnpm webhook:prod <URL>` met à jour le menu des commandes (ajoute `/avis`).
 
+### Nuage des mots-clés demandés
+
+`GET /stats/mots-cles` (avec `Authorization: Bearer $ADMIN_API_TOKEN`) compte les mots des
+questions posées au bot, encore en mémoire (`aec_conversations`, donc `MEMORY_DAYS` jours au plus).
+
+- Mots vides, mots interrogatifs et formules (« que propose le programme ») retirés ; casse,
+  accents et pluriel simple regroupés (« Retraites », « retraite »). Un mot compte une fois par question.
+- **Confidentialité** : seuls des comptes sortent, jamais une question, et un mot n'apparaît que s'il
+  a été employé par au moins 2 personnes distinctes (`min_personnes`, jamais moins de 2).
+- Paramètres : `jours` (défaut `MEMORY_DAYS`), `limite` (100, max 500), `min_personnes`,
+  `format=html` pour une page autonome avec le nuage (sinon JSON :
+  `{ jours, questions, minPersonnes, mots: [{ mot, questions, personnes, poids }] }`).
+
+```bash
+curl -H "Authorization: Bearer $ADMIN_API_TOKEN" "https://<serveur>/stats/mots-cles?format=html&jours=7" > nuage.html
+```
+
 ### Brancher le bot en production
 
 1. Renseigner `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` et
@@ -524,11 +541,13 @@ src/
 │  ├─ format.ts              message HTML, titres lisibles
 │  ├─ privacy.ts             pseudonymisation
 │  ├─ store.ts               compteurs et mémoire en base
+│  ├─ mots-cles.ts           mots-clés des questions, nuage HTML
 │  └─ runtime.ts             bot depuis l'environnement, webhook
 └─ mastra/
    ├─ index.ts               instance Mastra
    ├─ agents/aec.ts          instructions, modèle
    ├─ routes/capture.ts      POST /capture, GET /capture/config
+   ├─ routes/mots-cles.ts    GET /stats/mots-cles (nuage des mots demandés)
    ├─ tools/recherche.ts     outil de recherche
    ├─ scorers/index.ts       citations, statut, source attendue, fidélité
    └─ workflows/             ingest, purge
