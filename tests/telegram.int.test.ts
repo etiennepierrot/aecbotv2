@@ -71,7 +71,7 @@ describe.skipIf(!DB)("bot Telegram", () => {
 
   beforeAll(async () => {
     pool = new Pool({ connectionString: DB });
-    await pool.query("DROP TABLE IF EXISTS aec_conversations; DROP TABLE IF EXISTS aec_rate_limit;");
+    await pool.query("DROP TABLE IF EXISTS aec_conversations; DROP TABLE IF EXISTS aec_rate_limit; DROP TABLE IF EXISTS aec_questions_anonymes;");
     store = new BotStore(pool);
   });
   afterAll(() => pool.end());
@@ -492,6 +492,21 @@ describe.skipIf(!DB)("bot Telegram", () => {
     const { rows } = await pool.query("SELECT count(*)::int n FROM aec_conversations WHERE content LIKE 'vieille%'");
     expect(rows[0].n).toBe(0);
   });
+  it("copie anonymisée : sans pseudonyme, données masquées, ni purgée ni effacée par /oublier", async () => {
+    const pseudo = pseudonymize(USER_ID, SECRET);
+    await store.append(pseudo, "Ma retraite ? Rappelez-moi au 06 12 34 56 78", "réponse");
+    await pool.query("UPDATE aec_conversations SET created_at = now() - interval '31 days' WHERE pseudo = $1", [pseudo]);
+    await pool.query("UPDATE aec_questions_anonymes SET jour = current_date - 400 WHERE texte LIKE 'Ma retraite%'");
+    await store.purge(30);
+    await store.forget(pseudo);
+    expect(await store.questionsAnonymes(30)).not.toContain("Ma retraite ? Rappelez-moi au [téléphone]");
+    expect(await store.questionsAnonymes(401)).toContain("Ma retraite ? Rappelez-moi au [téléphone]");
+    const { rows } = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_name = 'aec_questions_anonymes'`,
+    );
+    expect(rows.map((r) => r.column_name).sort()).toEqual(["id", "jour", "texte"]);
+  });
+
   describe("avis généraux et réponses de l'équipe", () => {
     const TEAM_ID = 777;
     let ids = 2000;

@@ -3,11 +3,13 @@
  *
  * Confidentialité : seuls des comptes agrégés sortent d'ici, jamais une question. Un mot n'est
  * gardé que s'il a été employé par au moins `minPersonnes` personnes distinctes, pour qu'un terme
- * propre à une seule personne (un nom, une ville) ne ressorte pas.
+ * propre à une seule personne (un nom, une ville) ne ressorte pas. Sur la copie anonymisée, sans
+ * pseudonyme, ce filtre devient « au moins `minQuestions` questions ».
  */
 
 export interface QuestionPosee {
-  pseudo: string;
+  /** Absent pour la copie anonymisée. */
+  pseudo?: string;
   content: string;
 }
 
@@ -16,8 +18,8 @@ export interface MotCle {
   mot: string;
   /** Nombre de questions qui le contiennent (une fois par question). */
   questions: number;
-  /** Nombre de personnes distinctes qui l'ont employé. */
-  personnes: number;
+  /** Nombre de personnes distinctes qui l'ont employé (inconnu sur la copie anonymisée). */
+  personnes?: number;
   /** Entre 0 et 1, relatif au mot le plus demandé : la taille dans le nuage. */
   poids: number;
 }
@@ -25,6 +27,7 @@ export interface MotCle {
 export interface OptionsMotsCles {
   limite?: number;
   minPersonnes?: number;
+  minQuestions?: number;
 }
 
 /** Mots vides du français, mots interrogatifs et formules qui reviennent dans toutes les questions. */
@@ -59,7 +62,7 @@ export function mots(question: string): string[] {
     .filter((m) => m.length >= 3 && !MOTS_VIDES.has(m.normalize("NFD").replace(/\p{M}/gu, "")));
 }
 
-export function motsCles(questions: QuestionPosee[], { limite = 100, minPersonnes = 2 }: OptionsMotsCles = {}): MotCle[] {
+export function motsCles(questions: QuestionPosee[], { limite = 100, minPersonnes = 2, minQuestions = 1 }: OptionsMotsCles = {}): MotCle[] {
   const parCle = new Map<string, { questions: number; personnes: Set<string>; formes: Map<string, number> }>();
   for (const q of questions) {
     const vus = new Set<string>();
@@ -71,18 +74,19 @@ export function motsCles(questions: QuestionPosee[], { limite = 100, minPersonne
       if (vus.has(k)) continue;
       vus.add(k);
       e.questions++;
-      e.personnes.add(q.pseudo);
+      if (q.pseudo) e.personnes.add(q.pseudo);
     }
   }
+  const anonyme = questions.every((q) => !q.pseudo);
   const gardes = [...parCle.values()]
-    .filter((e) => e.personnes.size >= minPersonnes)
+    .filter((e) => e.questions >= minQuestions && (anonyme || e.personnes.size >= minPersonnes))
     .map((e) => ({
       // Forme la plus employée ; à égalité, la plus courte (le singulier).
       mot: [...e.formes].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length || a[0].localeCompare(b[0]))[0]![0],
       questions: e.questions,
-      personnes: e.personnes.size,
+      ...(anonyme ? {} : { personnes: e.personnes.size }),
     }))
-    .sort((a, b) => b.questions - a.questions || b.personnes - a.personnes || a.mot.localeCompare(b.mot, "fr"))
+    .sort((a, b) => b.questions - a.questions || (b.personnes ?? 0) - (a.personnes ?? 0) || a.mot.localeCompare(b.mot, "fr"))
     .slice(0, limite);
   const max = gardes[0]?.questions ?? 1;
   return gardes.map((m) => ({ ...m, poids: Math.round((m.questions / max) * 1000) / 1000 }));
@@ -92,14 +96,14 @@ const echapper = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 /** Page HTML autonome : le nuage, mots mélangés, taille selon le poids. */
-export function nuageHtml(motsCles: MotCle[], { jours }: { jours: number }): string {
+export function nuageHtml(motsCles: MotCle[], { jours, anonyme = false }: { jours: number; anonyme?: boolean }): string {
   // Ordre alphabétique : stable d'un appel à l'autre, et les gros mots ne sont pas tous au début.
   const ordre = [...motsCles].sort((a, b) => a.mot.localeCompare(b.mot, "fr"));
   const items = ordre
     .map((m) => {
       const taille = (0.9 + m.poids * 2.6).toFixed(2);
       const teinte = Math.round(m.poids * 4);
-      return `<li class="t${teinte}" style="font-size:${taille}rem" title="${m.questions} question(s), ${m.personnes} personne(s)">${echapper(m.mot)}</li>`;
+      return `<li class="t${teinte}" style="font-size:${taille}rem" title="${m.questions} question(s)${m.personnes === undefined ? "" : `, ${m.personnes} personne(s)`}">${echapper(m.mot)}</li>`;
     })
     .join("\n");
   return `<!doctype html>
@@ -127,7 +131,7 @@ export function nuageHtml(motsCles: MotCle[], { jours }: { jours: number }): str
 <body>
 <main>
 <h1>Mots-clés les plus demandés</h1>
-<p>${motsCles.length} mots, questions des ${jours} derniers jours. Survoler un mot pour ses chiffres.</p>
+<p>${motsCles.length} mots, questions des ${jours} derniers jours${anonyme ? " (copie anonymisée)" : ""}. Survoler un mot pour ses chiffres.</p>
 ${motsCles.length ? `<ul>\n${items}\n</ul>` : "<p>Pas encore assez de questions.</p>"}
 </main>
 </body>

@@ -48,22 +48,46 @@ describe("nuageHtml", () => {
   });
 });
 
+describe("motsCles sur la copie anonymisée", () => {
+  it("filtre au nombre de questions, sans compter les personnes", () => {
+    const r = motsCles(
+      ["retraite ?", "la retraite", "retraites", "smic", "smic"].map((content) => ({ content })),
+      { minQuestions: 3 },
+    );
+    expect(r).toEqual([{ mot: "retraite", questions: 3, poids: 1 }]);
+  });
+});
+
 describe("GET /stats/mots-cles", () => {
-  function app(questions = [q("u_a", "retraite"), q("u_b", "retraite"), q("u_c", "smic")]) {
-    const appels: number[] = [];
-    const store = { questionsRecentes: async (j: number) => (appels.push(j), questions) };
+  function app(
+    questions = [q("u_a", "retraite"), q("u_b", "retraite"), q("u_c", "smic")],
+    anonymes = ["smic", "smic", "smic", "retraite"],
+  ) {
+    const appels: string[] = [];
+    const store = {
+      questionsRecentes: async (j: number) => (appels.push(`memoire:${j}`), questions),
+      questionsAnonymes: async (j: number) => (appels.push(`anonymes:${j}`), anonymes),
+    };
     const h = new Hono().get("/stats/mots-cles", motsClesHandler(() => ({ store, memoryDays: 30 })));
     return { h, appels };
   }
 
-  it("renvoie les mots en JSON, jours bornés par MEMORY_DAYS, min_personnes jamais sous 2", async () => {
+  it("jusqu'à MEMORY_DAYS : mémoire du bot, min_personnes jamais sous 2", async () => {
     const { h, appels } = app();
-    const res = await h.request("/stats/mots-cles?jours=400&min_personnes=1");
+    const res = await h.request("/stats/mots-cles?min_personnes=1");
     expect(res.status).toBe(200);
     const body = (await res.json()) as { mots: unknown };
-    expect(appels).toEqual([30]);
-    expect(body).toMatchObject({ jours: 30, questions: 3, minPersonnes: 2 });
+    expect(appels).toEqual(["memoire:30"]);
+    expect(body).toMatchObject({ jours: 30, questions: 3, source: "memoire", minPersonnes: 2 });
     expect(body.mots).toEqual([{ mot: "retraite", questions: 2, personnes: 2, poids: 1 }]);
+  });
+
+  it("au-delà : copie anonymisée, min_questions jamais sous 3, jours bornés", async () => {
+    const { h, appels } = app();
+    const body = (await (await h.request("/stats/mots-cles?jours=99999&min_questions=1")).json()) as { mots: unknown };
+    expect(appels).toEqual(["anonymes:3650"]);
+    expect(body).toMatchObject({ jours: 3650, questions: 4, source: "anonymes", minQuestions: 3 });
+    expect(body.mots).toEqual([{ mot: "smic", questions: 3, poids: 1 }]);
   });
 
   it("renvoie une page HTML avec format=html", async () => {
