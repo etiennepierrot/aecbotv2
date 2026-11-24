@@ -14,6 +14,7 @@ import { scorers } from "./scorers/index.js";
 import { ingestDocumentWorkflow, ingestWorkflow } from "./workflows/ingest.js";
 import { purgeWorkflow } from "./workflows/purge.js";
 import { captureRoutes } from "./routes/capture.js";
+import { motsClesRoutes } from "./routes/mots-cles.js";
 
 const cfg = config();
 const logger = new PinoLogger({ name: "aecbot", level: "info" });
@@ -49,6 +50,8 @@ const apiRoutes = cfg.TELEGRAM_BOT_TOKEN
   ? [
       statusRoute,
       ...routesCapture,
+      // Nuage des mots-clés demandés : réservé à l'équipe (ADMIN_API_TOKEN), questions du bot seulement.
+      ...motsClesRoutes(),
       registerApiRoute("/telegram", {
         method: "POST",
         createHandler: async ({ mastra }) => {

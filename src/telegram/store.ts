@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import { anonymiserQuestion } from "./anonymiser.js";
 
 export interface HitResult {
   allowed: boolean;
@@ -75,6 +76,14 @@ export class BotStore {
           created_at        timestamptz NOT NULL DEFAULT now(),
           PRIMARY KEY (pseudo, prompt_message_id)
         );
+        -- Copie anonymisée des questions : ni pseudonyme, ni heure (le jour seul), données masquées.
+        -- Gardée sans limite : ni la purge ni /oublier ne s'y appliquent (aucun lien avec la personne).
+        CREATE TABLE IF NOT EXISTS aec_questions_anonymes (
+          id    bigserial PRIMARY KEY,
+          texte text NOT NULL,
+          jour  date NOT NULL DEFAULT current_date
+        );
+        CREATE INDEX IF NOT EXISTS aec_questions_anonymes_jour ON aec_questions_anonymes (jour);
       `)
       .then(() => undefined);
     return this.ready;
@@ -117,6 +126,18 @@ export class BotStore {
        VALUES ($1, 'user', $2, NULL, NULL, NULL), ($1, 'assistant', $3, $4, $5, $6)`,
       [pseudo, question, answer, traceId ?? null, spanId ?? null, suites.length ? JSON.stringify(suites) : null],
     );
+    const anonyme = anonymiserQuestion(question);
+    if (anonyme) await this.pool.query(`INSERT INTO aec_questions_anonymes (texte) VALUES ($1)`, [anonyme]);
+  }
+
+  /** Copie anonymisée des questions de ces `jours` derniers jours (jour en cours compris). */
+  async questionsAnonymes(jours: number): Promise<string[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT texte FROM aec_questions_anonymes WHERE jour > current_date - $1::int`,
+      [jours],
+    );
+    return rows.map((r) => r.texte as string);
   }
 
   /** Les suites proposées sous la réponse de cette trace, si elle a été donnée à cette personne. */
@@ -169,6 +190,17 @@ export class BotStore {
       [traceIds],
     );
     return new Map(rows.map((r) => [r.trace_id as string, { question: r.question as string, answer: r.answer as string }]));
+  }
+
+  /** Questions posées ces `jours` derniers jours (pour le nuage de mots-clés, jamais renvoyées telles quelles). */
+  async questionsRecentes(jours: number): Promise<{ pseudo: string; content: string }[]> {
+    await this.init();
+    const { rows } = await this.pool.query(
+      `SELECT pseudo, content FROM aec_conversations
+        WHERE role = 'user' AND created_at > now() - make_interval(days => $1)`,
+      [jours],
+    );
+    return rows as { pseudo: string; content: string }[];
   }
 
   async ownsTrace(pseudo: string, traceId: string): Promise<boolean> {

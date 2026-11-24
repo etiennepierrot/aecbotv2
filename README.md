@@ -343,6 +343,40 @@ caractères au plus) sont gardées, et **seulement si elles citent un passage qu
 
 Après le déploiement, `pnpm webhook:prod <URL>` met à jour le menu des commandes (ajoute `/avis`).
 
+### Copie anonymisée des questions
+
+Chaque question est aussi copiée dans `aec_questions_anonymes`, pour les statistiques au-delà de
+`MEMORY_DAYS` jours (`src/telegram/anonymiser.ts`) :
+
+- **ni pseudonyme ni heure** : le texte et le jour seulement ;
+- **masqués** : courriels, liens, comptes `@…`, téléphones, IBAN et toute suite de 6 chiffres ou plus
+  (`[courriel]`, `[téléphone]`, `[numéro]`…). Montants, années et âges restent (« 1600 euros », « 60 ans ») ;
+- **gardée sans limite** : ni la purge nocturne ni `/oublier` ne l'effacent, faute de lien avec la
+  personne. Un nom ou une adresse écrits en toutes lettres ne sont pas masqués ;
+- tant que la conversation d'origine est en mémoire (`MEMORY_DAYS` jours), le même texte s'y trouve
+  avec son pseudonyme : la copie n'est vraiment anonyme qu'une fois la conversation purgée.
+
+### Nuage des mots-clés demandés
+
+`GET /stats/mots-cles` (avec `Authorization: Bearer $ADMIN_API_TOKEN`) compte les mots des
+questions posées au bot. Jusqu'à `MEMORY_DAYS` jours, il lit la mémoire du bot (`aec_conversations`) ;
+au-delà (`jours=365` par exemple), la copie anonymisée.
+
+- Mots vides, mots interrogatifs et formules (« que propose le programme ») retirés ; casse,
+  accents et pluriel simple regroupés (« Retraites », « retraite »). Un mot compte une fois par question.
+- **Confidentialité** : seuls des comptes sortent, jamais une question. Sur la mémoire du bot, un
+  mot n'apparaît que s'il a été employé par au moins 2 personnes distinctes (`min_personnes`, jamais
+  moins de 2) ; sur la copie anonymisée, sans pseudonyme, par au moins 3 questions (`min_questions`,
+  jamais moins de 3).
+- Paramètres : `jours` (défaut `MEMORY_DAYS`, max 3650), `limite` (100, max 500), `min_personnes`, `min_questions`,
+  `format=html` pour une page autonome avec le nuage (sinon JSON :
+  `{ jours, questions, source, minPersonnes | minQuestions, mots: [{ mot, questions, personnes?, poids }] }`,
+  `personnes` absent sur la copie anonymisée).
+
+```bash
+curl -H "Authorization: Bearer $ADMIN_API_TOKEN" "https://<serveur>/stats/mots-cles?format=html&jours=7" > nuage.html
+```
+
 ### Brancher le bot en production
 
 1. Renseigner `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `PSEUDONYM_SECRET` et
@@ -524,11 +558,14 @@ src/
 │  ├─ format.ts              message HTML, titres lisibles
 │  ├─ privacy.ts             pseudonymisation
 │  ├─ store.ts               compteurs et mémoire en base
+│  ├─ mots-cles.ts           mots-clés des questions, nuage HTML
+│  ├─ anonymiser.ts          copie anonymisée des questions
 │  └─ runtime.ts             bot depuis l'environnement, webhook
 └─ mastra/
    ├─ index.ts               instance Mastra
    ├─ agents/aec.ts          instructions, modèle
    ├─ routes/capture.ts      POST /capture, GET /capture/config
+   ├─ routes/mots-cles.ts    GET /stats/mots-cles (nuage des mots demandés)
    ├─ tools/recherche.ts     outil de recherche
    ├─ scorers/index.ts       citations, statut, source attendue, fidélité
    └─ workflows/             ingest, purge
